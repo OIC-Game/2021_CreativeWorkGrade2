@@ -131,7 +131,7 @@ void CStage::Initialize()
 		for (int i = 0; i < m_EnemyCount; i++) {
 			m_EnemyArray[i].Release();
 		}
-	 	delete[] m_EnemyArray;
+		delete[] m_EnemyArray;
 		m_EnemyArray = NULL;
 	}
 	m_EnemyArray = new CEnemy[m_EnemyCount];
@@ -194,7 +194,7 @@ void CStage::Update(CPlayer& pl)
 		if (m_ScrollX > stgw - sw) {
 			m_ScrollX = stgw - sw;
 		}
-		
+
 		if (prec.Left - m_ScrollX < hsw) {
 			m_ScrollX -= hsw - (prec.Left - m_ScrollX);
 			if (m_ScrollX <= 0) {
@@ -408,29 +408,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 		if (cr.Right - m_ScrollX < -CHIPSIZE || cr.Left - m_ScrollX > sw + CHIPSIZE ||
 			cr.Bottom - m_ScrollY < -CHIPSIZE || cr.Top - m_ScrollY > sh + CHIPSIZE) continue;
 
-		if (m_BlockArray[i].CheckDirection(BlockDown) && move.y >= 0) {
-			if (m_BlockArray[i].IsAttacked() && ene != NULL) {
-				CRectangle b_trec = cr;
-				//接地判定
-				CRectangle brec = CRectangle(MOF_MIN(rb.Left, ra.Left), MOF_MIN(rb.Bottom, ra.Bottom), MOF_MAX(rb.Right, ra.Right), MOF_MAX(rb.Bottom, ra.Bottom));
-				brec.Bottom += 1;
-				brec.Expansion(-6, 0);
-
-				if (!m_BlockArray[i].CheckDirection(BlockAll) || (cr.Right <= rb.Left && cr.Right >= ra.Left) || (cr.Left >= rb.Right && cr.Left <= ra.Right)) {
-					b_trec.Bottom = b_trec.Top + 6;
-				}
-
-				if (b_trec.CollisionRect(brec)) {
-					ene->PushedUp();
-				}
-			}
-		}
-		if (m_BlockArray[i].GetType() < 0) {
-			continue;
-		}
-
 		if (move.y >= 0) {
-
 			CRectangle b_trec = cr;
 			//接地判定
 			CRectangle brec = CRectangle(MOF_MIN(rb.Left, ra.Left), MOF_MIN(rb.Bottom, ra.Bottom), MOF_MAX(rb.Right, ra.Right), MOF_MAX(rb.Bottom, ra.Bottom));
@@ -442,14 +420,19 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 			}
 
 			if (b_trec.CollisionRect(brec)) {
-				coll.og = true;
+				if (m_BlockArray[i].CheckDirection(BlockDown)) {
+					coll.og = true;
 
-				if (pl != NULL) {
-					pl->SlideMove(m_BlockArray[i].GetMove());
-				}
+					if (pl != NULL) {
+						pl->SlideMove(m_BlockArray[i].GetMove());
+					}
 
-				if (ene != NULL) {
-					ene->SlideMove(m_BlockArray[i].GetMove());
+					if (ene != NULL) {
+						if (m_BlockArray[i].IsAttacked()) { //ブロックが壊された状態
+							ene->PushedUp();
+						}
+						ene->SlideMove(m_BlockArray[i].GetMove());
+					}
 				}
 			}
 
@@ -478,6 +461,9 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 					}
 				}
 			}
+		}
+		if (m_BlockArray[i].GetType() < 0) {
+			continue;
 		}
 
 		if (move.y <= 0) {
@@ -521,7 +507,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 			CRectangle b_lrec = cr;
 			//右方向判定
 			CRectangle rrec = CRectangle(MOF_MIN(rb.Right, ra.Right), MOF_MIN(rb.Top, ra.Top), MOF_MAX(rb.Right, ra.Right), MOF_MAX(rb.Bottom, ra.Bottom));
-			rrec.Expansion(0,-6);
+			rrec.Expansion(0, -6);
 
 			if (!m_BlockArray[i].CheckDirection(BlockAll)) {
 				b_lrec.Right = b_lrec.Left + 6;
@@ -550,7 +536,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 				}
 			}
 		}
-		
+
 		if (move.x <= 0) {
 
 			CRectangle b_rrec = cr;

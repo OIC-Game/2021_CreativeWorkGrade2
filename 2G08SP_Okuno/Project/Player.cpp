@@ -97,6 +97,7 @@ void CPlayer::JumpingFn(bool btnPull)
 
 void CPlayer::Damage(bool death)
 {
+	if (m_DmgTime > 0 && !death) return;
 	if (m_TypeIdx == 0 || death) {
 		m_TypeIdx = 0;
 		m_bDead = true;
@@ -332,6 +333,10 @@ void CPlayer::CollisionStage(CCollisionData coll)
 	if (!coll.og && m_JumpStatus == OnGround) {
 		//ステータスをジャンプ状態にする
 		m_JumpStatus = Jumping;
+	}
+
+	if (coll.damage) {
+		Damage(false);
 	}
 }
 

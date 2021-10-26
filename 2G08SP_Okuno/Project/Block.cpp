@@ -77,14 +77,12 @@ void CBlock::AttackBlock(CPlayer* pl, CTexture* itemTextures)
 		if (m_Type < 0) { //表示されているブロックかどうか
 			return;
 		}
-		if (m_define->broken != 0) {
-			m_Attacked = true;
-		}
 
 		//マリオの種類がそのブロックを壊せるかどうか
 		if ((m_define->broken /* ←壊せるマリオの種類 */ & pl->GetType()) != pl->GetType()) {
 			if (m_Item == NULL)	return;
 		}
+		m_Attacked = true;
 
 		//このブロックにアイテムが含まれているか
 		if (m_Item != NULL) {

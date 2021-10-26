@@ -306,7 +306,7 @@ void CGame::Update(void) {
 				}
 				if (m_EnemyArray[i].GetType() == ENEMY_MARIO )
 				{
-					for (int j = 0; j < 10; j++)
+					for (int j = 0; j < ENEMYSHOT_COUNT; j++)
 					{
 						if (!m_EnemyArray[i].GetShotShow(j))
 						{

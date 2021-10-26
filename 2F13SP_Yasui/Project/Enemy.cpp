@@ -39,6 +39,8 @@ CEnemy::CEnemy() :
 	fire(false),
 	fireWait(0),
 	otherAttack(0),
+	dashCount(0),
+
 	enemy_MarioDead(false)
 {
 }
@@ -98,6 +100,7 @@ void CEnemy::Initialize(float px, float py, int type)
 	enemy_MarioDead = false;
 	debug_MarioAttackPettern = 0;
 	debugModeFlg = false;
+	dashCount = 0;
 
 	switch (enemy_Type)
 	{
@@ -509,6 +512,7 @@ void CEnemy::RenderDebug(float wx, float wy)
 		CGraphicsUtilities::RenderString(600, 500, "MARIO_ONNE:%d", one);
 		CGraphicsUtilities::RenderString(600, 550, "MARIO_LOOP:%d", loop);
 		CGraphicsUtilities::RenderString(600, 600, "MARIO_HP:%d", enemy_MarioHP);
+		CGraphicsUtilities::RenderString(600, 650, "MARIO_DASHCOUNT:%d", dashCount);
 
 	}
 	if (enemy_Type == ENEMY_SKELETON)
@@ -588,39 +592,41 @@ void CEnemy::CollisionStage(float ox, float oy)
 
 void CEnemy::ShotCollisionStage(float ox, float oy,int n)
 {
-	for (int i = 0; i < ENEMYSHOT_COUNT; i++)
+	/*for (int i = 0; i < ENEMYSHOT_COUNT; i++)
 	{
 		if (!m_ShotArray[i].GetShow())
 		{
 			continue;
 		}
-		CVector2 shotPosition = Vector2(m_ShotArray[i].GetPositionX(), m_ShotArray[i].GetPositionY());
+	}*/
+		CVector2 shotPosition = Vector2(m_ShotArray[n].GetPositionX(), m_ShotArray[n].GetPositionY());
 		shotPosition.x += ox;
 		shotPosition.y += oy;
-		m_ShotArray[i].SetPositionX(shotPosition.x);
-		m_ShotArray[i].SetPositionY(shotPosition.y);
-		float shotSpeed = m_ShotArray[i].GetSpeedY();
+		m_ShotArray[n].SetPositionX(shotPosition.x);
+		m_ShotArray[n].SetPositionY(shotPosition.y);
+		float shotSpeed = m_ShotArray[n].GetSpeedY();
+		float randomSpeed = CUtilities::RandomFloat();
 		//落下中の下埋まり、ジャンプ中の上埋まりの場合は移動を初期化する。
 		if (oy < 0)
 		{
-			shotSpeed *= -1;
+
+			shotSpeed *= -(1.0f + randomSpeed) ;
 
 		}
 		else if (oy > 0 && shotSpeed < 0)
 		{
-			shotSpeed *= 1;
+			shotSpeed *= -1.5;
 
 		}
 		if (ox < 0)
 		{
-			m_ShotArray[i].SetShow(false);
+			m_ShotArray[n].SetShow(false);
 		}
 		else if (ox > 0)
 		{
-			m_ShotArray[i].SetShow(false);
+			m_ShotArray[n].SetShow(false);
 		}
-		m_ShotArray[i].SetSpeedY(shotSpeed);
-	}
+		m_ShotArray[n].SetSpeedY(shotSpeed);
 	
 	
 }
@@ -659,10 +665,7 @@ void CEnemy::DeadJump(bool jumpFlg)
 
 void CEnemy::SkeletonShot(void)
 {
-	if (enemy_Dead)
-	{
-		return;
-	}
+
 	if (enemy_AttackFlg)
 	{
 		enemy_Move.x = 0;
@@ -739,6 +742,11 @@ void CEnemy::DistanceBetweenPlayer(float px)
 
 void CEnemy::MarioAttack(void)
 {
+	if (enemy_Position.y > 800)
+	{
+		enemy_Dead = true;
+		return;
+	}
 	//プレイヤーとマリオとの距離計算
 	tmp_DistanceBetweenPlayer = 0;
 	if (enemy_Position.x > tmp_playerPositionX)
@@ -831,10 +839,9 @@ void CEnemy::MarioAttack(void)
 
 	//行動条件
 	
-	if (enemy_MarioNowAttackPettern == 0)
+	if (enemy_MarioNowAttackPettern == 0 && !debugModeFlg)
 	{
 		MarioActionConditions();
-		
 
 	}
 	
@@ -946,7 +953,11 @@ void CEnemy::MarioActionConditions()
 {
 	//行動パターン条件
 	//ダッシュ
-	if (tmp_DistanceBetweenPlayer > 550 && !tmp_playerJumpFlg)
+	if (enemy_MarioNowAttackPettern > 0 && enemy_MarioNowAttackPettern != MARIOATTACK_DASH)
+	{
+		dashCount = 0;
+	}
+	if (tmp_DistanceBetweenPlayer > 550 && !tmp_playerJumpFlg && dashCount <= 1)
 	{
 		enemy_MarioNowAttackPettern = MARIOATTACK_DASH;
 		return;
@@ -1100,6 +1111,7 @@ void CEnemy::MarioActionModeDash()
 		{
 			otherAttack++;
 			enemy_MarioNowAttackPettern = 0;
+			dashCount++;
 			loop = 0;
 			return;
 		}
@@ -1386,7 +1398,8 @@ void CEnemy::MarioActionModeFire()
 							enemy_ShotWait = 80;
 						}
 						m_ShotArray[i].Fire(enemy_Position.x + 30, enemy_Position.y + 10,
-							5, 10, enemy_Reverse);
+							5, 5, enemy_Reverse);
+						break;
 					}
 					loop++;
 					//fire = false;
@@ -1398,7 +1411,7 @@ void CEnemy::MarioActionModeFire()
 				}
 			}
 		}
-		else if(enemy_ShotWait <= 0)
+		else if(enemy_ShotWait <= 0 && loop >= 3)
 		{
 			one = false;
 			fire = false;
@@ -1408,7 +1421,7 @@ void CEnemy::MarioActionModeFire()
 			enemy_ShotWait = 0;
 			return;
 		}
-		else if (enemy_ShotWait > 0)
+		else if(enemy_ShotWait > 0 && loop >= 3)
 		{
 			enemy_ShotWait--;
 		}
@@ -1464,6 +1477,9 @@ void CEnemy::MarioActionModeDamage()
 	if (enemy_MarioDamageWait <= 0)
 	{
 		one = false;
+		loop = 0;
+		fire = false;
+		enemy_ShotWait = 0;
 		enemy_MarioDamageWait = 0;
 		enemy_MarioNowAttackPettern = 0;
 		enemy_MarioDamageFlg = false;

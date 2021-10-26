@@ -63,7 +63,7 @@ MofBool CGameApp::Update(void){
 		if (g_pSceneBase)
 		{
 			delete g_pSceneBase;
-			g_pSceneBase = NULL;
+			//g_pSceneBase = NULL;
 		}
 		switch (NextScene)
 		{

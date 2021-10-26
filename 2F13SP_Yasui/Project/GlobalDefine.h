@@ -65,7 +65,7 @@
 /*êßå¿éûä‘*/
 #define		ONE_SECOND 60
 #define		GAME_TIMELIMIT 80
-#define		GAME_TIMELIMIT_BOSS 150
+#define		GAME_TIMELIMIT_BOSS 210
 
 /*ÉXÉRÉA*/
 #define		SCORE_GETITEM 1000

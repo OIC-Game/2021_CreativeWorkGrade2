@@ -52,6 +52,7 @@ private:
 	bool							changeFireMode;
 	bool							fire;
 	int								fireWait;
+	int								dashCount;
 	int								otherAttack;
 	int								debug_MarioAttackPettern;
 	bool							debugModeFlg;

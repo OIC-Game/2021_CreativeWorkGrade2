@@ -13,7 +13,8 @@
 class CPlayer
 {
 private:
-	CTexture    m_Texture;
+	CTexture    m_pTextureBlack;
+	CTexture    m_pTextureWhite;
 	float       m_PosX;
 	float       m_PosY;
 	CTexture    m_ShotTexture;

@@ -26,7 +26,7 @@ CPlayer::~CPlayer()
 //“Ç‚İ‚İ¬Œ÷‚È‚çTURU¸”s‚È‚çFALSE
 bool CPlayer::Load(void)
 {
-	if (!m_Texture.Load("Player.png"))
+	if (!m_pTextureBlack.Load("PlayerBlack.png"))
 	{
 		return false;
 	}

@@ -37,6 +37,7 @@ void CEnemy::Initialize(float px, float py, int type)
 		m_HP = 2;
 	m_DamageWait = 0;
 	m_bMove = false;
+	m_bkMove = false;
 	if (type == ENEMY_K)
 	{
 		SpriteAnimationCreate anim[] = {
@@ -114,9 +115,10 @@ void CEnemy::Update(float wx,float wy)
 		m_PosX += m_MoveX;
 		m_PosY += m_MoveY;
 	}
+	
 	if (m_bkMove)
 	{
-		m_MoveX = 4.0f;
+		m_MoveX = 5.0f;
 	}
 	m_Motion.AddTimer(CUtilities::GetFrameSecond());
 	m_SrcRect = m_Motion.GetSrcRect();
@@ -132,13 +134,16 @@ void CEnemy::Damage(int dmg)
 	{
 		if (!m_bkMove)
 			m_bkMove = true;
-		else
+		else if (m_bkMove)
+		{
+			m_MoveX = 0;
 			m_bkMove = false;
+		}
 	}
 	else
 	{
 		m_HP -= dmg;
-		m_DamageWait = 10;
+		m_DamageWait = 15;
 		m_Motion.ChangeMotion(MOTION_DAMAGE);
 	}
 }

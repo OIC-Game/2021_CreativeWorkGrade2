@@ -31,6 +31,11 @@ bool CPlayer::Load(void)
 		return false;
 	}
 
+	if (!m_pTextureWhite.Load("PlayerWhite.png"))
+	{
+		return false;
+	}
+
 	if (!m_Texture.Load("PlayerBlack.png"))
 	{
 		return false;
@@ -60,7 +65,7 @@ void CPlayer::Initialize(void)
 	{
 		m_ShotArray[i].Initialize();
 	}
-	m_PlayerColor = 0;
+	m_PlayerColor = 1;
 }
 
 //更新
@@ -88,13 +93,15 @@ void CPlayer::Update(void)
 		m_PosY += PLAYER_SPEED;
 	}
 
-	//Zキーで色変更　黒⇔白
+	//Zキーで色変更　黒⇔白 0→白 1→黒
 	if (g_pInput->IsKeyPush(MOFKEY_Z))
 	{
 		if (m_PlayerColor == 0)
 			m_PlayerColor = 1;
+		m_Texture = m_pTextureBlack;
 		if (m_PlayerColor == 1)
 			m_PlayerColor = 0;
+		m_Texture = m_pTextureWhite;
 	}
 
 	if (m_ShotWait <= 0)
@@ -150,6 +157,7 @@ void CPlayer::Release(void)
 {
 	m_Texture.Release();
 	m_pTextureBlack.Release();
+	m_pTextureWhite.Release();
 	m_ShotTexture.Release();
 }
 

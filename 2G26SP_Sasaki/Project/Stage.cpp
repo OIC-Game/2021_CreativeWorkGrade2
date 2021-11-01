@@ -69,6 +69,7 @@ void CStage::Update(CEnemy* ene,int ecnt)
 			//F‚ª‚Ç‚¿‚ç‚©
 			//if(EnemyColor)
 
+
 			//“GoŒ»
 			ene[i].SetTexture(&m_EnemyTexture,&m_EnemyShotTexture);
 			ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0);
@@ -77,8 +78,6 @@ void CStage::Update(CEnemy* ene,int ecnt)
 		//“GoŒ»”‚ğ‰ÁZ
 		m_EnemyNo++;
 	}
-
-		
 }
 
 //•`‰æˆ—

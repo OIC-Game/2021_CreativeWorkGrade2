@@ -36,5 +36,6 @@ public:
 	void Release();						//ƒŠƒ\[ƒX“™‚Ì‰ð•úˆ—
 	void RenderDebug(void);
 	bool IsAllEnemy(void) { return m_EnemyNo >= m_EnemyCount; }
+	int  EnemyShotColorBack(){ return m_EnemyShotColor; }
 };
 

@@ -111,10 +111,12 @@ public:
 	/// ゴール時の処理
 	/// </summary>
 	/// <param name="ox">ゴールポールへの埋まり具合</param>
+	/// <param name="gType">ゴールの種類(0=ゴールポール,1=ボス撃破)</param>
 	/// <param name="glb">ゴールの一番下のY座標</param>
 	/// <param name="stw">ステージの幅</param>
+	/// <param name="clearBgmPlay">クリアBGMの再生状態</param>
 	/// <returns>ゴールの処理が終わったどうか</returns>
-	bool GoalFn(float ox, float glb, float stw);
+	bool GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPlay);
 
 	void SlideMove(CVector2 v);
 

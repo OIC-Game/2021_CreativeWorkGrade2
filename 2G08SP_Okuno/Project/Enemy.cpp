@@ -12,7 +12,8 @@ CEnemy::CEnemy() :
 	m_JumpSp(0),
 	m_JustTrampled(false),
 	m_Texture(),
-	m_Damaged(false)
+	m_Damaged(false),
+	m_bGoal(false)
 {
 }
 
@@ -32,7 +33,7 @@ bool CEnemy::Load(CTexture* tex, CEnemyDefine* ed)
 	return true;
 }
 
-void CEnemy::Initialize(Vector2 pos, int stgh)
+void CEnemy::Initialize(Vector2 pos, bool bGoal, int stgh)
 {
 	m_sPos = pos;
 	m_Pos = pos;
@@ -45,6 +46,7 @@ void CEnemy::Initialize(Vector2 pos, int stgh)
 		m_bReverse = true;
 	}
 	m_Damaged = false;
+	m_bGoal = bGoal;
 	m_bShow = true;
 	m_JumpSp = 0;
 	m_ShowState = STATE_YET;

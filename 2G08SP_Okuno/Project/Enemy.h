@@ -34,6 +34,7 @@ private:
 	bool			m_JustTrampled;	//“¥‚ñ‚¾’¼Œã@d‚È‚è‚ª‰ğœ‚³‚ê‚é‚Ü‚Å
 	CEnemyDefine* m_define;
 	bool			m_Damaged; //CollisionŠÖ”—p
+	bool			m_bGoal;
 
 public:
 	CEnemy();
@@ -41,7 +42,7 @@ public:
 
 	bool Load(CTexture* tex, CEnemyDefine* ed);
 
-	void Initialize(Vector2 pos, int stgh);
+	void Initialize(Vector2 pos, bool bGoal, int stgh);
 
 	void Update(float wx, float wy, CRectangle prec);
 
@@ -97,5 +98,7 @@ public:
 
 	void SetJustTrampled(bool bjt) { m_JustTrampled = bjt; };
 	bool GetJustTrampled() { return m_JustTrampled; };
+
+	bool IsGEnemy() { return m_bGoal && (m_ShowState == STATE_DISAPPEAR); };
 };
 

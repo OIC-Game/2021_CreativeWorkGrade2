@@ -17,7 +17,8 @@ private:
 	CStage*		m_StageArray;		//ステージの配列
 	int			m_StageCount;
 	int			m_StageCursor;
-	int			m_GoalIdx;
+	int			m_GoalIdx; 
+	int			m_GoalType;
 	int			m_GoalX;
 	int			m_GoalTop;
 	int			m_GoalBottom;
@@ -37,7 +38,7 @@ public:
 
 	void Initialize();
 
-	void Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a);
+	void Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, bool clearBgmPlay);
 
 	void Render();
 
@@ -45,7 +46,7 @@ public:
 
 	void Release();
 
-	bool GoalCheck(CPlayer& pl, float& ox, int gx);
+	bool GoalCheck(CPlayer& pl, float& ox, int gtype, int gx);
 
 	Vector2 GetStartPos() { return m_StageArray[m_StageCursor].GetStartPos(); };
 

@@ -12,22 +12,22 @@ class CStage
 private:
 	CTexture	m_BgTexture;		//背景画像
 	CTexture	m_ChipTexture;		//マップチップ画像
-	CTexture*	m_pEnemyTexture;	//敵画像
-	CTexture*	m_pItemTexture;		//アイテム画像
-	CEnemy*		m_EnemyArray;
-	CItem*		m_ItemArray;
-	CBlock*		m_BlockArray;
+	CTexture* m_pEnemyTexture;	//敵画像
+	CTexture* m_pItemTexture;		//アイテム画像
+	CEnemy* m_EnemyArray;
+	CItem* m_ItemArray;
+	CBlock* m_BlockArray;
 
 	int			m_EnemyTextureCount;//敵画像の数
-	char*		m_pEnemyData;		//敵の配置情報
+	char* m_pEnemyData;		//敵の配置情報
 	int			m_EnemyCount;		//敵の総数
 	int			m_ItemTextureCount;	//アイテム画像の数
-	char*		m_pItemData;		//アイテムの配置情報
+	char* m_pItemData;		//アイテムの配置情報
 	int			m_ItemCount;		//アイテムの総数
 	//float		m_ChipSize;			//チップ一つのサイズ
 	int			m_XSize;			//マップの横方向のマスの数
 	int			m_YSize;			//マップの縦方向のマスの数
-	int*		m_ChipData;			//マップの各マスの情報
+	int* m_ChipData;			//マップの各マスの情報
 	int			m_BlockCount;		//
 	int			m_StartX;			//プレイヤーの初期位置
 	int			m_StartY;			//プレイヤーの初期位置
@@ -41,7 +41,7 @@ public:
 
 	bool Load(char* fname, int sx, int sy);
 
-	void Initialize();
+	void Initialize(bool bGoal, int gType, int gx, int gy);
 
 	void Update(CPlayer& pl);
 
@@ -62,6 +62,15 @@ public:
 	CCollisionData Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRectangle ra, CVector2 move);
 
 	Vector2 GetStartPos() { return Vector2(CHIPSIZE * m_StartX, CHIPSIZE * m_StartY); };
+
+	bool IsGEnemy() {
+		for (int i = 0; i < m_EnemyCount; i++) {
+			if (m_EnemyArray[i].IsGEnemy()) {
+				return true;
+			}
+		}
+		return false;
+	};
 
 	float GetScrollX() { return m_ScrollX; };
 

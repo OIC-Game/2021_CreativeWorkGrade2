@@ -335,7 +335,7 @@ void CPlayer::CollisionStage(CCollisionData coll)
 		m_JumpStatus = Jumping;
 	}
 
-	if (coll.damage) {
+	if (coll.damage && !coll.og) {
 		Damage(false);
 	}
 }
@@ -510,13 +510,20 @@ void CPlayer::CollisionItem(CItem& item)
 	}
 }
 
-bool CPlayer::GoalFn(float ox, float glb, float stw) {
+bool CPlayer::GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPlay) {
 	//ゴール時の初期処理
 	if (!m_bGoal) {
 		m_bGoal = true;				//ゴールフラグをtrueにする
 		m_JumpStatus = Manualing;	//重力を無視するようにする
 		m_Pos.x -= ox;				//ゴールポールへの埋まりを解消する
+		if (gType == 1) {
+			JumpStart(-8.2f);				//ジャンプする
+			m_Move.x = 0;		//
+		}
 		return false;
+	}
+	if (gType == 1) {
+		return !clearBgmPlay;
 	}
 	//ゴールポールを降りている間の処理
 	if (m_JumpStatus == Manualing) {

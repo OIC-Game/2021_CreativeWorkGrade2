@@ -56,6 +56,7 @@ bool CStageParent::Load(std::string fname)
 	}
 
 	m_GoalIdx = atoi(strtok(wk, ","));
+	m_GoalType = atoi(strtok(NULL, ","));
 	m_GoalX = atoi(strtok(NULL, ","));
 	m_GoalTop = atoi(strtok(NULL, ","));
 	m_GoalBottom = atoi(strtok(NULL, ","));
@@ -93,11 +94,11 @@ void CStageParent::Initialize()
 	m_SceneChangeFlg = false;
 	m_StageCursor = 0;
 	for (int i = 0; i < m_StageCount; i++) {
-		m_StageArray[i].Initialize();
+		m_StageArray[i].Initialize(i == m_GoalIdx, m_GoalType, m_GoalX, m_GoalTop);
 	}
 }
 
-void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a)
+void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, bool clearBgmPlay)
 {
 	m_updTime = timeGetTime();
 	m_StageArray[m_StageCursor].Update(pl);
@@ -122,9 +123,12 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a)
 	CCollisionData coll = m_StageArray[m_StageCursor].Collision(&pl, NULL, prec_b, prec_a, pl.GetMove());
 	pl.CollisionStage(coll);
 
-	m_GoalFlg = GoalCheck(pl, ox, m_GoalX);
+	if (!m_GoalFlg) {
+		m_GoalFlg = GoalCheck(pl, ox, m_GoalType, m_GoalX);
+	}
+
 	if (m_GoalFlg) {
-		if (pl.GoalFn(ox, GetGoalBottom(), GetStageWidth())) {
+		if (pl.GoalFn(ox, m_GoalType, GetGoalBottom(), GetStageWidth(), clearBgmPlay)) {
 			m_SceneChangeFlg = true;
 			m_SceneNext = G_SCENE_GAMECLEAR;
 		}
@@ -219,7 +223,7 @@ void CStageParent::Release()
 	}
 }
 
-bool CStageParent::GoalCheck(CPlayer& pl, float& ox, int gx)
+bool CStageParent::GoalCheck(CPlayer& pl, float& ox, int gtype, int gx)
 {
 	if (pl.GetGoal()) {
 		return true;
@@ -229,6 +233,10 @@ bool CStageParent::GoalCheck(CPlayer& pl, float& ox, int gx)
 	}
 
 	bool re = false;
+
+	if (gtype == 1) {
+		return m_StageArray[m_StageCursor].IsGEnemy();
+	}
 
 	CRectangle prec = pl.GetRect(true);
 	ox = prec.Right - ((gx + 0.5f) * CHIPSIZE);

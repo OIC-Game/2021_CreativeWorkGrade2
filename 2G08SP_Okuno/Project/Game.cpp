@@ -137,7 +137,7 @@ void CGame::Update()
 	else if (m_nScene == G_SCENE_GAME) {
 		m_Player.Update(m_Stage.GetScrollX(), m_Stage.GetScrollY());
 
-		m_Stage.Update(m_Player, m_Player.GetBRect(true), m_Player.GetRect(true));
+		m_Stage.Update(m_Player, m_Player.GetBRect(true), m_Player.GetRect(true), m_BGMClear.IsPlay());
 
 		if (m_Stage.IsGoal()) {
 			if (!m_ClearBgmFlg) {

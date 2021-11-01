@@ -31,7 +31,12 @@ bool CPlayer::Load(void)
 		return false;
 	}
 
-	if (!m_ShotTexture.Load("P_missile.png"))
+	if (!m_Texture.Load("PlayerBlack.png"))
+	{
+		return false;
+	}
+
+	if (!m_ShotTexture.Load("P_missileWhite.png"))
 	{
 		return false;
 	}
@@ -144,6 +149,7 @@ void CPlayer::Render(void)
 void CPlayer::Release(void)
 {
 	m_Texture.Release();
+	m_pTextureBlack.Release();
 	m_ShotTexture.Release();
 }
 

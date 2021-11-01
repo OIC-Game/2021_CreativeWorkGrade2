@@ -37,7 +37,7 @@ bool CStage::Load()
 	{
 		return false;
 	}
-	if (!m_EnemyShotTexture.Load("E_missile.png"))
+	if (!m_EnemyShotTexture.Load("E_missileBlack.png"))
 	{
 		return false;
 	}

@@ -1,0 +1,82 @@
+#include "breakBlock.h"
+
+CbreakBlock::CbreakBlock():
+	m_pTexture(NULL),
+	m_Pos()
+	//m_Move(),
+	//m_SrcRect()
+	//m_bShow(false)
+{
+}
+
+CbreakBlock::~CbreakBlock()
+{
+}
+
+void CbreakBlock::Initialize(float px, float py, int type)
+{
+	m_Pos.x = px;
+	m_Pos.y = py;
+	m_bShow = true;
+	/*m_Move.x = 0.0f;
+	m_Move.y = 0.0f;*/
+	m_Type = type;
+}
+
+void CbreakBlock::Update(void)
+{
+	if (!m_bShow)
+	{
+		return;
+	}
+	
+}
+
+void CbreakBlock::CollisionStage(float ox, float oy)
+{
+}
+
+void CbreakBlock::Render(float wx, float wy)
+{
+	//”ñ•\Ž¦
+	if (!m_bShow)
+	{
+		return;
+	}
+
+	//•`‰æ‹éŒ`
+	
+	CRectangle dr = CRectangle(0, 224,32 ,256 );
+	CRectangle(0,224,32,256) = m_SrcRect;
+
+	//”½“]ƒtƒ‰ƒO‚ªON‚Ìê‡•`‰æ‹éŒ`‚ð”½“]‚³‚¹‚é
+
+	/*{
+		float tmp = dr.Right;
+		dr.Right = dr.Left;
+		dr.Left = tmp;
+	}*/
+	//ƒeƒNƒXƒ`ƒƒ‚Ì•`‰æ
+	m_pTexture->Render(m_Pos.x - wx, m_Pos.y - wy, dr);
+}
+
+void CbreakBlock::RenderDebug(float wx, float wy)
+{
+	CRectangle hr = GetRect();
+	CGraphicsUtilities::RenderRect(hr.Left - wx, hr.Top - wy, hr.Right - wx, hr.Bottom - wy, MOF_XRGB(0, 255, 0));
+}
+
+void CbreakBlock::Release(void)
+{
+}
+
+bool CbreakBlock::Collision(CRectangle r, float& ox, float& oy)
+{
+	return false;
+}
+
+//bool CbreakBlock::CollisionPlayer(CPlayer& ply)
+//{
+//	
+//	return false;
+//}

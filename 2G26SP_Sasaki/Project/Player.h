@@ -29,6 +29,7 @@ private:
 	int m_ColorChangeWait;
 
 	int		m_PlayerColor;
+	int		m_PlayerShotColor;
 
 	bool  m_bDead;
 public:

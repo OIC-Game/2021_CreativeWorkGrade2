@@ -11,6 +11,7 @@ private:
 	float					m_PosX;
 	float					m_PosY;
 	bool					m_bShow;
+	int						m_pShotColor;
 public:
 	CPlayerShot();
 	~CPlayerShot();
@@ -32,6 +33,8 @@ public:
 
 	//弾のテクスチャを設定
 	void SetTexture(CTexture* pt){ m_pTexture = pt; }
+
+	void SetShotColor(int* co) { m_pShotColor; }
 
 	//弾が表示されている場合trueを返す
 	bool GetShow(void){ return m_bShow; }

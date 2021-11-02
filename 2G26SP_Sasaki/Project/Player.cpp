@@ -77,6 +77,7 @@ void CPlayer::Initialize(void)
 		m_ShotArray[i].Initialize();
 	}
 	m_PlayerColor = 1;
+	m_PlayerShotColor = 0;
 	m_Texture = m_pTextureBlack;
 }
 
@@ -128,6 +129,15 @@ void CPlayer::Update(void)
 				//	m_ShotTexture = m_pShotTextureWhite;
 				//}
 				m_ShotWait = PLAYERSHOT_WAIT;
+				if (m_PlayerShotColor == 1)
+				{
+					m_ShotArray[i].SetTexture(&m_pShotTextureBlack);
+				}
+				if (m_PlayerShotColor == 0)
+				{
+					m_ShotArray[i].SetTexture(&m_pShotTextureWhite);
+				}
+				m_ShotArray[i].SetShotColor(&m_PlayerShotColor);
 				m_ShotArray[i].Fire(m_PosX + m_Texture.GetWidth()*0.5f, m_PosY);
 				break;
 			}
@@ -214,7 +224,10 @@ bool CPlayer::Collision(CEnemy& ene)
 			continue;
 		}
 		CRectangle srec = m_ShotArray[i].GetRect();
-		if (m_PlayerColor == enecolor)
+		//色次第で敵に弾が当たらない
+		//今は無理やりプレイヤーの色で決めている
+		//後々弾の色と判定を取りたい
+		if (m_PlayerShotColor != enecolor)
 		{
 			if (srec.CollisionRect(erec))
 			{
@@ -254,12 +267,14 @@ void CPlayer::PlayerColorChange(void)
 	if (g_pInput->IsKeyPush(MOFKEY_Z) && (m_PlayerColor == 0) && (m_ColorChangeWait == 0))
 	{
 		m_PlayerColor = 1;
+		m_PlayerShotColor = 0;
 		m_Texture = m_pTextureBlack;
 		m_ColorChangeWait = PLAYERCOLOR_WAIT;
 	}
 	if (g_pInput->IsKeyPush(MOFKEY_Z) && (m_PlayerColor == 1) && (m_ColorChangeWait == 0))
 	{
-		m_PlayerColor = 0;
+		m_PlayerColor = 0; 
+		m_PlayerShotColor = 1;
 		m_Texture = m_pTextureWhite;
 		m_ColorChangeWait = PLAYERCOLOR_WAIT;
 	}

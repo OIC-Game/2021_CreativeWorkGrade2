@@ -4,6 +4,7 @@
 //•ÏX‚·‚éƒV[ƒ“
 extern int						gChangeScene;
 
+int								gStage = STAGE_NO01;
 CGame::CGame(){
 }
 

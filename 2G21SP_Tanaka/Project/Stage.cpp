@@ -1,5 +1,7 @@
 #include "Stage.h"
 
+
+
 CStage::CStage():
 m_ChipTexture(),
 m_BackTexture(),

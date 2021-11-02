@@ -2,6 +2,7 @@
 #include	"Player.h"
 #include	"Enemy.h"
 #include	"Item.h"
+#include	"GameDefine.h"
 #include	"PoPItemManager.h"
 
 #define		COINBLOCK		0

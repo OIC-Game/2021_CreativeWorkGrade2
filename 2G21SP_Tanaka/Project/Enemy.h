@@ -44,6 +44,15 @@ public:
 	CRectangle GetRect() {
 		return CRectangle(m_PosX + ENEMY_RECTDECREASE, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - ENEMY_RECTDECREASE, m_PosY + m_SrcRect.GetHeight());
 	}
+
+	CRectangle Left() {
+		return CRectangle(m_PosX, m_PosY, m_PosX + m_SrcRect.GetWidth() - 20, m_PosY + m_SrcRect.GetHeight());
+	}
+
+	CRectangle Right() {
+		return CRectangle(m_PosX+20, m_PosY, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
+	}
+
 	void Damege(void);
 };
 

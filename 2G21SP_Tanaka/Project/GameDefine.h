@@ -10,5 +10,9 @@ enum tag_SCENENO {
 	SCENENO_GAMERETRY,
 };
 
+enum tag_GAMESTAGE {
+	STAGE_NO01,
+};
+
 //èdóÕ
 #define		GRAVITY		0.3f

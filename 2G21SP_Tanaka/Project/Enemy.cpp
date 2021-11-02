@@ -62,6 +62,20 @@ void CEnemy::Update(float wx, float wy){
 	{
 		m_bMove = true;
 	}
+
+	CRectangle le = Left();
+	CRectangle re = Right();
+	if (re.CollisionRect(le) && m_MoveY > 0)
+	{
+		m_MoveX *= -1;
+		m_bReverse = true;
+	}
+	else if (le.CollisionRect(re) && m_MoveY < 0)
+	{
+		m_MoveX *= -1;
+		m_bReverse = false;
+	}
+
 	//d—Í‚É‚æ‚è‰º‚É­‚µ‚¸‚Â‰º‚ª‚é
 	m_MoveY += GRAVITY;
 	if (m_MoveY >= 20.0f)
@@ -107,6 +121,12 @@ void CEnemy::RenderDebug(float wx, float wy){
 	//“–‚½‚è”»’è‚Ì•\Ž¦
 	CRectangle hr = GetRect();
 	CGraphicsUtilities::RenderRect(hr.Left - wx, hr.Top - wy, hr.Right - wx, hr.Bottom - wy, MOF_XRGB(255, 0, 0));
+
+	CRectangle le = Left();
+	CGraphicsUtilities::RenderRect(le.Left - wx, le.Top - wy, le.Right - wx, le.Bottom - wy, MOF_XRGB(0, 0, 0));
+
+	CRectangle re = Right();
+	CGraphicsUtilities::RenderRect(re.Left - wx, re.Top - wy, re.Right - wx, re.Bottom - wy, MOF_XRGB(255, 255, 255));
 }
 
 void CEnemy::Release(){

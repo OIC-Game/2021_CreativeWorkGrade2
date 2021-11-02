@@ -119,6 +119,14 @@ void CPlayer::Update(void)
 				{
 					continue;
 				}
+				//if (m_PlayerColor == 0)
+				//{
+				//	m_ShotTexture = m_pShotTextureBlack;
+				//}
+				//if (m_PlayerColor == 1)
+				//{
+				//	m_ShotTexture = m_pShotTextureWhite;
+				//}
 				m_ShotWait = PLAYERSHOT_WAIT;
 				m_ShotArray[i].Fire(m_PosX + m_Texture.GetWidth()*0.5f, m_PosY);
 				break;
@@ -206,11 +214,14 @@ bool CPlayer::Collision(CEnemy& ene)
 			continue;
 		}
 		CRectangle srec = m_ShotArray[i].GetRect();
-		if (srec.CollisionRect(erec))
+		if (m_PlayerColor == enecolor)
 		{
-			ene.Damage(1);
-			m_ShotArray[i].SetShow(false);
-			return true;
+			if (srec.CollisionRect(erec))
+			{
+				ene.Damage(1);
+				m_ShotArray[i].SetShow(false);
+				return true;
+			}
 		}
 	}
 	for (int i = 0; i < ENEMYSHOT_COUNT; i++)

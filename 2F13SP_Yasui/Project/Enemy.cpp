@@ -53,7 +53,7 @@ CEnemy::~CEnemy()
 bool CEnemy::Load(void)
 {
 
-	return false;
+	return true;
 }
 
 /*
@@ -665,7 +665,10 @@ void CEnemy::DeadJump(bool jumpFlg)
 
 void CEnemy::SkeletonShot(void)
 {
-
+	if (enemy_Dead)
+	{
+		return;
+	}
 	if (enemy_AttackFlg)
 	{
 		enemy_Move.x = 0;
@@ -838,11 +841,13 @@ void CEnemy::MarioAttack(void)
 	}
 
 	//行動条件
-	
+	if (enemy_MarioNowAttackPettern > 0 && enemy_MarioNowAttackPettern != MARIOATTACK_DASH)
+	{
+		dashCount = 0;
+	}
 	if (enemy_MarioNowAttackPettern == 0 && !debugModeFlg)
 	{
 		MarioActionConditions();
-
 	}
 	
 
@@ -953,10 +958,7 @@ void CEnemy::MarioActionConditions()
 {
 	//行動パターン条件
 	//ダッシュ
-	if (enemy_MarioNowAttackPettern > 0 && enemy_MarioNowAttackPettern != MARIOATTACK_DASH)
-	{
-		dashCount = 0;
-	}
+	
 	if (tmp_DistanceBetweenPlayer > 550 && !tmp_playerJumpFlg && dashCount <= 1)
 	{
 		enemy_MarioNowAttackPettern = MARIOATTACK_DASH;

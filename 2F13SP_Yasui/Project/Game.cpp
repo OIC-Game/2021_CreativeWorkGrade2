@@ -485,12 +485,7 @@ void CGame::Update(void) {
 			stage_number = STAGE_1_1;
 			m_bEnd = true;
 		}
-			
-
-		
-
 	}
-
 }
 
 

@@ -114,11 +114,12 @@ MofBool CGameApp::Update(void) {
 			}
 		}
 		if (g_nScene == SCENE_GAME) {
+			int c_Stage = g_Title.GetClearStageIdx();
 			if (g_Game.IsStageClear()) {
-				int clear = g_Title.GetClearStageIdx();
-				if (clear < g_Game.GetStageIdx()) clear = g_Game.GetStageIdx();
-				g_Title.SetClearStage(clear);
+				if (c_Stage < g_Game.GetStageIdx()) c_Stage = g_Game.GetStageIdx();
+				g_Title.SetClearStage(c_Stage);
 			}
+			g_Title.SetStageCursor(c_Stage);
 		}
 		g_bScene = g_nScene;
 		g_nScene = g_nSceneChange;

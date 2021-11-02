@@ -95,6 +95,7 @@ bool CGameDefine::Load_Enemy(const char* fname) {
 		m_pGameDefine->m_EnemyDefine[i].damageFlg = atoi(strtok(NULL, ","));
 		m_pGameDefine->m_EnemyDefine[i].damageDirection = atoi(strtok(NULL, ","));
 		m_pGameDefine->m_EnemyDefine[i].move = atoi(strtok(NULL, ","));
+		m_pGameDefine->m_EnemyDefine[i].hp = atoi(strtok(NULL, ","));
 		m_pGameDefine->m_EnemyDefine[i].x_ext1 = atof(strtok(NULL, ","));
 		m_pGameDefine->m_EnemyDefine[i].x_ext2 = atof(strtok(NULL, ","));
 		m_pGameDefine->m_EnemyDefine[i].y_ext1 = atof(strtok(NULL, ","));

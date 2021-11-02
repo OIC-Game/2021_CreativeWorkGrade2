@@ -32,6 +32,8 @@ public:
 
 	void SetClearStage(int stageIdx) { m_ClearStageCursor = stageIdx; }
 
+	void SetStageCursor(int cursor) { m_StageCursor = cursor; }
+
 	int GetClearStageIdx() {
 		return m_ClearStageCursor;
 	}

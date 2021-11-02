@@ -26,6 +26,7 @@ private:
 	int				m_nScene;
 	float			m_SceneChangeTime;
 	int				m_nStageIdx;
+	float			m_Time;
 
 
 	DWORD m_updTime;

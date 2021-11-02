@@ -4,6 +4,7 @@ CPlayer::CPlayer() :
 	m_sth(0),
 	m_TypeIdx(0),
 	m_bDead(false),
+	m_bDeadEnd(0),
 	m_bGoal(false),
 	m_DmgTime(false),
 	m_Life(0),
@@ -44,6 +45,7 @@ void CPlayer::Initialize(Vector2 pos, int life)
 	m_Move.y = 0;
 	m_bReverse = false;
 	m_bDead = false;
+	m_bDeadEnd = 0;
 	m_bGoal = false;
 	m_DmgTime = 0;
 	m_Life = life;
@@ -125,7 +127,7 @@ void CPlayer::Update(float wx, float wy)
 	//このフレームで横移動(入力)があったかどうか
 	bool bMove = false;
 
-	if (!m_bGoal) {
+	if (!m_bGoal && !m_bDead) {
 		//左（マイナス）移動（←又はA）
 		if (g_pInput->IsKeyHold(MOFKEY_LEFT) || g_pInput->IsKeyHold(MOFKEY_A)) {
 			bMove = true;
@@ -372,7 +374,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 			CCollisionData coll = CCollisionData();
 			coll.ox = rrec.Right - elrec.Left;
 			ene.CollisionStage(coll);
-			if (ene.Touched(prec)) {
+			if (ene.Touched(prec, true)) {
 				return;
 			}
 		}
@@ -383,7 +385,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 			CCollisionData coll = CCollisionData();
 			coll.ox = lrec.Left - errec.Right;
 			ene.CollisionStage(coll);
-			if (ene.Touched(prec)) {
+			if (ene.Touched(prec, true)) {
 				return;
 			}
 		}
@@ -539,6 +541,22 @@ bool CPlayer::GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPla
 		return false;
 	}
 	return true;
+}
+
+bool CPlayer::DeadFn()
+{
+	if (m_bDeadEnd == 0) {
+		m_bDeadEnd = 1;
+		m_Move.x = 0;
+		JumpStart(-10.6f);
+	}
+	else if (m_bDeadEnd == 1) {
+		if (m_Pos.y > m_sth + 50) {
+			m_bDeadEnd = 2;
+		}
+	}
+
+	return m_bDeadEnd == 2;
 }
 
 void CPlayer::SlideMove(CVector2 v)

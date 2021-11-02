@@ -46,7 +46,7 @@ public:
 
 	void Release();
 
-	bool GoalCheck(CPlayer& pl, float& ox, int gtype, int gx);
+	bool GoalCheck(CPlayer& pl, float& ox);
 
 	Vector2 GetStartPos() { return m_StageArray[m_StageCursor].GetStartPos(); };
 

@@ -13,7 +13,8 @@ CEnemy::CEnemy() :
 	m_JustTrampled(false),
 	m_Texture(),
 	m_Damaged(false),
-	m_bGoal(false)
+	m_bGoal(false),
+	m_hp(0)
 {
 }
 
@@ -25,9 +26,6 @@ bool CEnemy::Load(CTexture* tex, CEnemyDefine* ed)
 {
 	m_Texture = tex;
 	m_define = ed;
-	en_anim = new SpriteAnimationCreate[ANIM_COUNT]{
-		{"‘Ò‹@", 0, 0, 32, 32, TRUE, {5, 0, 0}},
-	};
 
 	m_Motion.Create(ed->anim, ed->animCount);
 	return true;
@@ -41,6 +39,7 @@ void CEnemy::Initialize(Vector2 pos, bool bGoal, int stgh)
 	m_stgh = stgh;
 	m_bReverse = false;
 	m_Move.x = m_define->x_ext1;
+	m_hp = m_define->hp;
 	if ((m_define->move & MOVE_LEFT) == MOVE_LEFT) {
 		m_Move.x *= -1;
 		m_bReverse = true;
@@ -100,7 +99,7 @@ void CEnemy::Update(float wx, float wy, CRectangle prec)
 
 	//—Ž‰ºŽž‚Ìˆ—
 	if (m_Pos.y > m_stgh) {
-		m_ShowState = STATE_DISAPPEAR;
+		Damage(true);
 	}
 }
 
@@ -123,8 +122,6 @@ void CEnemy::Render(float wx, float wy)
 void CEnemy::Release()
 {
 	m_Motion.Release();
-	delete[] en_anim;
-	en_anim = NULL;
 }
 
 void CEnemy::CollisionStage(CCollisionData coll)
@@ -205,8 +202,8 @@ bool CEnemy::CollisionObj(CRectangle erec, CVector2 eMove, int eDmgFlg, int eDmg
 			if ((eDmgFlg & DAMAGE_ONLY_ENEMY) == DAMAGE_ONLY_ENEMY) {
 
 				//m_bShow = false;
-				m_ShowState = STATE_DISAPPEAR;
-				m_Damaged = true;
+
+				Damage(false);
 			}
 		}
 		pr_result = true;
@@ -242,8 +239,7 @@ bool CEnemy::CollisionObj(CRectangle erec, CVector2 eMove, int eDmgFlg, int eDmg
 			if ((eDmgFlg & DAMAGE_ONLY_ENEMY) == DAMAGE_ONLY_ENEMY) {
 
 				//m_bShow = false;
-				m_ShowState = STATE_DISAPPEAR;
-				m_Damaged = true;
+				Damage(false);
 			}
 		}
 		pr_result = true;
@@ -262,8 +258,7 @@ bool CEnemy::CollisionObj(CRectangle erec, CVector2 eMove, int eDmgFlg, int eDmg
 			if ((eDmgFlg & DAMAGE_ONLY_ENEMY) == DAMAGE_ONLY_ENEMY) {
 
 				//m_bShow = false;
-				m_ShowState = STATE_DISAPPEAR;
-				m_Damaged = true;
+				Damage(false);
 			}
 		}
 		pr_result = true;
@@ -275,8 +270,7 @@ bool CEnemy::CollisionObj(CRectangle erec, CVector2 eMove, int eDmgFlg, int eDmg
 			if ((eDmgFlg & DAMAGE_ONLY_ENEMY) == DAMAGE_ONLY_ENEMY) {
 
 				//m_bShow = false;
-				m_ShowState = STATE_DISAPPEAR;
-				m_Damaged = true;
+				Damage(false);
 			}
 		}
 		pr_result = true;
@@ -288,8 +282,7 @@ bool CEnemy::CollisionObj(CRectangle erec, CVector2 eMove, int eDmgFlg, int eDmg
 			if ((eDmgFlg & DAMAGE_ONLY_ENEMY) == DAMAGE_ONLY_ENEMY) {
 
 				//m_bShow = false;
-				m_ShowState = STATE_DISAPPEAR;
-				m_Damaged = true;
+				Damage(false);
 			}
 		}
 		pr_result = true;
@@ -329,7 +322,16 @@ void CEnemy::Trampled(CRectangle prec)
 	}
 }
 
-bool CEnemy::Touched(CRectangle prec)
+void CEnemy::Damage(bool death)
+{
+	m_hp -= 1;
+	if (death || m_hp <= 0) {
+		m_ShowState = STATE_DISAPPEAR;
+	}
+	m_Damaged = true;
+}
+
+bool CEnemy::Touched(CRectangle prec, bool sence)
 {
 	if ((m_define->changeFlg & CHANGE_TOUCH) == CHANGE_TOUCH) {
 
@@ -346,9 +348,11 @@ bool CEnemy::Touched(CRectangle prec)
 			m_Move.x *= -1;
 		}
 		else if ((m_define->move & MOVE_SENSE) == MOVE_SENSE) {
-			CRectangle erec = GetRect();
-			if ((prec.Left + prec.Right) / 2 > (erec.Left + erec.Right) / 2) {
-				m_Move.x *= -1;
+			if (sence) {
+				CRectangle erec = GetRect();
+				if ((prec.Left + prec.Right) / 2 > (erec.Left + erec.Right) / 2) {
+					m_Move.x *= -1;
+				}
 			}
 		}
 		return true;
@@ -359,7 +363,12 @@ bool CEnemy::Touched(CRectangle prec)
 void CEnemy::PushedUp()
 {
 	//m_bShow = false;
-	m_ShowState = STATE_DISAPPEAR;
+	if ((m_define->changeFlg & CHANGE_TOUCH) == CHANGE_TOUCH) {
+		Touched(CRectangle(0, 0, 0, 0), false);
+	}
+	else {
+		m_ShowState = STATE_DISAPPEAR;
+	}
 }
 
 void CEnemy::SlideMove(CVector2 v)

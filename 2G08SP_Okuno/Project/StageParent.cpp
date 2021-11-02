@@ -101,20 +101,19 @@ void CStageParent::Initialize()
 void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, bool clearBgmPlay)
 {
 	m_updTime = timeGetTime();
-	m_StageArray[m_StageCursor].Update(pl);
 
-	/*
-	if (g_pInput->IsKeyPush(MOFKEY_F2)) {
-		if (m_StageCursor == 0) {
-			m_StageCursor = 1;
+	if (pl.GetDead()) {
+		if (pl.DeadFn()) {
+			pl.SetLife(pl.GetLife() - 1);
+			m_SceneChangeFlg = true;
+			m_SceneNext = G_SCENE_LIFE;
 		}
-		else {
-			m_StageCursor = 0;
-		}
-		pl.ChangeStage(m_StageArray[m_StageCursor].GetStartPos());
-		pl.SetStageHeight(GetStageHeight());
 		return;
-	}*/
+	}
+
+	if (!m_GoalFlg) {
+		m_StageArray[m_StageCursor].Update(pl);
+	}
 
 	float ox = 0;
 
@@ -124,7 +123,7 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 	pl.CollisionStage(coll);
 
 	if (!m_GoalFlg) {
-		m_GoalFlg = GoalCheck(pl, ox, m_GoalType, m_GoalX);
+		m_GoalFlg = GoalCheck(pl, ox);
 	}
 
 	if (m_GoalFlg) {
@@ -176,12 +175,6 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 		}
 	}
 
-	if (pl.GetDead()) {
-		pl.SetLife(pl.GetLife() - 1);
-		m_SceneChangeFlg = true;
-		m_SceneNext = G_SCENE_LIFE;
-	}
-
 	//if (g_pInput->IsKeyPush(MOFKEY_F3)) {
 	//	m_DebugFlg = !m_DebugFlg;
 	//}
@@ -223,7 +216,7 @@ void CStageParent::Release()
 	}
 }
 
-bool CStageParent::GoalCheck(CPlayer& pl, float& ox, int gtype, int gx)
+bool CStageParent::GoalCheck(CPlayer& pl, float& ox)
 {
 	if (pl.GetGoal()) {
 		return true;
@@ -234,12 +227,16 @@ bool CStageParent::GoalCheck(CPlayer& pl, float& ox, int gtype, int gx)
 
 	bool re = false;
 
-	if (gtype == 1) {
-		return m_StageArray[m_StageCursor].IsGEnemy();
+	CRectangle prec = pl.GetRect(true);
+	if (m_GoalType == 1) {
+		if (m_StageArray[m_StageCursor].IsGEnemy()) {
+			return true;
+		}
+		ox = prec.Right - ((m_GoalBottom + 0.5f) * CHIPSIZE);
+		return ox >= 0;
 	}
 
-	CRectangle prec = pl.GetRect(true);
-	ox = prec.Right - ((gx + 0.5f) * CHIPSIZE);
+	ox = prec.Right - ((m_GoalX + 0.5f) * CHIPSIZE);
 	if (ox >= 0) {
 		re = true;
 	}

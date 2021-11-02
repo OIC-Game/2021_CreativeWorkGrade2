@@ -129,6 +129,7 @@ public:
 	int damageFlg;
 	int damageDirection;
 	int move;
+	int hp;
 	float x_ext1;
 	float x_ext2;
 	float y_ext1;
@@ -143,6 +144,7 @@ public:
 		damageFlg(0),
 		damageDirection(0),
 		move(0),
+		hp(0),
 		x_ext1(0),
 		x_ext2(0),
 		y_ext1(0),

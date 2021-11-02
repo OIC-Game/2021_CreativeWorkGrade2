@@ -18,7 +18,6 @@ private:
 		ANIM_COUNT,
 	};
 
-	SpriteAnimationCreate* en_anim;
 	CSpriteMotionController	m_Motion;
 
 	CTexture* m_Texture;		//âÊëú
@@ -35,6 +34,7 @@ private:
 	CEnemyDefine* m_define;
 	bool			m_Damaged; //Collisionä÷êîóp
 	bool			m_bGoal;
+	int				m_hp;
 
 public:
 	CEnemy();
@@ -74,7 +74,9 @@ public:
 	/// </summary>
 	void Trampled(CRectangle prec);
 
-	bool Touched(CRectangle prec);
+	void Damage(bool death);
+
+	bool Touched(CRectangle prec, bool sence);
 
 	void PushedUp();
 

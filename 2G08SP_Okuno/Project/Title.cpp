@@ -79,13 +79,13 @@ void CTitle::Initialize()
 
 void CTitle::Update()
 {
-	if (g_pInput->IsKeyPush(MOFKEY_UP)) {
+	if (g_pInput->IsKeyPush(MOFKEY_LEFT)) {
 		m_StageCursor--;
 		if (m_StageCursor < 0) {
 			m_StageCursor = 0;
 		}
 	}
-	if (g_pInput->IsKeyPush(MOFKEY_DOWN)) {
+	if (g_pInput->IsKeyPush(MOFKEY_RIGHT)) {
 		m_StageCursor++;
 		if (m_StageCursor >= m_StageCount) {
 			m_StageCursor = m_StageCount - 1;

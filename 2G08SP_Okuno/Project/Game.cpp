@@ -15,7 +15,8 @@ CGame::CGame() :
 	m_Life(0),
 	m_nScene(0),
 	m_nStageIdx(0),
-	m_SceneChangeTime(0)
+	m_SceneChangeTime(0),
+	m_Time(0)
 {
 }
 
@@ -56,7 +57,7 @@ bool CGame::Load(CTexture* playerTex)
 		m_SoundArray[i].SetVolume(g_SettingWin.GetSoundVolume());
 	}
 
-	
+
 	m_Life = pllifeDefault; //Žb’è“I‚Éƒ‰ƒCƒt‚Ì‰Šú’l‚ÌÝ’è
 
 	//if (!m_Stage.Load("Stage1.txt", "Stage1Values.txt")) {
@@ -90,6 +91,7 @@ bool CGame::Initialize(std::string fname, int stageIdx)
 	m_SceneChangeTime = 3.0f;
 	m_ClearBgmFlg = false;
 	m_nStageIdx = stageIdx;
+	m_Time = 100;
 	return true;
 }
 
@@ -148,8 +150,17 @@ void CGame::Update()
 				m_ClearBgmFlg = true;
 			}
 		}
-		else if (!m_BGM.IsPlay()) {
-			m_BGM.Play();
+		else {
+			if (m_Time > 0) {
+				m_Time -= CUtilities::GetFrameSecond();
+				if (m_Time < 0) {
+					m_Time = 0;
+					m_Player.Damage(true);
+				}
+			}
+			if (!m_BGM.IsPlay()) {
+				m_BGM.Play();
+			}
 		}
 
 		if (m_Stage.IsSceneChange() && !m_BGMClear.IsPlay()) {
@@ -192,7 +203,7 @@ void CGame::Render()
 		m_Player.Render(m_Stage.GetScrollX(), m_Stage.GetScrollY());
 
 		CGraphicsUtilities::RenderString(10, 10, "ƒQ[ƒ€");
-		CGraphicsUtilities::RenderString(300, 10, "LIFE~%d", m_Player.GetLife());
+		CGraphicsUtilities::RenderString(300, 10, "LIFE~%d TIME %3.0f", m_Player.GetLife(), m_Time);
 	}
 	m_renderTime = timeGetTime() - m_renderTime;
 }

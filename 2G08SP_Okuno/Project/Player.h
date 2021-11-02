@@ -66,6 +66,7 @@ private:
 	float			m_sth;			//ステージの縦幅
 	int				m_TypeIdx;		//マリオの状態のインデックス
 	bool			m_bDead;		//死亡フラグ
+	int				m_bDeadEnd;
 	bool			m_bGoal;		//ゴールフラグ
 	float			m_DmgTime;		//ダメージを受けた場合の無敵時間
 	int				m_Life;			//マリオのライフ
@@ -82,8 +83,6 @@ private:
 	/// </summary>
 	/// <param name="btnPull">そのフレームでジャンプボタンが離されたかどうか</param>
 	void JumpingFn(bool btnPull);
-
-	void Damage(bool death);
 
 public:
 	CPlayer();
@@ -107,6 +106,8 @@ public:
 
 	void CollisionItem(CItem& item);
 
+	void Damage(bool death);
+
 	/// <summary>
 	/// ゴール時の処理
 	/// </summary>
@@ -117,6 +118,8 @@ public:
 	/// <param name="clearBgmPlay">クリアBGMの再生状態</param>
 	/// <returns>ゴールの処理が終わったどうか</returns>
 	bool GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPlay);
+
+	bool DeadFn();
 
 	void SlideMove(CVector2 v);
 

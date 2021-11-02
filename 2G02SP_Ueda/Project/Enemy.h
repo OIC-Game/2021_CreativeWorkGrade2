@@ -13,6 +13,7 @@ enum tag_ENEMYTYPE {
 };
 class CEnemy {
 private:
+	
 	CTexture* m_pTexture;
 	CSpriteMotionController	m_Motion;
 	int						m_Type;
@@ -27,6 +28,7 @@ private:
 	int						m_DamageWait;
 	bool					m_bMove;
 	bool					m_bkMove;
+	bool					m_way;
 	enum tag_MOTION {
 		MOTION_MOVE,
 		MOTION_DAMAGE,
@@ -38,7 +40,7 @@ public:
 	~CEnemy();
 	void Initialize(float px, float py, int type);
 	void Update(float wx,float wy);
-	void Damage(int dmg);
+	void Damage(int dmg,bool way);
 	void CollisionStage(float ox, float oy);
 	void Render(float wx, float wy);
 	void RenderDebug(float wx, float wy);

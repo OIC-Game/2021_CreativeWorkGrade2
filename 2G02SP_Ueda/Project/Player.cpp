@@ -28,7 +28,8 @@ CPlayer::CPlayer() :
 	m_bPipeMove(false),
 	m_bUnder(false),
 	m_bPipeUp(false),
-	m_bCoinCount(0)
+	m_bCoinCount(0),
+	m_way(false)
 {
 }
 
@@ -74,6 +75,7 @@ void CPlayer::Initialize(void)
 	m_bPipeMove=false;
 	m_bCoinCount = 0;
 	MotionRefresh();
+	m_way = false;
 }
 
 void CPlayer::Update(float wx,float wy)
@@ -305,6 +307,7 @@ void CPlayer::RenderDebug(float wx, float wy)
 	CGraphicsUtilities::RenderString(10, 70, "プレイヤー位置 X : %.0f , Y : %.0f", m_PosX, m_PosY);
 	CRectangle hr = GetRect();
 	CGraphicsUtilities::RenderRect(hr.Left - wx, hr.Top - wy, hr.Right - wx, hr.Bottom - wy, MOF_XRGB(0, 255, 0));
+	CGraphicsUtilities::RenderRect(barec.Left - wx,barec.Top - wy, barec.Right - wx, barec.Bottom - wy, MOF_XRGB(0, 0, 0));
 }
 
 void CPlayer::Release(void)
@@ -439,8 +442,21 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 	
 	CRectangle hrec = erec;
 	hrec.Bottom = (hrec.Bottom + hrec.Top) / 2;
+
+	CRectangle rirec = hrec;
+	rirec.Left = (rirec.Left + rirec.Right) * 2;
+	CRectangle lerec = hrec;
+	lerec.Right = (lerec.Left + lerec.Right) / 2;
+	
 	CRectangle lrec = prec;
 	lrec.Top = lrec.Bottom - 1;
+
+	CRectangle wrec;
+	wrec = lrec;
+	wrec.Left = (wrec.Left + wrec.Right) / 2 - 1;
+	wrec.Right = wrec.Left + 2;
+
+	barec = wrec;
 
 	if (hrec.CollisionRect(lrec))
 	{
@@ -451,7 +467,15 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 		{
 			m_MoveY = -9.0f;
 		}
-		ene.Damage(1);
+		if (rirec.CollisionRect(wrec))
+		{
+			m_way = false;
+		}
+		else if (lerec.CollisionRect(wrec))
+		{
+			m_way = true;
+		}
+		ene.Damage(1,m_way);
 		return true;
 	}
 

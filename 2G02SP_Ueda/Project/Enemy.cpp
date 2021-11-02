@@ -1,20 +1,21 @@
 #include "Enemy.h"
 
-CEnemy::CEnemy():
-m_pTexture(NULL),
-m_Motion(),
-m_PosX(0.0f),
-m_PosY(0.0f),
-m_MoveX(0.0f),
-m_MoveY(0.0f),
-m_bShow(false),
-m_bReverse(false),
-m_SrcRect(),
-m_HP(0),
-m_DamageWait(0),
-m_Type(),
-m_bMove(false),
-m_bkMove(false)
+CEnemy::CEnemy() :
+	m_pTexture(NULL),
+	m_Motion(),
+	m_PosX(0.0f),
+	m_PosY(0.0f),
+	m_MoveX(0.0f),
+	m_MoveY(0.0f),
+	m_bShow(false),
+	m_bReverse(false),
+	m_SrcRect(),
+	m_HP(0),
+	m_DamageWait(0),
+	m_Type(),
+	m_bMove(false),
+	m_bkMove(false),
+	m_way(false)
 {
 }
 
@@ -38,6 +39,7 @@ void CEnemy::Initialize(float px, float py, int type)
 	m_DamageWait = 0;
 	m_bMove = false;
 	m_bkMove = false;
+	m_way = false;
 	if (type == ENEMY_K)
 	{
 		SpriteAnimationCreate anim[] = {
@@ -69,7 +71,7 @@ void CEnemy::Initialize(float px, float py, int type)
 				"É_ÉÅÅ[ÉW",
 				0,64,
 				32,32,
-				FALSE,{{1,0,0}}
+				FALSE,{{10,0,0}}
 			},
 		};
 		m_Motion.Create(anim, MOTION_COUNT);
@@ -116,9 +118,13 @@ void CEnemy::Update(float wx,float wy)
 		m_PosY += m_MoveY;
 	}
 	
-	if (m_bkMove)
+	if (m_bkMove && m_MoveX != 5.0f && m_MoveX != -5.0f && m_way)
 	{
 		m_MoveX = 5.0f;
+	}
+	else if (m_bkMove && m_MoveX != 5.0f && m_MoveX != -5.0f && !m_way)
+	{
+		m_MoveX = -5.0f;
 	}
 	m_Motion.AddTimer(CUtilities::GetFrameSecond());
 	m_SrcRect = m_Motion.GetSrcRect();
@@ -128,8 +134,9 @@ void CEnemy::Update(float wx,float wy)
 	}
 }
 
-void CEnemy::Damage(int dmg)
+void CEnemy::Damage(int dmg,bool way)
 {
+	m_way = way;
 	if (m_Type == ENEMY_N && m_HP == 1)
 	{
 		if (!m_bkMove)
@@ -143,7 +150,7 @@ void CEnemy::Damage(int dmg)
 	else
 	{
 		m_HP -= dmg;
-		m_DamageWait = 15;
+		m_DamageWait = 10;
 		m_Motion.ChangeMotion(MOTION_DAMAGE);
 	}
 }

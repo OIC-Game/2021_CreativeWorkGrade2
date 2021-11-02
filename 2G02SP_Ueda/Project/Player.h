@@ -55,6 +55,8 @@ private:
 	bool m_bUnder;
 	bool m_bPipeUp;
 	int m_bCoinCount;
+	bool m_way;
+	CRectangle barec;
 	enum tag_MOTION {
 		MOTION_WAIT,
 		MOTION_WALK,

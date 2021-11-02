@@ -45,6 +45,17 @@ bool CPlayer::Load(void)
 	{
 		return false;
 	}
+	
+	if (!m_pShotTextureBlack.Load("P_missileBlack.png"))
+	{
+		return false;
+	}
+	
+	if (!m_pShotTextureWhite.Load("P_missileWhite.png"))
+	{
+		return false;
+	}
+
 	for (int i=0; i < PLAYERSHOT_COUNT; i++)
 	{
 		m_ShotArray[i].SetTexture(&m_ShotTexture);
@@ -66,6 +77,7 @@ void CPlayer::Initialize(void)
 		m_ShotArray[i].Initialize();
 	}
 	m_PlayerColor = 1;
+	m_Texture = m_pTextureBlack;
 }
 
 //更新
@@ -75,6 +87,10 @@ void CPlayer::Update(void)
 	{
 		return;
 	}
+
+	//Zキーで色変更
+	PlayerColorChange();
+
 	//キーボードでの移動
 	if (g_pInput->IsKeyHold(MOFKEY_LEFT))
 	{
@@ -91,17 +107,6 @@ void CPlayer::Update(void)
 	else if (g_pInput->IsKeyHold(MOFKEY_DOWN))
 	{
 		m_PosY += PLAYER_SPEED;
-	}
-
-	//Zキーで色変更　黒⇔白 0→白 1→黒
-	if (g_pInput->IsKeyPush(MOFKEY_Z))
-	{
-		if (m_PlayerColor == 0)
-			m_PlayerColor = 1;
-		m_Texture = m_pTextureBlack;
-		if (m_PlayerColor == 1)
-			m_PlayerColor = 0;
-		m_Texture = m_pTextureWhite;
 	}
 
 	if (m_ShotWait <= 0)
@@ -159,6 +164,8 @@ void CPlayer::Release(void)
 	m_pTextureBlack.Release();
 	m_pTextureWhite.Release();
 	m_ShotTexture.Release();
+	m_pShotTextureBlack.Release();
+	m_pShotTextureWhite.Release();
 }
 
 void CPlayer::RenderDebug(void)
@@ -213,12 +220,36 @@ bool CPlayer::Collision(CEnemy& ene)
 			continue;
 		}
 		CRectangle srec = ene.GetShot(i).GetRect();
-		if (srec.CollisionRect(prec))
+		if (m_PlayerColor != enecolor)
 		{
-			m_bDead = true;
-			ene.GetShot(i).SetShow(false);
-			return true;
+			if (srec.CollisionRect(prec))
+			{
+				m_bDead = true;
+				ene.GetShot(i).SetShow(false);
+				return true;
+			}
 		}
 	}
 	return false;
+}
+
+void CPlayer::PlayerColorChange(void)
+{
+	//色変え待機時間
+	if (m_ColorChangeWait > 0)
+		m_ColorChangeWait--;
+
+	//Zキーで色変更　黒⇔白 0→白 1→黒
+	if (g_pInput->IsKeyPush(MOFKEY_Z) && (m_PlayerColor == 0) && (m_ColorChangeWait == 0))
+	{
+		m_PlayerColor = 1;
+		m_Texture = m_pTextureBlack;
+		m_ColorChangeWait = PLAYERCOLOR_WAIT;
+	}
+	if (g_pInput->IsKeyPush(MOFKEY_Z) && (m_PlayerColor == 1) && (m_ColorChangeWait == 0))
+	{
+		m_PlayerColor = 0;
+		m_Texture = m_pTextureWhite;
+		m_ColorChangeWait = PLAYERCOLOR_WAIT;
+	}
 }

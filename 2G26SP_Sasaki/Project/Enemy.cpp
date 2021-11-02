@@ -40,6 +40,7 @@ void CEnemy::Initialize(void){
 	m_SpeedX = 0;
 	m_SpeedY = 0;
 	m_bShow = false;
+	m_EnemyColor = 1;
 }
 /**
  * ŠJŽn

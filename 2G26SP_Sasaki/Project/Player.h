@@ -10,6 +10,9 @@
 #define      PLAYERSHOT_COUNT  20
 
 #define      PLAYERSHOT_WAIT 20
+
+#define		 PLAYERCOLOR_WAIT 15
+
 class CPlayer
 {
 private:
@@ -19,8 +22,11 @@ private:
 	float       m_PosX;
 	float       m_PosY;
 	CTexture    m_ShotTexture;
+	CTexture    m_pShotTextureBlack;
+	CTexture    m_pShotTextureWhite;
 	CPlayerShot m_ShotArray[PLAYERSHOT_COUNT];
 	int m_ShotWait;
+	int m_ColorChangeWait;
 
 	int		m_PlayerColor;
 
@@ -41,6 +47,8 @@ public:
 	{
 		return m_bDead;
 	}
+
+	void PlayerColorChange(void);
 
 	//ÉvÉåÉCÉÑÅ[ÇÃ
 	/*CRectangle GetRect()

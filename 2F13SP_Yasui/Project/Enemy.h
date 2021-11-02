@@ -57,6 +57,7 @@ private:
 	int								debug_MarioAttackPettern;
 	bool							debugModeFlg;
 
+	
 
 	
 	//マリオ行動パターン
@@ -128,6 +129,7 @@ private:
 	int				enemy_ShotWait;
 	bool			enemy_AttackFlg;
 	float			enemy_DistanceBetweenToPlayer;
+	CSoundBuffer	enemy_FireSE;
 
 public:
 	CEnemy();

@@ -40,8 +40,8 @@ CEnemy::CEnemy() :
 	fireWait(0),
 	otherAttack(0),
 	dashCount(0),
-
-	enemy_MarioDead(false)
+	enemy_MarioDead(false),
+	enemy_FireSE()
 {
 }
 
@@ -52,7 +52,6 @@ CEnemy::~CEnemy()
 
 bool CEnemy::Load(void)
 {
-
 	return true;
 }
 
@@ -592,13 +591,7 @@ void CEnemy::CollisionStage(float ox, float oy)
 
 void CEnemy::ShotCollisionStage(float ox, float oy,int n)
 {
-	/*for (int i = 0; i < ENEMYSHOT_COUNT; i++)
-	{
-		if (!m_ShotArray[i].GetShow())
-		{
-			continue;
-		}
-	}*/
+
 		CVector2 shotPosition = Vector2(m_ShotArray[n].GetPositionX(), m_ShotArray[n].GetPositionY());
 		shotPosition.x += ox;
 		shotPosition.y += oy;
@@ -618,11 +611,11 @@ void CEnemy::ShotCollisionStage(float ox, float oy,int n)
 			shotSpeed *= -1.5;
 
 		}
-		if (ox < 0)
+		if (ox < -2)
 		{
 			m_ShotArray[n].SetShow(false);
 		}
-		else if (ox > 0)
+		else if (ox > 2)
 		{
 			m_ShotArray[n].SetShow(false);
 		}

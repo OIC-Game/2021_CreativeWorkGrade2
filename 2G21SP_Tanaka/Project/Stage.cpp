@@ -180,13 +180,6 @@ void CStage::Initialize(char* pName, CEnemy* pEnemy, CItem* pItem) {
 	m_ScrollX = 0;
 	m_ScrollY = 0;
 	int n = 0;
-	for (int y = 0; y < m_YCount; y++)
-	{
-		for (int x = 0; x < m_XCount; x++)
-		{
-
-		}
-	}
 
 	//“G
 	for (int y = 0; y < m_YCount; y++)

@@ -480,7 +480,7 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 	
 	if (er.CollisionRect(erec))
 	{
-		m_MoveY = -2.0f;
+		m_MoveY = -6.0f;
 		m_enemySound.Play();
 		ene.Damege();
 		EnemyScore();

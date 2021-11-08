@@ -4,7 +4,7 @@
 //変更するシーン
 extern int						gChangeScene;
 
-int								gStage = STAGE_NO01;
+extern int						gStage = STAGENO_01;
 CGame::CGame(){
 }
 
@@ -15,7 +15,17 @@ bool CGame::Load(void){
 	//プレイヤー素材の読み込み
 	m_Player.Load();
 	//ステージの素材読み込み
-	m_Stage.Load("Stage01.txt");
+	switch (gStage)
+	{
+		case STAGENO_01:
+		m_Stage.Load("Stage01.txt");
+		break;
+		case STAGENO_02:
+		m_Stage.Load("Stage02.txt");
+		break;
+	}
+	//m_Stage.Load("Stage01.txt");
+	//m_Stage.Load("Stage02.txt");
 	//敵メモリ確保
 	m_EnemyArray = new CEnemy[m_Stage.GetEnemyCount()];
 	//アイテムメモリ確保
@@ -31,7 +41,16 @@ void CGame::Initialize(void){
 	//プレイヤーの状態初期化
 	m_Player.Initialize();
 	//ステージの状態初期化
-	m_Stage.Initialize("Stage01.txt", m_EnemyArray, m_ItemArray);
+	switch (gStage)
+	{
+		case STAGENO_01:
+			m_Stage.Initialize("Stage01.txt", m_EnemyArray, m_ItemArray);
+			break;
+		case STAGENO_02:
+			m_Stage.Initialize("Stage02.txt", m_EnemyArray, m_ItemArray);
+			break;
+	}
+	//m_Stage.Initialize("Stage01.txt", m_EnemyArray, m_ItemArray);
 	m_PoPItemManager.Initialize();
 	m_Stage.SetPoPItemManager(&m_PoPItemManager);
 }
@@ -110,6 +129,11 @@ void CGame::Update(void){
 	if (m_Player.IsClear())
 	{
 		gChangeScene = SCENENO_GAMECLEAR;
+	}
+	if (g_pInput->IsKeyPush(MOFKEY_0))
+	{
+		gStage = STAGENO_02;
+		gChangeScene = SCENENO_GAMERETRY;
 	}
 }
 

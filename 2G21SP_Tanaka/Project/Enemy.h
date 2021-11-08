@@ -50,7 +50,7 @@ public:
 	}
 
 	CRectangle Right() {
-		return CRectangle(m_PosX+20, m_PosY, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
+		return CRectangle(m_PosX + 20, m_PosY, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
 	}
 
 	void Damege(void);

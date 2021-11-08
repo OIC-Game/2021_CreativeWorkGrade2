@@ -78,6 +78,7 @@ MofBool CGameApp::Update(void) {
 			break;
 		case SCENENO_GAMERETRY:
 			gGameRetry.Update();
+			break;
 	}
 
 	if (gChangeScene != gScene)

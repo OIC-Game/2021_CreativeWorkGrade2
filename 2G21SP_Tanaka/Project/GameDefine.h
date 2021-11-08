@@ -11,7 +11,8 @@ enum tag_SCENENO {
 };
 
 enum tag_GAMESTAGE {
-	STAGE_NO01,
+	STAGENO_01,
+	STAGENO_02,
 };
 
 //èdóÕ

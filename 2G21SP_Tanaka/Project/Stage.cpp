@@ -175,6 +175,52 @@ void CStage::Initialize(char* pName, CEnemy* pEnemy, CItem* pItem) {
 		}
 	}
 
+	//敵のテクスチャ読み込み
+	pstr = strtok(NULL, ",");
+	m_EnemyTextureCount = atoi(pstr);
+	for (int i = 0; i < m_EnemyTextureCount; i++)
+	{
+		pstr = strtok(NULL, ",");
+		m_pEnemyTexture[i].Load(pstr);
+	}
+	
+	//配置データの読み込み
+	m_pEnemyData = (char*)malloc(m_XCount * m_YCount);
+	m_EnemyCount = 0;
+	for (int y = 0; y < m_YCount; y++)
+	{
+		for (int x = 0; x < m_XCount; x++)
+		{
+			m_pEnemyData[y * m_XCount + x] = atoi(strtok(NULL, ","));
+			if (m_pEnemyData[y * m_XCount + x] > 0)
+			{
+				m_EnemyCount++;
+			}
+		}
+	}
+
+	//アイテムのテクスチャの読み込み
+	pstr = strtok(NULL, ",");
+	m_ItemTextureCount = atoi(pstr);
+	for (int i = 0; i < m_ItemTextureCount; i++)
+	{
+		pstr = strtok(NULL, ",");
+		m_pItemTexture[i].Load(pstr);
+	}
+	//配置データの読み込み
+	m_pItemData = (char*)malloc(m_XCount * m_YCount);
+	m_ItemCount = 0;
+	for (int y = 0; y < m_YCount; y++)
+	{
+		for (int x = 0; x < m_XCount; x++)
+		{
+			m_pItemData[y * m_XCount + x] = atoi(strtok(NULL, ","));
+			if (m_pItemData[y * m_XCount + x] > 0)
+			{
+				m_ItemCount++;
+			}
+		}
+	}
 	//ファイルを閉じる
 	fclose(fp);
 	free(pBuffer);
@@ -182,7 +228,6 @@ void CStage::Initialize(char* pName, CEnemy* pEnemy, CItem* pItem) {
 	m_ScrollX = 0;
 	m_ScrollY = 0;
 	int n = 0;
-
 	//敵
 	for (int y = 0; y < m_YCount; y++)
 	{

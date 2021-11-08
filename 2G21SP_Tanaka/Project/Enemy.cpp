@@ -65,16 +65,12 @@ void CEnemy::Update(float wx, float wy){
 
 	CRectangle le = Left();
 	CRectangle re = Right();
-	if (re.CollisionRect(le) && m_MoveY > 0)
+	if (re.CollisionRect(le))
 	{
 		m_MoveX *= -1;
 		m_bReverse = true;
 	}
-	else if (le.CollisionRect(re) && m_MoveY < 0)
-	{
-		m_MoveX *= -1;
-		m_bReverse = false;
-	}
+	
 
 	//d—Í‚É‚æ‚è‰º‚É­‚µ‚¸‚Â‰º‚ª‚é
 	m_MoveY += GRAVITY;

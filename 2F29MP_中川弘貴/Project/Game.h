@@ -1,4 +1,5 @@
 #pragma once
+#include "Fade.h"
 
 //Ç’ÇÊÇÃÉTÉCÉY
 #define		PUYO_SIZE	50

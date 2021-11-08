@@ -1,4 +1,5 @@
 #pragma once
+#include "Fade.h"
 
 class CTitle {
 private:

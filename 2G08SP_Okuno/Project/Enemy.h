@@ -20,6 +20,8 @@ private:
 
 	CSpriteMotionController	m_Motion;
 
+	CSoundBuffer* m_SkillSound;
+
 	CTexture* m_Texture;		//‰æ‘œ
 	CVector2		m_sPos;			//‰ŠúˆÊ’u
 	CVector2		m_Pos;			//ˆÊ’u
@@ -40,7 +42,7 @@ public:
 	CEnemy();
 	~CEnemy();
 
-	bool Load(CTexture* tex, CEnemyDefine* ed);
+	bool Load(CTexture* tex, CEnemyDefine* ed, CSoundBuffer* skillSound);
 
 	void Initialize(Vector2 pos, bool bGoal, int stgh);
 

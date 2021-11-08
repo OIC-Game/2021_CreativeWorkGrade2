@@ -44,6 +44,12 @@ bool CGame::Load(CTexture* playerTex)
 	m_BGMClear.SetLoop(false);
 	m_BGMClear.SetVolume(g_SettingWin.GetSoundVolume());
 
+	if (!m_SkillSound.Load("firedown.mp3")) {
+		return false;
+	}
+	m_SkillSound.SetLoop(false);
+	m_SkillSound.SetVolume(g_SettingWin.GetSoundVolume());
+
 	m_SoundCount = m_Player.GetSoundCount();
 	m_SoundArray = new CSoundBuffer[m_SoundCount];
 	std::string* soundFiles = m_Player.GetSoundFiles();
@@ -78,7 +84,7 @@ bool CGame::Load(CTexture* playerTex)
 bool CGame::Initialize(std::string fname, int stageIdx)
 {
 	m_Stage.Release();
-	if (!m_Stage.Load(fname)) {
+	if (!m_Stage.Load(fname, &m_SkillSound)) {
 		return false;
 	}
 
@@ -118,6 +124,7 @@ void CGame::Update()
 			m_Player.SetLife(m_Life);
 
 			m_nScene = G_SCENE_LIFE;
+			m_Time = 100;
 		}
 	}
 	else if (m_nScene == G_SCENE_LIFE) {
@@ -221,6 +228,7 @@ void CGame::Release()
 	m_Stage.Release();
 
 	m_SkillTexture.Release();
+	m_SkillSound.Release();
 
 	if (m_SoundArray) {
 		for (int i = 0; i < m_SoundCount; i++) {

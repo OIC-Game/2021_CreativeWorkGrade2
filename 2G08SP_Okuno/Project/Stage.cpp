@@ -122,7 +122,7 @@ bool CStage::Load(char* fname, int sx, int sy)
 	return true;
 }
 
-void CStage::Initialize(bool bGoal, int gType, int gx, int gy)
+void CStage::Initialize(bool bGoal, int gType, int gx, int gy, CSoundBuffer* skillSound)
 {
 	m_ScrollX = 0;
 	m_ScrollY = 0;
@@ -142,7 +142,7 @@ void CStage::Initialize(bool bGoal, int gType, int gx, int gy)
 			if (on < 0) {
 				continue;
 			}
-			m_EnemyArray[n].Load(m_pEnemyTexture, CGameDefine::GetGameDefine()->GetEnemyByIdx(on + 1));
+			m_EnemyArray[n].Load(m_pEnemyTexture, CGameDefine::GetGameDefine()->GetEnemyByIdx(on + 1), skillSound);
 			m_EnemyArray[n++].Initialize(Vector2(x * CHIPSIZE, y * CHIPSIZE), (bGoal && (gType == 1) && (x == gx) && (y == gy)), GetStageHeight());
 		}
 	}

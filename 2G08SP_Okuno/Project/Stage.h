@@ -41,7 +41,7 @@ public:
 
 	bool Load(char* fname, int sx, int sy);
 
-	void Initialize(bool bGoal, int gType, int gx, int gy);
+	void Initialize(bool bGoal, int gType, int gx, int gy, CSoundBuffer* skillSound);
 
 	void Update(CPlayer& pl);
 

@@ -16,7 +16,7 @@ CStageParent::~CStageParent()
 {
 }
 
-bool CStageParent::Load(std::string fname)
+bool CStageParent::Load(std::string fname, CSoundBuffer* skillSound)
 {
 	FILE* f = fopen(fname.c_str(), "rt");
 	if (f == NULL) {
@@ -84,6 +84,8 @@ bool CStageParent::Load(std::string fname)
 	fclose(f);
 	free(buffer);
 
+	m_pSkillSound = skillSound;
+
 	return true;
 }
 
@@ -94,7 +96,7 @@ void CStageParent::Initialize()
 	m_SceneChangeFlg = false;
 	m_StageCursor = 0;
 	for (int i = 0; i < m_StageCount; i++) {
-		m_StageArray[i].Initialize(i == m_GoalIdx, m_GoalType, m_GoalX, m_GoalTop);
+		m_StageArray[i].Initialize(i == m_GoalIdx, m_GoalType, m_GoalX, m_GoalTop, m_pSkillSound);
 	}
 }
 

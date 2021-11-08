@@ -77,7 +77,9 @@ void CPlayer::JumpStart(float SSpeed) {
 		m_Move.y = JumpSSpeed[ix];
 	}
 
-	m_SoundArray[SOUND_JUMP].Play();
+	if (!m_bDead) {
+		m_SoundArray[SOUND_JUMP].Play();
+	}
 }
 
 void CPlayer::JumpingFn(bool btnPull)

@@ -21,6 +21,7 @@ private:
 	CSoundBuffer*	m_SoundArray;
 	CSoundBuffer	m_BGM;
 	CSoundBuffer	m_BGMClear;
+	CSoundBuffer	m_SkillSound;
 	bool			m_ClearBgmFlg;
 	int				m_Life;
 	int				m_nScene;

@@ -22,10 +22,11 @@ CEnemy::~CEnemy()
 {
 }
 
-bool CEnemy::Load(CTexture* tex, CEnemyDefine* ed)
+bool CEnemy::Load(CTexture* tex, CEnemyDefine* ed, CSoundBuffer* skillSound)
 {
 	m_Texture = tex;
 	m_define = ed;
+	m_SkillSound = skillSound;
 
 	m_Motion.Create(ed->anim, ed->animCount);
 	return true;
@@ -179,6 +180,9 @@ void CEnemy::CollisionSkill(CSkillObj& sObj)
 	if (CollisionObj(sObj.GetRect(), sObj.GetMove(), sObj.GetDamageFlg(), sObj.GetDamageDirection())) {
 		//“–‚½‚Á‚½Žž‚Ìˆ—
 		if (m_Damaged) {
+			if (m_ShowState == STATE_DISAPPEAR) {
+				m_SkillSound->Play();
+			}
 			sObj.Hit();
 		}
 	}

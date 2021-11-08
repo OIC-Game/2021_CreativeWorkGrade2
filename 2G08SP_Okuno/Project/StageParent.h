@@ -23,6 +23,8 @@ private:
 	int			m_GoalTop;
 	int			m_GoalBottom;
 
+	CSoundBuffer* m_pSkillSound;
+
 	//bool		m_DebugFlg;
 
 	bool		m_GoalFlg;
@@ -34,7 +36,7 @@ public:
 	CStageParent();
 	~CStageParent();
 
-	bool Load(std::string fname);
+	bool Load(std::string fname, CSoundBuffer* skillSound);
 
 	void Initialize();
 

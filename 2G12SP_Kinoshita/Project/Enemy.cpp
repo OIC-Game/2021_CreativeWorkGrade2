@@ -37,7 +37,7 @@ void CEnemy::Initialize(float px, float py, int type) {
 	//m_Type = type;
 	m_Pos.x = px;
 	m_Pos.y = py;
-	m_Move.x = -3.0f;
+	m_Move.x = -2.0f;
 	m_Move.y = 0.0f;
 	m_bReverse = false;
 	m_bShow = true;
@@ -50,7 +50,7 @@ void CEnemy::Initialize(float px, float py, int type) {
 			"ˆÚ“®",
 			0,0,
 			30,32,
-			TRUE,{{5,0,0},{5,1,0}}
+			TRUE,{{7,0,0},{7,1,0}}
 		},
 
 		SpriteAnimationCreate{

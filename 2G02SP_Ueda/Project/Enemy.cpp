@@ -53,7 +53,7 @@ void CEnemy::Initialize(float px, float py, int type)
 				"ƒ_ƒ[ƒW",
 				0,32,
 				32,32,
-				FALSE,{{20,0,0}}
+				FALSE,{{18,0,0}}
 			},
 		};
 		m_Motion.Create(anim, MOTION_COUNT);
@@ -117,15 +117,6 @@ void CEnemy::Update(float wx,float wy)
 		m_PosX += m_MoveX;
 		m_PosY += m_MoveY;
 	}
-	
-	if (m_bkMove && m_MoveX != 5.0f && m_MoveX != -5.0f && m_way)
-	{
-		m_MoveX = 5.0f;
-	}
-	else if (m_bkMove && m_MoveX != 5.0f && m_MoveX != -5.0f && !m_way)
-	{
-		m_MoveX = -5.0f;
-	}
 	m_Motion.AddTimer(CUtilities::GetFrameSecond());
 	m_SrcRect = m_Motion.GetSrcRect();
 	if (m_DamageWait > 0)
@@ -146,11 +137,19 @@ void CEnemy::Damage(int dmg,bool way)
 			m_MoveX = 0;
 			m_bkMove = false;
 		}
+		if (/*m_bkMove && */m_MoveX == 0.0f && m_way)
+		{
+			m_MoveX = 5.0f;
+		}
+		else if (/*m_bkMove && */m_MoveX == 0.0f && !m_way)
+		{
+			m_MoveX = -5.0f;
+		}
 	}
-	else
+	else if (m_HP != 0)
 	{
 		m_HP -= dmg;
-		m_DamageWait = 10;
+		m_DamageWait = 20;
 		m_Motion.ChangeMotion(MOTION_DAMAGE);
 	}
 }
@@ -193,7 +192,6 @@ void CEnemy::Render(float wx, float wy)
 		dr.Left = tmp;
 	}
 	m_pTexture->Render(m_PosX - wx, m_PosY - wy, dr);
-
 }
 
 void CEnemy::RenderDebug(float wx, float wy)

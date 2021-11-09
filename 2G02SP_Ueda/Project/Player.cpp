@@ -444,7 +444,7 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 	hrec.Bottom = (hrec.Bottom + hrec.Top) / 2;
 
 	CRectangle rirec = hrec;
-	rirec.Left = (rirec.Left + rirec.Right) * 2;
+	rirec.Left = (rirec.Left + rirec.Right) / 2;
 	CRectangle lerec = hrec;
 	lerec.Right = (lerec.Left + lerec.Right) / 2;
 	
@@ -471,7 +471,7 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 		{
 			m_way = false;
 		}
-		else if (lerec.CollisionRect(wrec))
+		if (lerec.CollisionRect(wrec))
 		{
 			m_way = true;
 		}
@@ -498,7 +498,7 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 			m_bGiant = false;
 			m_DamageWait = 150;
 		}
-		m_HP -= 1;
+		//m_HP -= 1;
 		
 		if (m_HP <= 0)
 		{

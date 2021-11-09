@@ -22,6 +22,7 @@ private:
 	ENEMYSTART*  m_pEnemyStart;
 	int         m_EnemyCount;
 	CTexture    m_EnemyTexture;
+	CTexture    m_EnemyTextureWhite;
 	int         m_EnemyNo;
 	int			m_EnemyShotColor;
 	CTexture    m_EnemyShotTexture;

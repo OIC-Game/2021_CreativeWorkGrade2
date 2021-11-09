@@ -405,13 +405,12 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 	for (int i = 0; i < m_BlockCount; i++) {
 		if (m_BlockArray[i].GetType() < 0) continue;
 		CRectangle cr = m_BlockArray[i].GetRect();
-		if (cr.Right - m_ScrollX < -CHIPSIZE || cr.Left - m_ScrollX > sw + CHIPSIZE ||
-			cr.Bottom - m_ScrollY < -CHIPSIZE || cr.Top - m_ScrollY > sh + CHIPSIZE) continue;
+		if (cr.Right - m_ScrollX < -CHIPSIZE || cr.Left - m_ScrollX > sw + CHIPSIZE) continue;
 
 		if (move.y >= 0) {
 			CRectangle b_trec = cr;
 			//ê⁄ínîªíË
-			CRectangle brec = CRectangle(MOF_MIN(rb.Left, ra.Left), MOF_MIN(rb.Bottom, ra.Bottom), MOF_MAX(rb.Right, ra.Right), MOF_MAX(rb.Bottom, ra.Bottom));
+			CRectangle brec = CRectangle(min(rb.Left, ra.Left), min(rb.Bottom, ra.Bottom), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom));
 			//brec.Bottom += 1;
 			brec.Expansion(-6, 0);
 
@@ -471,7 +470,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 
 			CRectangle b_brec = cr;
 			//è„ï˚å¸îªíË
-			CRectangle trec = CRectangle(MOF_MIN(rb.Left, ra.Left), MOF_MIN(rb.Top, ra.Top), MOF_MAX(rb.Right, ra.Right), MOF_MAX(rb.Top, ra.Top));
+			CRectangle trec = CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Top, ra.Top));
 			trec.Expansion(-6, 0);
 			trec += CVector2(0, 1);
 
@@ -509,16 +508,14 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 
 			CRectangle b_lrec = cr;
 			//âEï˚å¸îªíË
-			CRectangle rrec = CRectangle(MOF_MIN(rb.Right, ra.Right), MOF_MIN(rb.Top, ra.Top), MOF_MAX(rb.Right, ra.Right), MOF_MAX(rb.Bottom, ra.Bottom));
+			CRectangle rrec = CRectangle(min(rb.Right, ra.Right), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom));
 			rrec.Expansion(0, -6);
-			rrec -= CVector2(1, 0);
 
 			if (!m_BlockArray[i].CheckDirection(BlockAll)) {
 				b_lrec.Right = b_lrec.Left + 6;
 			}
 
 			if (b_lrec.CollisionRect(rrec)) {
-				rrec += CVector2(1, 0);
 				/*if (0 < coll.ox) {
 					coll.crush = true;
 					break;
@@ -546,16 +543,14 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 
 			CRectangle b_rrec = cr;
 			//ç∂ï˚å¸îªíË
-			CRectangle lrec = CRectangle(MOF_MIN(rb.Left, ra.Left), MOF_MIN(rb.Top, ra.Top), MOF_MAX(rb.Left, ra.Left), MOF_MAX(rb.Bottom, ra.Bottom));
+			CRectangle lrec = CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Left, ra.Left), max(rb.Bottom, ra.Bottom));
 			lrec.Expansion(0, -6);
-			lrec -= CVector2(1, 0);
 
 			if (!m_BlockArray[i].CheckDirection(BlockAll)) {
 				b_rrec.Left = b_rrec.Right - 6;
 			}
 
 			if (b_rrec.CollisionRect(lrec)) {
-				lrec += CVector2(1, 0);
 				/*if (0 > coll.ox) {
 					coll.crush = true;
 					break;

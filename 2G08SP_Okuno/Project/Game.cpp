@@ -124,13 +124,13 @@ void CGame::Update()
 			m_Player.SetLife(m_Life);
 
 			m_nScene = G_SCENE_LIFE;
-			m_Time = 100;
 		}
 	}
 	else if (m_nScene == G_SCENE_LIFE) {
 		m_SceneChangeTime -= CUtilities::GetFrameSecond();
 		if (m_SceneChangeTime <= 0) {
 			m_SceneChangeTime = 3.0f;
+			m_Time = 100;
 			m_nScene = G_SCENE_GAME;
 
 			m_Stage.Initialize();
@@ -158,7 +158,7 @@ void CGame::Update()
 			}
 		}
 		else {
-			if (m_Time > 0) {
+			if (m_Time > 0 && !m_Player.GetDead()) {
 				m_Time -= CUtilities::GetFrameSecond();
 				if (m_Time < 0) {
 					m_Time = 0;

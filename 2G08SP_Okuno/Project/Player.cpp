@@ -274,6 +274,8 @@ void CPlayer::Update(float wx, float wy)
 		m_Pos.x = wx;
 	}
 
+	if (m_bGoal) return;
+
 	//óéâ∫éûÇÃèàóù
 	if (m_Pos.y > m_sth) {
 		m_bDead = true;
@@ -350,7 +352,8 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 		return;
 	}
 	
-	CRectangle prec = GetRect(true);
+	CRectangle rb = GetBRect(true);
+	CRectangle ra = GetRect(true);
 	CRectangle erec = ene.GetRect();
 	erec.Expansion(0, -3);
 
@@ -358,36 +361,34 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 	CRectangle elrec = erec;
 	elrec.Right = (elrec.Left + elrec.Right) / 2;
 
-	CRectangle rrec = prec;
-	rrec.Left = rrec.Right - 1;
+	CRectangle rrec = CRectangle(min(rb.Right, ra.Right), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom));
 	rrec.Expansion(0, -6);
 
 	//ç∂ï˚å¸îªíËóp
 	CRectangle errec = erec;
 	errec.Left = (errec.Left + errec.Right) / 2;
 
-	CRectangle lrec = prec;
-	lrec.Right = lrec.Left + 1;
+	CRectangle lrec = CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Left, ra.Left), max(rb.Bottom, ra.Bottom));
 	lrec.Expansion(0, -6);
 
 	if (elrec.CollisionRect(rrec) && m_DmgTime <= 0 && !ene.GetJustTrampled()) {
-		if ((ene.GetDamageFlg() & DAMAGE_ONLY_PLAYER) == DAMAGE_ONLY_PLAYER &&
+		if (ene.CheckDamageFlg(DAMAGE_ONLY_PLAYER) &&
 			(ene.GetDamageDirection() & BlockLeft) != BlockLeft) {
 			CCollisionData coll = CCollisionData();
 			coll.ox = rrec.Right - elrec.Left;
 			ene.CollisionStage(coll);
-			if (ene.Touched(prec, true)) {
+			if (ene.Touched(ra, true)) {
 				return;
 			}
 		}
 	}
 	if (errec.CollisionRect(lrec) && m_DmgTime <= 0 && !ene.GetJustTrampled()) {
-		if ((ene.GetDamageFlg() & DAMAGE_ONLY_PLAYER) == DAMAGE_ONLY_PLAYER &&
+		if (ene.CheckDamageFlg(DAMAGE_ONLY_PLAYER) &&
 			(ene.GetDamageDirection() & BlockRight) != BlockRight) {
 			CCollisionData coll = CCollisionData();
 			coll.ox = lrec.Left - errec.Right;
 			ene.CollisionStage(coll);
-			if (ene.Touched(prec, true)) {
+			if (ene.Touched(ra, true)) {
 				return;
 			}
 		}
@@ -397,8 +398,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 	CRectangle hrec = erec;
 	hrec.Bottom = (hrec.Bottom + hrec.Top) / 2;
 
-	CRectangle brec = prec;
-	brec.Top = brec.Bottom - 1;
+	CRectangle brec = CRectangle(min(rb.Left, ra.Left), min(rb.Bottom, ra.Bottom), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom));
 	brec.Expansion(-6, 0);
 
 	//ì•Ç›Ç¬ÇØÇΩèÍçá
@@ -406,7 +406,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 		if (ene.GetJustTrampled()) return;
 		bool tFlg = (ene.GetChangeFlg() & CHANGE_TOUCH) == CHANGE_TOUCH;
 
-		if ((ene.GetDamageFlg() & DAMAGE_ONLY_PLAYER) == DAMAGE_ONLY_PLAYER &&
+		if (ene.CheckDamageFlg(DAMAGE_ONLY_PLAYER) &&
 			(ene.GetDamageDirection() & BlockUp) == BlockUp && 
 			(ene.GetChangeFlg() & CHANGE_TRAMPLED) != CHANGE_TRAMPLED) {
 			if (m_DmgTime > 0) return;
@@ -414,7 +414,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 			Damage(false);
 			return;
 		}
-		ene.Trampled(prec);
+		ene.Trampled(ra);
 		m_SoundArray[SOUND_TRAMPLED].Play();
 
 		if (g_pInput->IsKeyHold(MOFKEY_SPACE) || g_pInput->IsMouseKeyHold(0)) {
@@ -432,12 +432,11 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 	CRectangle drec = erec;
 	drec.Top = (drec.Bottom + drec.Top) / 2;
 
-	CRectangle trec = prec;
-	trec.Bottom = trec.Top + 1;
+	CRectangle trec = CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Top, ra.Top));
 	trec.Expansion(-6, 0);
 
 	if (drec.CollisionRect(trec) && (m_Move.y <= 0 || ene.GetMove().y >= 0)) {
-		if ((ene.GetDamageFlg() & DAMAGE_ONLY_PLAYER) == DAMAGE_ONLY_PLAYER &&
+		if (ene.CheckDamageFlg(DAMAGE_ONLY_PLAYER) &&
 			(ene.GetDamageDirection() & BlockDown) == BlockDown) {
 			if (m_DmgTime > 0 || ene.GetJustTrampled()) return;
 
@@ -448,7 +447,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 
 
 	if (elrec.CollisionRect(rrec) && (m_Move.x >= 0 || ene.GetMove().x <= 0)) {
-		if ((ene.GetDamageFlg() & DAMAGE_ONLY_PLAYER) == DAMAGE_ONLY_PLAYER &&
+		if (ene.CheckDamageFlg(DAMAGE_ONLY_PLAYER) &&
 			(ene.GetDamageDirection() & BlockLeft) == BlockLeft) {
 			if (m_DmgTime > 0 || ene.GetJustTrampled()) return;
 
@@ -459,7 +458,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 
 
 	if (errec.CollisionRect(lrec) && (m_Move.x <= 0 || ene.GetMove().x >= 0)) {
-		if ((ene.GetDamageFlg() & DAMAGE_ONLY_PLAYER) == DAMAGE_ONLY_PLAYER &&
+		if (ene.CheckDamageFlg(DAMAGE_ONLY_PLAYER) &&
 			(ene.GetDamageDirection() & BlockRight) == BlockRight) {
 			if (m_DmgTime > 0 || ene.GetJustTrampled()) return;
 
@@ -469,7 +468,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 	}
 
 	if (ene.GetJustTrampled()) {
-		ene.SetJustTrampled(erec.CollisionRect(prec));
+		ene.SetJustTrampled(erec.CollisionRect(ra));
 	}
 }
 

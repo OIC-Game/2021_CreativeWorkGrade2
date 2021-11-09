@@ -96,7 +96,8 @@ public:
 		return CRectangle(m_Pos.x, m_Pos.y, m_Pos.x + m_Motion.GetSrcRect().GetWidth(), m_Pos.y + m_Motion.GetSrcRect().GetHeight());
 	};
 
-	int GetDamageFlg() { return m_define->damageFlg; };
+	int CheckDamageFlg(int flg) { return (m_define->damageFlg & flg) != 0; };
+	int GetDamageFlg() { return m_define->damageFlg; }
 	int GetDamageDirection() { return m_define->damageDirection; };
 	int GetChangeFlg() { return m_define->changeFlg; };
 

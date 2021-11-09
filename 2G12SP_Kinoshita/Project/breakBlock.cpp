@@ -18,8 +18,7 @@ void CbreakBlock::Initialize(float px, float py, int type)
 	m_Pos.x = px;
 	m_Pos.y = py;
 	m_bShow = true;
-	/*m_Move.x = 0.0f;
-	m_Move.y = 0.0f;*/
+	m_PosWait = 0;
 	m_Type = type;
 }
 
@@ -29,7 +28,10 @@ void CbreakBlock::Update(void)
 	{
 		return;
 	}
-	
+	if (m_PosWait > 0)
+	{
+		m_PosWait--;
+	}
 }
 
 void CbreakBlock::CollisionStage(float ox, float oy)
@@ -75,8 +77,17 @@ bool CbreakBlock::Collision(CRectangle r, float& ox, float& oy)
 	return false;
 }
 
-//bool CbreakBlock::CollisionPlayer(CPlayer& ply)
-//{
-//	
-//	return false;
-//}
+void CbreakBlock::GetPos(void)
+{
+	m_PosWait = 2;
+	if (m_PosWait > 0 )
+	{
+		m_Pos.y -= 2;
+	}
+	
+}
+
+void CbreakBlock::GetShow(void)
+{
+	m_bShow = false;
+}

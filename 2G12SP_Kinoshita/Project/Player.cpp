@@ -488,6 +488,7 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 		m_DamageWait = 60;
 		if (m_Power == 1)
 		{
+			m_Power = 0;
 			m_Motion.ChangeMotion(MOTION_WAIT);
 		}
 		return true;
@@ -639,11 +640,20 @@ bool CPlayer::CollisionbreakBlock(CbreakBlock& blo, float ox, float oy)
 	CRectangle bl = blo.GetRect();
 	CRectangle bo = Getbody();
 	CRectangle prlg = GetLEG();
+	CRectangle plect = GetRect();
 	if (prec.CollisionRect(bl))
 	{
 		m_MoveX = 0;
 		m_MoveY = 0;
 		m_PosY += bl.Bottom - prec.Top;
+		if (m_Power == 0)
+		{
+			blo.GetPos();
+		}
+		else if (m_Power == 1)
+		{
+			blo.GetShow();
+		}
 	}
 	else if (prlg.CollisionRect(bl))
 	{
@@ -681,13 +691,13 @@ bool CPlayer::CollisionbreakBlock(CbreakBlock& blo, float ox, float oy)
 			m_MoveX = 0;
 		}
 	}
-	else if (bo.CollisionRect(bl))
+	/*else if (plect.CollisionRect(bl))
 	{
 		m_MoveX = 0;
 		m_MoveY = 0;
-		m_PosX += 0;
-		m_PosY += 0;
-	}
+		m_PosX += bl.Left+prec.Right;
+		m_PosY += bl.Left - prec.Left;
+	}*/
 	return false;
 }
 

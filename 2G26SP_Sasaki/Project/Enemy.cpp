@@ -15,7 +15,7 @@ m_PosY(0.0f) ,
 m_SpeedX(0.0f) ,
 m_SpeedY(0.0f) ,
 m_bShow(false),
-m_HP(5),
+m_HP(2),
 m_ShotArray(),
 m_ShotWait(0),
 m_ShotWaitSet(0)

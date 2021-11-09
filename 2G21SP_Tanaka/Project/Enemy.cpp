@@ -63,15 +63,6 @@ void CEnemy::Update(float wx, float wy){
 		m_bMove = true;
 	}
 
-	CRectangle le = Left();
-	CRectangle re = Right();
-	if (re.CollisionRect(le))
-	{
-		m_MoveX *= -1;
-		m_bReverse = true;
-	}
-	
-
 	//d—Í‚É‚æ‚è‰º‚É­‚µ‚¸‚Â‰º‚ª‚é
 	m_MoveY += GRAVITY;
 	if (m_MoveY >= 20.0f)
@@ -152,6 +143,10 @@ void CEnemy::CollisionStage(float ox, float oy){
 		m_MoveX *= -1;
 		m_bReverse = false;
 	}
+}
+
+void CEnemy::CollisonEnemy(void){
+	
 }
 
 void CEnemy::Damege(void){

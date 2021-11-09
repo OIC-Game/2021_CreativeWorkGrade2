@@ -1,5 +1,7 @@
 #include "Player.h"
 
+extern int			gStage;
+
 CPlayer::CPlayer():
 m_Texture(),
 m_PosX(0.0f),
@@ -106,9 +108,13 @@ void CPlayer::Initialize(void){
 	{
 		m_Life = 3;
 	}
-	m_Stat = 0;
+	if (gStage == STAGENO_01)
+	{
+		m_Stat = 0;
+		m_Coin = 0;
+		m_Score = 0;
+	}
 	m_Comb = 0;
-	m_Coin = 0;
 	m_bJump = false;
 	m_bShow = true;
 	m_bReverse = false;
@@ -119,7 +125,6 @@ void CPlayer::Initialize(void){
 	m_bDead = false;
 	m_bEndTime = 0;
 	m_DamageWait = 0;
-	m_Score = 0;
 	m_Motion.ChangeMotion(MOTION_WAIT);
 	m_BGM.SetLoop(TRUE);
 	m_BGM.Play();
@@ -315,6 +320,11 @@ void CPlayer::UpdateKey(){
 	else
 	{
 		m_MoveY += GRAVITY * 1.5f;
+	}
+
+	if (g_pInput->IsKeyPush(MOFKEY_1))
+	{
+		m_bClear = true;
 	}
 }
 

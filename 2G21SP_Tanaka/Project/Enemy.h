@@ -2,6 +2,13 @@
 #include		"Mof.h"
 #include		"GameDefine.h"
 
+enum tag_ENEMYTYPE {
+	ENEMY_01,
+	ENEMY_02,
+
+	ENEMY_TYPECOUNT,
+};
+
 //ìñÇΩÇËîªíËå∏êäïù
 #define		ENEMY_RECTDECREASE		7
 
@@ -33,11 +40,11 @@ public:
 	~CEnemy();
 	void Initialize(float px, float py, int type);
 	void Update(float wx, float wy);
-
 	void Render(float wx, float wy);
 	void RenderDebug(float wx, float wy);
 	void Release();
 	void CollisionStage(float ox, float oy);
+	void CollisonEnemy(void);
 	void SetTexture(CTexture* pt) { m_pTexture = pt; }
 	bool GetShow(void) { return m_bShow; }
 	bool GetDead(void) { return m_bDead; }

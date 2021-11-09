@@ -34,14 +34,18 @@ public:
 	//’e‚ÌƒeƒNƒXƒ`ƒƒ‚ðÝ’è
 	void SetTexture(CTexture* pt){ m_pTexture = pt; }
 
-	void SetShotColor(int* co) { m_pShotColor; }
+	void SetPlayerShotColor(int pc) { m_pShotColor = pc; }
+
+	//void SetShotColor(int* co) { m_pShotColor; }
 
 	//’e‚ª•\Ž¦‚³‚ê‚Ä‚¢‚éê‡true‚ð•Ô‚·
 	bool GetShow(void){ return m_bShow; }
 
-	//Chapter7-8‚Å’Ç‰Á
 	//’e‚Ì•\Ž¦ó‘Ô‚ðÝ’è‚·‚é
 	void SetShow(bool bs){ m_bShow = bs; }
+
+	//’e‚ÌF‚ð•Ô‚·
+	int GetPlayerColorShow() { return m_pShotColor; }
 
 	//’e‚Ì‹éŒ`‚ð•Ô‚·
 	CRectangle GetRect(){ return CRectangle(m_PosX,m_PosY,m_PosX + m_pTexture->GetWidth(),m_PosY + m_pTexture->GetHeight()); }

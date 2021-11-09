@@ -9,7 +9,8 @@ CPlayer::CPlayer():
 	m_bDead(false),
 	m_ShotTexture(),
 	m_ShotArray(),
-	m_ShotWait()
+	m_ShotWait(),
+	m_ColorChangeWait(0.0f)
 
 {
 
@@ -132,12 +133,14 @@ void CPlayer::Update(void)
 				if (m_PlayerShotColor == 1)
 				{
 					m_ShotArray[i].SetTexture(&m_pShotTextureBlack);
+					m_ShotArray[i].SetPlayerShotColor(1);
 				}
 				if (m_PlayerShotColor == 0)
 				{
 					m_ShotArray[i].SetTexture(&m_pShotTextureWhite);
+					m_ShotArray[i].SetPlayerShotColor(0);
 				}
-				m_ShotArray[i].SetShotColor(&m_PlayerShotColor);
+				//m_ShotArray[i].SetShotColor(&m_PlayerShotColor);
 				m_ShotArray[i].Fire(m_PosX + m_Texture.GetWidth()*0.5f, m_PosY);
 				break;
 			}
@@ -225,17 +228,20 @@ bool CPlayer::Collision(CEnemy& ene)
 		}
 		CRectangle srec = m_ShotArray[i].GetRect();
 		//色次第で敵に弾が当たらない
-		//今は無理やりプレイヤーの色で決めている
-		//後々弾の色と判定を取りたい
-		if (m_PlayerShotColor != enecolor)
+		//弾の色
+		int plshtcol = m_ShotArray[i].GetPlayerColorShow();
+		//if (m_PlayerShotColor != enecolor)
+		//{
+		if (srec.CollisionRect(erec))
 		{
-			if (srec.CollisionRect(erec))
+			if (plshtcol != enecolor)
 			{
 				ene.Damage(1);
 				m_ShotArray[i].SetShow(false);
 				return true;
 			}
 		}
+		//}
 	}
 	for (int i = 0; i < ENEMYSHOT_COUNT; i++)
 	{

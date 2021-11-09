@@ -3,10 +3,11 @@
 
 class CTitle {
 private:
-	CTexture	m_BackTexture;
-	int			m_fade;
-	bool		m_bStart;
+	CTexture		m_backTexture;
+	bool			m_startFlg;
 	CSoundBuffer	m_titleBGM;
+
+	CFade			m_fade;
 public:
 	CTitle();
 	~CTitle();

@@ -10,6 +10,18 @@
 //自由落下の速度
 #define		DROP_SPEED 80
 
+enum Type
+{
+	Empty,
+	Wall,
+	Red,
+	Blue,
+	Yellow,
+	Green,
+
+	TypeCount,
+};
+
 typedef enum
 {
 	Top,
@@ -38,29 +50,46 @@ struct S_FieldPos
 class CGame {
 private:
 
+	int			m_field[FH][FW];
+	int			m_type[2][2];
 
-	bool bChain = false;
-	bool bCheck[FH][FW];
-	bool bDestroy[FH][FW];
-	int bondCnt;
+	//タイマー
 
-	int			field[FH][FW];
-	int			wait;            //自動落下まで待つ変数
-	int			type[2][2];
-	int			m_sleepTime;         //sleepの代わり
+	//自動落下まで待つ変数
+	int			m_dropTimeCnt;
+	//また後で名前変える　　間を生み出すためタイム変数
+	int			m_sleepTime;
+	//
+	int			m_readyTime;
 	int			m_downHoldTime;
 	int			m_leftHoldTime;
 	int			m_rightHoldTime;
-	int			m_chainCnt;
+
+	//スコア
 	int			m_maxChainCnt;
 	int			m_score;
-	int			m_readyTime;
 
+	//連鎖
+
+	//ぷよが消滅した
+	bool		m_chainFlg;
+	//空でも壁でもなくぷよである
+	bool		m_puyoCheckFlg[FH][FW];
+	//消滅させるぷよ
+	bool		m_destroyFlg[FH][FW];
+	//同じ色が何個繋がっているか
+	int			m_bondCnt;
+	//連鎖数
+	int			m_chainCnt;
+
+	//ぷよ素材
 	CTexture    m_RedPuyoTexture;
 	CTexture    m_BluePuyoTexture;
 	CTexture    m_YellowPuyoTexture;
 	CTexture    m_GreenPuyoTexture;
+	//背景
 	CTexture	m_BackTexture;
+	//ゲームオーバーのバツ
 	CTexture	m_CrossMarkTexture;
 	CTexture	m_GameOverTexture;
 	CTexture    m_PauseTexture;
@@ -79,6 +108,9 @@ private:
 	CSoundBuffer	m_gameBGM;
 	CSoundBuffer	m_pauseSound;
 	CSoundBuffer	m_gameOverSound;
+
+	CFade			fade;
+	bool			endFlg;
 
 public:
 	CGame();

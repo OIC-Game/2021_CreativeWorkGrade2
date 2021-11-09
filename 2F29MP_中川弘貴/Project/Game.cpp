@@ -121,11 +121,11 @@ void CGame::Initialize(void)
 		for (int x = 0; x < FW; x++)
 		{
 			if (x == 0 || x == FW - 1)
-				field[y][x] = 1;
+				m_field[y][x] = Wall;
 			else if (y == FH - 1)
-				field[y][x] = 1;
+				m_field[y][x] = Wall;
 			else
-				field[y][x] = 0;
+				m_field[y][x] = Empty;
 		}
 	}
 
@@ -135,7 +135,7 @@ void CGame::Initialize(void)
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			type[i][j] = random.Random(2, 6);
+			m_type[i][j] = random.Random(Red, TypeCount);
 		}
 	}
 
@@ -150,7 +150,7 @@ void CGame::Initialize(void)
 	m_gameBGM.SetVolume(0.05f);
 
 	//色々初期値
-	wait = DROP_SPEED;
+	m_dropTimeCnt = DROP_SPEED;
 	m_chainCnt = 0;
 	m_maxChainCnt = 0;
 	m_score = 0;
@@ -167,28 +167,31 @@ void CGame::Initialize(void)
 	sFPos.x = 3;
 	sFPos.y = 0;
 	eStep = E_Rotation::Top;
+	endFlg = false;
+
+	fade.FadeIn();
 }
 
 void CGame::ChainCheck(int y, int x)
 {
-	if (field[y][x] != 0 && field[y][x] != 1 &&
-		!bCheck[y][x])
+	if (m_field[y][x] != 0 && m_field[y][x] != 1 &&
+		!m_puyoCheckFlg[y][x])
 	{
-		bCheck[y][x] = true;
-		bondCnt++;
-		if (field[y][x] == field[y - 1][x])
+		m_puyoCheckFlg[y][x] = true;
+		m_bondCnt++;
+		if (m_field[y][x] == m_field[y - 1][x])
 		{
 			ChainCheck(y - 1, x);
 		}
-		if (field[y][x] == field[y][x + 1])
+		if (m_field[y][x] == m_field[y][x + 1])
 		{
 			ChainCheck(y, x + 1);
 		}
-		if (field[y][x] == field[y + 1][x])
+		if (m_field[y][x] == m_field[y + 1][x])
 		{
 			ChainCheck(y + 1, x);
 		}
-		if (field[y][x] == field[y][x - 1])
+		if (m_field[y][x] == m_field[y][x - 1])
 		{
 			ChainCheck(y, x - 1);
 		}
@@ -200,6 +203,19 @@ void CGame::ChainCheck(int y, int x)
 */
 void CGame::Update(void)
 {
+	//フェードの処理
+	fade.Update();
+	if (fade.GetFadeIn() || fade.GetFadeOut())
+	{
+		return;
+	}
+	else if (endFlg)
+	{
+		m_gameBGM.Stop();
+		m_gameOverSound.Stop();
+		gChangeScene = SCENENO_TITLE;
+	}
+
 	//ReadyGo カウントダウン の処理
 	if (eFlow == ready)
 	{
@@ -225,8 +241,9 @@ void CGame::Update(void)
 		}
 		if (g_pInput->IsKeyPush(MOFKEY_RETURN))
 		{
-			m_gameBGM.Stop();
-			gChangeScene = SCENENO_TITLE;
+			fade.FadeOut();
+			endFlg = true;
+
 		}
 	}
 
@@ -242,31 +259,31 @@ void CGame::Update(void)
 		}
 
 		//自由落下
-		if (wait < 0)
+		if (m_dropTimeCnt < 0)
 		{
 			//確定しているか
-			if ((field[sFPos.y + 1][sFPos.x] != 0 && eStep == Top) ||
-				(field[sFPos.y + 2][sFPos.x] != 0 && eStep == Bottom) ||
-				((field[sFPos.y + 1][sFPos.x - 1] != 0 ||
-					field[sFPos.y + 1][sFPos.x] != 0) && eStep == Left) ||
-					((field[sFPos.y + 1][sFPos.x + 1] != 0 ||
-						field[sFPos.y + 1][sFPos.x] != 0) && eStep == Right))
+			if ((m_field[sFPos.y + 1][sFPos.x] != 0 && eStep == Top) ||
+				(m_field[sFPos.y + 2][sFPos.x] != 0 && eStep == Bottom) ||
+				((m_field[sFPos.y + 1][sFPos.x - 1] != 0 ||
+					m_field[sFPos.y + 1][sFPos.x] != 0) && eStep == Left) ||
+					((m_field[sFPos.y + 1][sFPos.x + 1] != 0 ||
+						m_field[sFPos.y + 1][sFPos.x] != 0) && eStep == Right))
 			{
 
 				//画面外に設置しないように
 				if (sFPos.y >= 0) {
 					//メインのぷよを格納
-					field[sFPos.y][sFPos.x] = type[0][0];
+					m_field[sFPos.y][sFPos.x] = m_type[0][0];
 				}
 				//サブのぷよを格納
 				if (eStep == Top && sFPos.y - 1 >= 0)
-					field[sFPos.y - 1][sFPos.x] = type[0][1];
+					m_field[sFPos.y - 1][sFPos.x] = m_type[0][1];
 				if (eStep == Left && sFPos.y >= 0)
-					field[sFPos.y][sFPos.x - 1] = type[0][1];
+					m_field[sFPos.y][sFPos.x - 1] = m_type[0][1];
 				if (eStep == Right && sFPos.y >= 0)
-					field[sFPos.y][sFPos.x + 1] = type[0][1];
+					m_field[sFPos.y][sFPos.x + 1] = m_type[0][1];
 				if (eStep == Bottom && sFPos.y + 1 >= 0)
-					field[sFPos.y + 1][sFPos.x] = type[0][1];
+					m_field[sFPos.y + 1][sFPos.x] = m_type[0][1];
 
 				//スコア加算
 				m_score += 10;
@@ -283,21 +300,21 @@ void CGame::Update(void)
 			//確定してなければ一マス落ちる
 			pos.y += PUYO_SIZE;
 			sFPos.y += 1;
-			wait = DROP_SPEED;
+			m_dropTimeCnt = DROP_SPEED;
 		}
 		else
 		{
-			wait--;
+			m_dropTimeCnt--;
 		}
 
 		//左に移動
 		if (g_pInput->IsKeyPush(MOFKEY_A) &&
-			((field[sFPos.y][sFPos.x - 1] == 0 &&
-				field[sFPos.y - 1][sFPos.x - 1] == 0 && eStep == Top) ||
-				(field[sFPos.y][sFPos.x - 1] == 0 &&
-					field[sFPos.y + 1][sFPos.x - 1] == 0 && eStep == Bottom) ||
-					(field[sFPos.y][sFPos.x - 1] == 0 && eStep == Right) ||
-				(field[sFPos.y][sFPos.x - 2] == 0 && eStep == Left)))
+			((m_field[sFPos.y][sFPos.x - 1] == 0 &&
+				m_field[sFPos.y - 1][sFPos.x - 1] == 0 && eStep == Top) ||
+				(m_field[sFPos.y][sFPos.x - 1] == 0 &&
+					m_field[sFPos.y + 1][sFPos.x - 1] == 0 && eStep == Bottom) ||
+					(m_field[sFPos.y][sFPos.x - 1] == 0 && eStep == Right) ||
+				(m_field[sFPos.y][sFPos.x - 2] == 0 && eStep == Left)))
 		{
 			//移動音
 			m_moveSound.Play();
@@ -308,12 +325,12 @@ void CGame::Update(void)
 			sFPos.x -= 1;
 		}
 		else if (g_pInput->IsKeyHold(MOFKEY_A) &&
-			((field[sFPos.y][sFPos.x - 1] == 0 &&
-				field[sFPos.y - 1][sFPos.x - 1] == 0 && eStep == Top) ||
-				(field[sFPos.y][sFPos.x - 1] == 0 &&
-					field[sFPos.y + 1][sFPos.x - 1] == 0 && eStep == Bottom) ||
-					(field[sFPos.y][sFPos.x - 1] == 0 && eStep == Right) ||
-				(field[sFPos.y][sFPos.x - 2] == 0 && eStep == Left)))
+			((m_field[sFPos.y][sFPos.x - 1] == 0 &&
+				m_field[sFPos.y - 1][sFPos.x - 1] == 0 && eStep == Top) ||
+				(m_field[sFPos.y][sFPos.x - 1] == 0 &&
+					m_field[sFPos.y + 1][sFPos.x - 1] == 0 && eStep == Bottom) ||
+					(m_field[sFPos.y][sFPos.x - 1] == 0 && eStep == Right) ||
+				(m_field[sFPos.y][sFPos.x - 2] == 0 && eStep == Left)))
 		{
 			if (m_leftHoldTime <= 0)
 			{
@@ -332,12 +349,12 @@ void CGame::Update(void)
 
 		//右に移動
 		if (g_pInput->IsKeyPush(MOFKEY_D) &&
-			((field[sFPos.y][sFPos.x + 1] == 0 &&
-				field[sFPos.y - 1][sFPos.x + 1] == 0 && eStep == Top) ||
-				(field[sFPos.y][sFPos.x + 1] == 0 &&
-					field[sFPos.y + 1][sFPos.x + 1] == 0 && eStep == Bottom) ||
-					(field[sFPos.y][sFPos.x + 1] == 0 && eStep == Left) ||
-				(field[sFPos.y][sFPos.x + 2] == 0 && eStep == Right)))
+			((m_field[sFPos.y][sFPos.x + 1] == 0 &&
+				m_field[sFPos.y - 1][sFPos.x + 1] == 0 && eStep == Top) ||
+				(m_field[sFPos.y][sFPos.x + 1] == 0 &&
+					m_field[sFPos.y + 1][sFPos.x + 1] == 0 && eStep == Bottom) ||
+					(m_field[sFPos.y][sFPos.x + 1] == 0 && eStep == Left) ||
+				(m_field[sFPos.y][sFPos.x + 2] == 0 && eStep == Right)))
 		{
 			//移動音
 			m_moveSound.Play();
@@ -348,12 +365,12 @@ void CGame::Update(void)
 			sFPos.x += 1;
 		}
 		else if (g_pInput->IsKeyHold(MOFKEY_D) &&
-			((field[sFPos.y][sFPos.x + 1] == 0 &&
-				field[sFPos.y - 1][sFPos.x + 1] == 0 && eStep == Top) ||
-				(field[sFPos.y][sFPos.x + 1] == 0 &&
-					field[sFPos.y + 1][sFPos.x + 1] == 0 && eStep == Bottom) ||
-					(field[sFPos.y][sFPos.x + 1] == 0 && eStep == Left) ||
-				(field[sFPos.y][sFPos.x + 2] == 0 && eStep == Right)))
+			((m_field[sFPos.y][sFPos.x + 1] == 0 &&
+				m_field[sFPos.y - 1][sFPos.x + 1] == 0 && eStep == Top) ||
+				(m_field[sFPos.y][sFPos.x + 1] == 0 &&
+					m_field[sFPos.y + 1][sFPos.x + 1] == 0 && eStep == Bottom) ||
+					(m_field[sFPos.y][sFPos.x + 1] == 0 && eStep == Left) ||
+				(m_field[sFPos.y][sFPos.x + 2] == 0 && eStep == Right)))
 		{
 			if (m_rightHoldTime <= 0)
 			{
@@ -375,14 +392,14 @@ void CGame::Update(void)
 		{
 			m_downHoldTime = 10;
 			//押したときに1マス落とす
-			wait = -1;
+			m_dropTimeCnt = -1;
 		}
 		//キーによって下に移動(高速降下)
 		else if (g_pInput->IsKeyHold(MOFKEY_S))
 		{	
 			if (m_downHoldTime <= 0) {
 				//長押しで高速降下
-				wait -= 15;
+				m_dropTimeCnt -= 15;
 			}
 			else
 			{
@@ -395,10 +412,10 @@ void CGame::Update(void)
 		{
 			if (eStep == Top)
 			{
-				if (field[sFPos.y][sFPos.x - 1] == 0 ||
-					field[sFPos.y][sFPos.x + 1] == 0)
+				if (m_field[sFPos.y][sFPos.x - 1] == 0 ||
+					m_field[sFPos.y][sFPos.x + 1] == 0)
 				{
-					if (field[sFPos.y][sFPos.x - 1] != 0)
+					if (m_field[sFPos.y][sFPos.x - 1] != 0)
 					{
 						pos.x += PUYO_SIZE;
 						sFPos.x += 1;
@@ -411,7 +428,7 @@ void CGame::Update(void)
 			}
 			else if (eStep == Left)
 			{
-				if (field[sFPos.y + 1][sFPos.x] != 0)
+				if (m_field[sFPos.y + 1][sFPos.x] != 0)
 				{
 					pos.y -= PUYO_SIZE;
 					sFPos.y -= 1;
@@ -422,10 +439,10 @@ void CGame::Update(void)
 			}
 			else if (eStep == Bottom)
 			{
-				if (field[sFPos.y][sFPos.x - 1] == 0 ||
-					field[sFPos.y][sFPos.x + 1] == 0)
+				if (m_field[sFPos.y][sFPos.x - 1] == 0 ||
+					m_field[sFPos.y][sFPos.x + 1] == 0)
 				{
-					if (field[sFPos.y][sFPos.x + 1] != 0)
+					if (m_field[sFPos.y][sFPos.x + 1] != 0)
 					{
 						pos.x -= PUYO_SIZE;
 						sFPos.x -= 1;
@@ -451,10 +468,10 @@ void CGame::Update(void)
 		{
 			if (eStep == Top)
 			{
-				if (field[sFPos.y][sFPos.x - 1] == 0 ||
-					field[sFPos.y][sFPos.x + 1] == 0)
+				if (m_field[sFPos.y][sFPos.x - 1] == 0 ||
+					m_field[sFPos.y][sFPos.x + 1] == 0)
 				{
-					if (field[sFPos.y][sFPos.x + 1] != 0)
+					if (m_field[sFPos.y][sFPos.x + 1] != 0)
 					{
 						pos.x -= PUYO_SIZE;
 						sFPos.x -= 1;
@@ -466,7 +483,7 @@ void CGame::Update(void)
 			}
 			else if (eStep == Right)
 			{
-				if (field[sFPos.y + 1][sFPos.x] != 0)
+				if (m_field[sFPos.y + 1][sFPos.x] != 0)
 				{
 					pos.y -= PUYO_SIZE;
 					sFPos.y -= 1;
@@ -477,10 +494,10 @@ void CGame::Update(void)
 			}
 			else if (eStep == Bottom)
 			{
-				if (field[sFPos.y][sFPos.x - 1] == 0 ||
-					field[sFPos.y][sFPos.x + 1] == 0)
+				if (m_field[sFPos.y][sFPos.x - 1] == 0 ||
+					m_field[sFPos.y][sFPos.x + 1] == 0)
 				{
-					if (field[sFPos.y][sFPos.x - 1] != 0)
+					if (m_field[sFPos.y][sFPos.x - 1] != 0)
 					{
 						pos.x += PUYO_SIZE;
 						sFPos.x += 1;
@@ -513,15 +530,15 @@ void CGame::Update(void)
 				for (int x = FW - 1; x >= 1; x--)
 				{
 					//ぷよが宙に浮いているとき
-					if (field[y][x] != 0 &&
-						field[y + 1][x] == 0)
+					if (m_field[y][x] != 0 &&
+						m_field[y + 1][x] == 0)
 					{
 
 						for (int i = y; i <= FH - 2; i++) 
 						{
-							field[i + 1][x] = field[i][x];
-							field[i][x] = 0;
-							if (field[i + 2][x] != 0)
+							m_field[i + 1][x] = m_field[i][x];
+							m_field[i][x] = 0;
+							if (m_field[i + 2][x] != 0)
 							{
 								break;
 							}
@@ -548,33 +565,33 @@ void CGame::Update(void)
 			//連鎖のチェック
 			//連鎖が行われた場合はちぎりに戻り一度整地する。その際、連鎖数はどっかしらの変数にとっておく
 			//連鎖が行われなかった場合、リスタートへ
-			bChain = false;
+			m_chainFlg = false;
 
 			for (int y = 0; y < FH; y++)
 			{
 				for (int x = 0; x < FW; x++)
 				{
 					ChainCheck(y, x);
-					if (bondCnt >= 4)
+					if (m_bondCnt >= 4)
 					{
 						for (int i = 0; i < FH; i++)
 						{
 							for (int j = 0; j < FW; j++)
 							{
-								if (bCheck[i][j])
+								if (m_puyoCheckFlg[i][j])
 								{
-									bDestroy[i][j] = true;
+									m_destroyFlg[i][j] = true;
 								}
 
 							}
 						}
 					}
-					bondCnt = 0;
+					m_bondCnt = 0;
 					for (int i = 0; i < FH; i++)
 					{
 						for (int j = 0; j < FW; j++)
 						{
-							bCheck[i][j] = false;
+							m_puyoCheckFlg[i][j] = false;
 
 						}
 					}
@@ -585,17 +602,17 @@ void CGame::Update(void)
 			{
 				for (int j = 0; j < FW; j++)
 				{
-					if (bDestroy[i][j])
+					if (m_destroyFlg[i][j])
 					{
-						field[i][j] = 0;
-						bChain = true;
+						m_field[i][j] = 0;
+						m_chainFlg = true;
 					}
-					bDestroy[i][j] = false;
+					m_destroyFlg[i][j] = false;
 				}
 			}
 			
 
-			if (bChain)
+			if (m_chainFlg)
 			{
 				//操作不能時間 sleepの代わり 40は適当
 				m_sleepTime = 40;
@@ -608,16 +625,16 @@ void CGame::Update(void)
 				//ちぎりに移る
 				eFlow = tear;
 			}
-			else if (!bChain)
+			else if (!m_chainFlg)
 			{
 				//操作不能時間 sleepの代わり 40は適当
 				m_sleepTime = 20;
 
 				//バツ部分に(2,3,4,5)のどれかしらがあればゲームオーバー
-				if (field[0][3] == 2 ||
-					field[0][3] == 3 ||
-					field[0][3] == 4 ||
-					field[0][3] == 5)
+				if (m_field[0][3] == 2 ||
+					m_field[0][3] == 3 ||
+					m_field[0][3] == 4 ||
+					m_field[0][3] == 5)
 				{
 					m_gameBGM.Stop();
 					m_gameOverSound.Play();
@@ -651,16 +668,16 @@ void CGame::Update(void)
 	else if (eFlow == reStart)
 	{
 		//次のぷよを操作できるよう、セットする
-		type[0][0] = type[1][0];
-		type[0][1] = type[1][1];
+		m_type[0][0] = m_type[1][0];
+		m_type[0][1] = m_type[1][1];
 
 		//次回のぷよを格納しておくため
 		//ぷよの色をランダムで決める
-		type[1][0] = random.Random(2, 6);
-		type[1][1] = random.Random(2, 6);
+		m_type[1][0] = random.Random(2, 6);
+		m_type[1][1] = random.Random(2, 6);
 
 		//色々初期値
-		wait = DROP_SPEED;
+		m_dropTimeCnt = DROP_SPEED;
 		m_chainCnt = 0;
 
 		//連鎖音のピッチのリセット
@@ -682,8 +699,9 @@ void CGame::Update(void)
 	{
 		if (g_pInput->IsKeyPush(MOFKEY_RETURN))
 		{
-			m_gameOverSound.Stop();
-			gChangeScene = SCENENO_TITLE;
+			fade.FadeOut();
+			endFlg = true;
+
 		}
 	}
 
@@ -714,23 +732,23 @@ void CGame::Render(void)
 	{
 		for (int x = 0; x < FW; x++)
 		{
-			if (field[y][x] == 5)
+			if (m_field[y][x] == 5)
 				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_GREEN);
 				m_GreenPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
-			if (field[y][x] == 4)
+			if (m_field[y][x] == 4)
 				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_YELLOW);
 				m_YellowPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
-			if (field[y][x] == 3)
+			if (m_field[y][x] == 3)
 				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_BLUE);
 				m_BluePuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
-			if (field[y][x] == 2)
+			if (m_field[y][x] == 2)
 				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_RED);
 				m_RedPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
-			if (field[y][x] == 1)
+			if (m_field[y][x] == 1)
 				CGraphicsUtilities::RenderFillRect(BL + x * BL, BL * 2 + y * BL, x * BL + BL * 2, y * BL + BL * 3, MOF_COLOR_BLACK);
 
 			//if (field[y][x] == 0)
@@ -742,57 +760,57 @@ void CGame::Render(void)
 	//待機中のぷよ
 	CGraphicsUtilities::RenderString(490, 100, "NEXT");
 	CGraphicsUtilities::RenderFillRect(480, 130, 550, 250, MOF_COLOR_CBLACK);
-	if (type[1][1] == 2)
+	if (m_type[1][1] == 2)
 		m_RedPuyoTexture.Render(490, 140);
 
-	else if (type[1][1] == 3)
+	else if (m_type[1][1] == 3)
 		m_BluePuyoTexture.Render(490, 140);
 
-	else if (type[1][1] == 4)
+	else if (m_type[1][1] == 4)
 		m_YellowPuyoTexture.Render(490, 140);
 
-	else if (type[1][1] == 5)
+	else if (m_type[1][1] == 5)
 		m_GreenPuyoTexture.Render(490, 140);
 
-	if (type[1][0] == 2)
+	if (m_type[1][0] == 2)
 		m_RedPuyoTexture.Render(490, 190);
 
-	else if (type[1][0] == 3)
+	else if (m_type[1][0] == 3)
 		m_BluePuyoTexture.Render(490, 190);
 
-	else if (type[1][0] == 4)
+	else if (m_type[1][0] == 4)
 		m_YellowPuyoTexture.Render(490, 190);
 
-	else if (type[1][0] == 5)
+	else if (m_type[1][0] == 5)
 		m_GreenPuyoTexture.Render(490, 190);
 
 
 	//操作中のぷよの描画
 	if (eFlow == drop || eFlow == pause) {
 		//本体
-		if (type[0][0] == 2)
+		if (m_type[0][0] == 2)
 			m_RedPuyoTexture.Render(pos.x, pos.y);
 
-		if (type[0][0] == 3)
+		if (m_type[0][0] == 3)
 			m_BluePuyoTexture.Render(pos.x, pos.y);
 
-		if (type[0][0] == 4)
+		if (m_type[0][0] == 4)
 			m_YellowPuyoTexture.Render(pos.x, pos.y);
 
-		if (type[0][0] == 5)
+		if (m_type[0][0] == 5)
 			m_GreenPuyoTexture.Render(pos.x, pos.y);
 
 		//サブ
-		if (type[0][1] == 2)
+		if (m_type[0][1] == 2)
 			
 			m_RedPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
-		if (type[0][1] == 3)
+		if (m_type[0][1] == 3)
 			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_BLUE);
 			m_BluePuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
-		if (type[0][1] == 4)
+		if (m_type[0][1] == 4)
 			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_YELLOW);
 			m_YellowPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
-		if (type[0][1] == 5)
+		if (m_type[0][1] == 5)
 			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_GREEN);
 			m_GreenPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
 	}
@@ -841,6 +859,8 @@ void CGame::Render(void)
 		//ポーズ画面の描画
 		m_PauseTexture.Render(256, 167);
 	}
+
+	fade.Render();
 }
 
 /*

@@ -12,13 +12,6 @@ CFade::~CFade()
 {
 }
 
-void CFade::Initialize()
-{
-	alpha = 255;
-	fadeInFlg = false;
-	fadeOutFlg = false;
-}
-
 void CFade::Update()
 {
 	if (fadeInFlg)

@@ -8,9 +8,8 @@ extern int		gChangeScene;
   コンストラクタ
 */
 CTitle::CTitle():
-m_BackTexture(),
-m_fade(0),
-m_bStart(false),
+m_backTexture(),
+m_startFlg(false),
 m_titleBGM()
 {
 }
@@ -27,7 +26,7 @@ CTitle::~CTitle() {
 bool CTitle::Load(void)
 {
 	//テクスチャの読み込み
-	if (!m_BackTexture.Load("TitleBack.png"))
+	if (!m_backTexture.Load("TitleBack.png"))
 	{
 		return false;
 	}
@@ -53,9 +52,10 @@ void CTitle::Initialize(void)
 
 	//音量の調整
 	m_titleBGM.SetVolume(0.06f);
-
-	m_fade = 0;
-	m_bStart = false;
+	//開始フラグを初期化
+	m_startFlg = false;
+	//フェードイン
+	m_fade.FadeIn();
 }
 
 /*
@@ -63,24 +63,26 @@ void CTitle::Initialize(void)
 */
 void CTitle::Update(void)
 {
+	//フェードの処理
+	m_fade.Update();
+	if (m_fade.GetFadeIn() || m_fade.GetFadeOut())
+	{
+		return;
+	}
+	//ゲームの開始フラグがTrueであり、フェードアウトが完了すれば
+	else if (m_startFlg)
+	{
+		m_titleBGM.Stop();
+		gChangeScene = SCENENO_GAME;
+	}
+
 	if (g_pInput->IsKeyPush(MOFKEY_RETURN))
 	{
-		m_bStart = true;
+		m_startFlg = true;
+		//フェードアウト
+		m_fade.FadeOut();
 	}
 
-	//ゲームの開始フラグがTrueになり次第、画面を真っ暗にする
-	if (m_bStart)
-	{
-		m_fade += 3;
-		//画面が真っ黒になったら(m_fadeが255になると真っ暗)
-		if (m_fade >= 255)
-		{
-			m_titleBGM.Stop();
-			gChangeScene = SCENENO_GAME;
-
-		}
-	}
-	
 	
 }
 
@@ -89,10 +91,13 @@ void CTitle::Update(void)
 */
 void CTitle::Render(void)
 {
-	m_BackTexture.Render(0, 0);
+	//背景の描画
+	m_backTexture.Render(0, 0);
+	//説明文
 	CGraphicsUtilities::RenderString(340, 400, MOF_COLOR_BLACK, "ゲームを開始する[Enter]");
-	//フェード用の黒い四角
-	CGraphicsUtilities::RenderFillRect(0, 0, 1024, 768, MOF_ARGB(m_fade, 0, 0, 0));
+
+	m_fade.Render();
+
 }
 
 /*
@@ -100,8 +105,7 @@ void CTitle::Render(void)
 */
 void CTitle::Release(void)
 {
-	m_BackTexture.Release();
-
+	m_backTexture.Release();
 	//音の解放
 	m_titleBGM.Release();
 }

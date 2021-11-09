@@ -9,7 +9,6 @@ private:
 public:
 	CFade();
 	~CFade();
-	void Initialize();
 	void Update();
 	void Render();
 	bool GetFadeIn()
@@ -25,12 +24,14 @@ public:
 		fadeInFlg = true;
 		//•ÛŒ¯
 		fadeOutFlg = false;
+		alpha = 255;
 	}
 	void FadeOut()
 	{
 		fadeOutFlg = true;
 		//•ÛŒ¯
 		fadeInFlg = false;
+		alpha = 0;
 	}
 };
 

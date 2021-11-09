@@ -11,7 +11,7 @@ typedef struct tag_ENEMYSTART
 {
 	float PosX;
 	float Scroll;
-	//int	  Color;
+	int	  Color;
 }ENEMYSTART;
 
 class CStage

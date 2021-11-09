@@ -72,7 +72,7 @@ void CStage::Update(CEnemy* ene,int ecnt)
 
 			//“GoŒ»
 			ene[i].SetTexture(&m_EnemyTexture,&m_EnemyShotTexture);
-			ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0);
+			ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0 , m_pEnemyStart[m_EnemyNo].Color);
 			break;
 		}
 		//“GoŒ»”‚ğ‰ÁZ

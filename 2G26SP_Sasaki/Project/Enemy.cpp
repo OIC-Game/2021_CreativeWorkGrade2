@@ -50,9 +50,10 @@ void CEnemy::Initialize(void){
  * [in]			px				”­ŽË‚wÀ•W
  * [in]			py				”­ŽË‚xÀ•W
  */
-void CEnemy::Start(float px,float py){
+void CEnemy::Start(float px,float py ,int encol){
 	m_PosX = px - m_pTexture->GetWidth() * 0.5f;
 	m_PosY = py - m_pTexture->GetHeight();
+	m_EnemyColor = encol;
 	m_SpeedX = 0;
 	m_SpeedY = 1;
 	m_bShow = true;

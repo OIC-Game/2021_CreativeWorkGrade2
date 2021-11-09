@@ -11,7 +11,7 @@
 #include	"GameApp.h"
 #include	"Player.h"
 #include	"Stage.h"
-#include	"Stage1.h"
+
 #include    "Title.h"
 #include"Game.h"
 

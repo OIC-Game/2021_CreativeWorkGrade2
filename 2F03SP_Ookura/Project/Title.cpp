@@ -24,7 +24,7 @@ CTitle::~CTitle() {
 
 bool CTitle::Load(void)
 {
-	if (!title_Texture.Load("Enemy2.png"))
+	if (!title_Texture.Load("Tit0le.png"))
 	{
 		return false;
 	}

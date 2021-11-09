@@ -265,22 +265,26 @@ void CStage::Update(CPlayer& pl)
 	else if (pl.GetWarpFlg() && !stage_FixScroll)
 	{
 
-		stage_Scroll.x = 6175;//(prect.Right - stage_Scroll.x) - (sw - 400);
+		stage_Scroll.x = 6175;
 
 			stage_FixScroll = true;
 	}
 
 	if (pl.GetMarioDead())
 	{
-		if (prect.Left - stage_Scroll.x < 400) {
-			stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
+		/*if (prect.Left - stage_Scroll.x < 200)
+		{
+			stage_Scroll.x -= 200 - (prect.Left - stage_Scroll.x);
 			if (stage_Scroll.x <= 0) {
 				stage_Scroll.x = 0;
 			}
-		}
-		else if (prect.Right - stage_Scroll.x > sw - 400) {
-			stage_Scroll.x += (prect.Right - stage_Scroll.x) - (sw - 400);
-			if (stage_Scroll.x >= stgw - sw) {
+		}*/
+		if(pl.GetBossClearFlg())
+		if (prect.Right - stage_Scroll.x > sw - 50)
+		{
+			stage_Scroll.x += (prect.Right - stage_Scroll.x) - (sw - 50);
+			if (stage_Scroll.x >= stgw - sw)
+			{
 				stage_Scroll.x = stgw - sw;
 			}
 		}

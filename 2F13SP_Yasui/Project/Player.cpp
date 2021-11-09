@@ -158,8 +158,7 @@ void CPlayer::Update(void)
 	}
 	if (player_Position.x > 7500 && !player_BossClearFlg)
 	{
-		player_Move = 1;
-		player_Move = 10;
+		
 		player_BossClearFlg = true;
 	}
 	//死亡,クリアフラグがfalseの時プレイヤーを動かす
@@ -232,6 +231,10 @@ void CPlayer::Update(void)
 		}
 		//落ちる処理
 		player_Jump += PLAYER_GRAVITY;
+		if (player_Jump > 20.0f)
+		{
+			player_Jump = 20.0f;
+		}
 		player_Position.y += player_Jump;
 		//落ち切った後、画面遷移
 		if (player_Position.y > 850)
@@ -303,6 +306,10 @@ void CPlayer::Update(void)
 	}
 	else if (player_BossClearFlg && !player_BossClearTransitionFlg)
 	{
+		player_Jump = 10;
+		player_Move = 5;
+		player_Position.x += player_Move;
+		player_Position.y += player_Jump;
 		player_Position.x += 2;
 
 	}
@@ -524,8 +531,6 @@ void CPlayer::PlayerJump(void)
 
 	if (player_JumpFlg)
 	{
-
-
 		//途中でジャンプボタンを離した時ジャンプ速度を半減(小ジャンプ)
 		if (player_Jump < 0 && g_pInput->IsKeyPull(MOFKEY_UP))
 		{
@@ -550,14 +555,14 @@ void CPlayer::CollisionStage(float ox, float oy)
 {
 
 	//死亡フラグfalseの時当たり判定を行う
-	if (!player_DeadFlg && !player_ClearTransitionFlg) // && player_ChangeWait <= 0)
+	if (!player_DeadFlg && !player_ClearTransitionFlg)
 	{
 
 		player_Position.x += ox;
 		player_Position.y += oy;
 		player_CheckGround = true;
 		//落下中の下埋まり、ジャンプ中の上埋まりの場合は移動を初期化する
-		if (oy < 0)	//&& player_Jump > 0)
+		if (oy < 0)
 		{
 
 			player_Jump = 0;

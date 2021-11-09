@@ -11,8 +11,6 @@
 #define		PLAYER_ENEMYSTEP_JUMPSPEED 5
 //重力
 #define		PLAYER_GRAVITY 0.4f
-//地面
-#define		GROUND 700
 //死亡時ウェイト
 #define		PLAYER_DEADWAIT 30
 //初期ライフ
@@ -63,9 +61,8 @@
 #define		CHIP_CLEARTRANSITION 32
 
 /*制限時間*/
-#define		ONE_SECOND 60
-#define		GAME_TIMELIMIT 80
-#define		GAME_TIMELIMIT_BOSS 210
+#define		GAME_TIMELIMIT 150
+#define		GAME_TIMELIMIT_BOSS 300
 
 /*スコア*/
 #define		SCORE_GETITEM 1000

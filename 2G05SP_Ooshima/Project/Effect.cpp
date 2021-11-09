@@ -1,6 +1,8 @@
 #include	"Effect.h"
 #include	"EffectManager.h"
 
+
+// test
 /**
  * コンストラクタ
  *

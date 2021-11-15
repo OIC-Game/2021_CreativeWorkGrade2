@@ -122,10 +122,10 @@ bool CGame::Load(void)
 		return false;
 	}
 
-	/*if (!game_MarioFireSE.Load("MarioFire.mp3"))
+	if (!game_MarioFireSE.Load("MarioFire.mp3"))
 	{
 		return false;
-	}*/
+	}
 
 	//敵メモリ確保
 	m_EnemyArray = new CEnemy[g_Stage.GetEnemyCount()];
@@ -161,7 +161,15 @@ void CGame::Initialize(void) {
 		{
 			game_LAST_BGM.SetLoop(TRUE);
 			game_LAST_BGM.Play();
+			break;
 		}
+		default:
+		{
+			game_BGM.SetLoop(TRUE);
+			game_BGM.Play();
+			break;
+		}
+
 	}
 	game_playSoundFlg = false;
 	game_playBGMFlg = false;
@@ -253,6 +261,16 @@ void CGame::Update(void) {
 			{
 				
 				game_playMarioSEFlg = false;
+			}
+
+			if (!game_MarioFireSEFlg && m_EnemyArray[i].GetMarioFireFlg())
+			{
+				game_MarioFireSE.Play();
+				game_MarioFireSEFlg = true;
+			}
+			else if (game_MarioFireSEFlg && !m_EnemyArray[i].GetMarioFireFlg())
+			{
+				game_MarioFireSEFlg = false;
 			}
 
 			if (!game_playSoundFlg && m_EnemyArray[i].GetMarioDeadFlg())
@@ -418,7 +436,10 @@ void CGame::Update(void) {
 			game_BGM.Stop();
 		}
 	}
-
+	if (g_Player.Getplayer_DeadFlg() == true && !game_GameOverSE.IsPlay())
+	{
+		g_Player.Setplayer_DeadTransitionFlg(true);
+	}
 	//ゲームオーバー画面遷移
 	if (g_Player.Getplayer_DeadTransitionFlg() == true)
 	{
@@ -603,5 +624,5 @@ void CGame::Release(void)
 	game_MarioJumpSE.Release();
 	game_MarioDeadSE.Release();
 	game_BossClearSE.Release();
-	//game_MarioFireSE.Release();
+	game_MarioFireSE.Release();
 }

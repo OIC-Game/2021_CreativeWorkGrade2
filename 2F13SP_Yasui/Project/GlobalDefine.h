@@ -34,7 +34,7 @@
 //消滅時間
 #define		 ENEMY_DISAPPEARTIME 120
 //マリオHP
-#define		 ENEMY_MARIOHP 3
+#define		 ENEMY_MARIOHP 6
 
 /*アイテム*/
 #define		 ITEM_GRAVITY 0.4f
@@ -52,6 +52,9 @@
 #define		CHIP_EMOJI 4
 #define		CHIP_HARDBLOCK 21
 #define		CHIP_COINBLOCK 25
+#define		CHIP_BLUEBLOCK 41
+#define		CHIP_BLUEHARDBLOCK 42
+
 //ゴールフラッグ
 #define		CHIP_GOALFLAG_L 13
 #define		CHIP_GOALFLAG_R 14

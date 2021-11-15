@@ -198,11 +198,11 @@ void CPlayer::Update(void)
 			player_Position.y += player_Jump;
 
 		}
-		//—Ž‰º‚µ‚½ŽžŽ€–Sƒtƒ‰ƒO‚ðTRUE
-		if (player_Position.y > 800)
-		{
-			player_DeadFlg = true;
-		}
+		////—Ž‰º‚µ‚½ŽžŽ€–Sƒtƒ‰ƒO‚ðTRUE
+		//if (player_Position.y > 800)
+		//{
+		//	player_DeadFlg = true;
+		//}
 
 	}
 	else if (player_DeadFlg)
@@ -236,12 +236,6 @@ void CPlayer::Update(void)
 			player_Jump = 20.0f;
 		}
 		player_Position.y += player_Jump;
-		//—Ž‚¿Ø‚Á‚½ŒãA‰æ–Ê‘JˆÚ
-		if (player_Position.y > 850)
-		{
-			player_DeadTransitionFlg = true;
-
-		}
 	}
 	else if (player_ClearFlg)
 	{
@@ -306,11 +300,24 @@ void CPlayer::Update(void)
 	}
 	else if (player_BossClearFlg && !player_BossClearTransitionFlg)
 	{
-		player_Jump = 10;
-		player_Move = 5;
+		player_Jump = 5;
+		player_Move = 1;
 		player_Position.x += player_Move;
 		player_Position.y += player_Jump;
-		player_Position.x += 2;
+		if (!player_ChangeBig)
+		{
+			if (player_Motion.GetMotionNo() != MOTION_SMALL_MOVE)
+			{
+				player_Motion.ChangeMotion(MOTION_SMALL_MOVE);
+			}
+		}
+		else
+		{
+			if (player_Motion.GetMotionNo() != MOTION_BIG_MOVE)
+			{
+				player_Motion.ChangeMotion(MOTION_BIG_MOVE);
+			}
+		}
 
 	}
 

@@ -243,11 +243,13 @@ void CStage::Update(CPlayer& pl)
 	CRectangle prect = pl.GetRectPlayer();
 	//スクリーンの幅
 	float sw = g_pGraphics->GetTargetWidth();
+	float sh = g_pGraphics->GetTargetHeight();
 	//ステージ全体の幅
 	float stgw = stage_ChipSize * stage_XCount;
+	float stgh = stage_ChipSize * stage_YCount;
 
 	//座標が画面端によっている(角端から200pixel)場合スクロールを行って補正する。
-	if (pl.Getplayer_PositionX() < 5270 && !pl.GetWarpFlg())
+	if (pl.Getplayer_PositionX() < 5270 && !pl.GetWarpFlg() && pl.Getplayer_PositionY() <= 1000)
 	{
 		if (prect.Left - stage_Scroll.x < 400) {
 			stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
@@ -261,6 +263,7 @@ void CStage::Update(CPlayer& pl)
 				stage_Scroll.x = stgw - sw;
 			}
 		}
+		stage_Scroll.y = 0;
 	}
 	else if (pl.GetWarpFlg() && !stage_FixScroll)
 	{
@@ -268,6 +271,23 @@ void CStage::Update(CPlayer& pl)
 		stage_Scroll.x = 6175;
 
 			stage_FixScroll = true;
+	}
+	if (pl.Getplayer_PositionY() > 1000 && !pl.Getplayer_DeadFlg())
+	{
+		if (prect.Left - stage_Scroll.x < 400) {
+			stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
+			if (stage_Scroll.x <= 0) {
+				stage_Scroll.x = 0;
+			}
+		}
+		else if (prect.Right - stage_Scroll.x > sw - 400 && pl.Getplayer_PositionX() < 900) {
+			stage_Scroll.x += (prect.Right - stage_Scroll.x) - (sw - 400);
+			if (stage_Scroll.x >= stgw - sw) {
+				stage_Scroll.x = stgw - sw;
+			}
+		}
+
+		stage_Scroll.y = 900;
 	}
 
 	if (pl.GetMarioDead())
@@ -279,7 +299,6 @@ void CStage::Update(CPlayer& pl)
 				stage_Scroll.x = 0;
 			}
 		}*/
-		if(pl.GetBossClearFlg())
 		if (prect.Right - stage_Scroll.x > sw - 50)
 		{
 			stage_Scroll.x += (prect.Right - stage_Scroll.x) - (sw - 50);
@@ -288,6 +307,12 @@ void CStage::Update(CPlayer& pl)
 				stage_Scroll.x = stgw - sw;
 			}
 		}
+		if (pl.GetBossClearFlg())
+		{
+			if (stage_Scroll.x < 7400)
+				stage_Scroll.x += 5;
+		}
+		
 	}
 	
 
@@ -360,10 +385,10 @@ void CStage::Render(void)
 	//遠景の描画
 	int scw = g_pGraphics->GetTargetWidth();
 	int sch = g_pGraphics->GetTargetHeight();
-	float bScale = sch / (float)stage_BackTexture.GetHeight();
-	int bw = (int)(stage_BackTexture.GetWidth() * bScale);
-	int bh = (int)(stage_BackTexture.GetHeight() * bScale);
-	for (float y = ((int)-stage_Scroll.y % bh) - bh; y < sch; y += bh) {
+	//float bScale = sch / (float)stage_BackTexture.GetHeight();
+	int bw = (int)(stage_BackTexture.GetWidth());
+	int bh = (int)(stage_BackTexture.GetHeight());
+	for (float y = ((int)-stage_Scroll.y % bh); y < sch; y += bh) {
 		for (float x = ((int)-stage_Scroll.x / 4 % bw) - bw; x < scw; x += bw) {
 			stage_BackTexture.Render(x, y);
 		}
@@ -395,7 +420,7 @@ void CStage::Render(void)
 
 void CStage::RenderDebug(void)
 {
-
+	CGraphicsUtilities::RenderString(600, 20, "スクロール:%f", stage_Scroll.x);
 }
 
 void CStage::Release(void)
@@ -534,6 +559,14 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				r.Top += cr.Top - bottomRect.Bottom;
 				r.Bottom += cr.Top - bottomRect.Bottom;
 
+				if (cn == 42 || cn == 43)
+				{
+					if (g_pInput->IsKeyHold(MOFKEY_DOWN))
+					{
+						pl.SetPlayerPos(Vector2(200, 1200));
+					}
+				}
+
 				//接触しているブロックが動いているとき、敵とアイテムのフラグをTrue
 				if (stage_gap[y * stage_XCount + x] != 0)
 				{
@@ -569,7 +602,8 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 
 				//接触したブロックの動きフラグをTrueにする
 				if (cn == CHIP_QUESTION - 1 || cn == CHIP_HARDBLOCK - 1 
-					|| cn == CHIP_EMOJI - 1 || cn == CHIP_BLOCK - 1 || cn == CHIP_COINBLOCK - 1)
+					|| cn == CHIP_EMOJI - 1 || cn == CHIP_BLOCK - 1 || cn == CHIP_COINBLOCK - 1
+					|| cn == CHIP_BLUEBLOCK -1 || cn == CHIP_BLUEHARDBLOCK - 1)
 				{
 
 					//XとYの値を退避
@@ -579,7 +613,7 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 					stage_chipUp = true;
 				}
 				//破壊
-				if (cn == CHIP_BLOCK - 1 && pl.Getplayer_BigFlg())
+				if ((cn == CHIP_BLOCK - 1 || cn == CHIP_BLUEBLOCK - 1) && pl.Getplayer_BigFlg())
 				{
 					stage_tmpChipX = x;
 					stage_tmpChipY = y;
@@ -610,6 +644,7 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				ox += cr.Right - leftRect.Left;
 				r.Left += cr.Right - leftRect.Left;
 				r.Right += cr.Right - leftRect.Left;
+				
 				if (cn == CHIP_GOALROD - 1)
 				{
 					pl.Setplayer_ClearFlg(true);
@@ -651,6 +686,13 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				if (cn == 34)
 				{
 					pl.SetBossClearTrantionFlg(true);
+				}
+				if (cn == 44 || cn == 52)
+				{
+					if (g_pInput->IsKeyHold(MOFKEY_RIGHT))
+					{
+						pl.SetPlayerPos(Vector2(1778, 448));
+					}
 				}
 			}
 

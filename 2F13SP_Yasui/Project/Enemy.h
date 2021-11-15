@@ -189,6 +189,8 @@ public:
 	void MarioActionModeDead();
 	void MarioActionModeMove();
 
+	bool GetMarioFireFlg() { return fire; }
+
 
 
 

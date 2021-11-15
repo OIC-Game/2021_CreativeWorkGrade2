@@ -120,10 +120,10 @@ void CItem::Update(void) {
 			{
 				item_Move.y = 20.0f;
 			}
-			if (item_Position.y > 800)
+			/*if (item_Position.y > 800)
 			{
 				item_Show = false;
-			}
+			}*/
 			//ÀÛ‚ÉÀ•W‚ğˆÚ“®‚³‚¹‚é
 			item_Position.x += item_Move.x;
 			item_Position.y += item_Move.y;

@@ -50,6 +50,7 @@ private:
 	bool			player_Scroll;
 	bool			player_BossClearFlg;
 	bool			player_BossClearTransitionFlg;
+	bool			player_DokanWarpFlg;
 
 	//ÉÇÅ[ÉVÉáÉìéÌóﬁ
 	enum tag_MOTION
@@ -86,7 +87,8 @@ public:
 	void FallCheck(bool og);
 	bool Getplayer_DeadFlg() { return player_DeadFlg; };
 	void Setplayer_DeadFlg(bool deadFlg) { player_DeadFlg = deadFlg; };
-	bool Getplayer_DeadTransitionFlg() { return player_DeadTransitionFlg; };
+	bool Getplayer_DeadTransitionFlg() { return player_DeadTransitionFlg; }
+	void Setplayer_DeadTransitionFlg(bool deadFlg) { player_DeadTransitionFlg = deadFlg; }
 	bool Getplayer_ClearFlg() { return player_ClearFlg; };
 	void Setplayer_ClearFlg(bool clearFlg) { player_ClearFlg = clearFlg; };
 	bool Getplayer_ClearTransitionFlg() { return player_ClearTransitionFlg; };
@@ -105,6 +107,7 @@ public:
 	void Damage(void);
 	void ChangeBig(void);
 	float Getplayer_PositionX() { return player_Position.x; };
+	float Getplayer_PositionY() { return player_Position.y; };
 	bool GetWarpFlg() { return player_WarpFlg; }
 	void SetWarpFlg(bool Warp) { player_WarpFlg = Warp; }
 	float GetPlayer_MoveX() { return player_Move; }
@@ -114,5 +117,7 @@ public:
 	void SetBossClearTrantionFlg(bool clear) { player_BossClearTransitionFlg = clear; }
 	bool GetBossClearTrantionFlg() { return player_BossClearTransitionFlg; }
 	bool GetBossClearFlg() { return player_BossClearFlg; }
+	bool GetDokanWorpFlg() { return player_DokanWarpFlg; }
+	void SetPlayerPos(CVector2 position) { player_Position = position; }
 };
 

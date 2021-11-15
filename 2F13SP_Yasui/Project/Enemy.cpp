@@ -276,7 +276,7 @@ void CEnemy::Initialize(float px, float py, int type)
 				"i‰»UŒ‚",
 				576,68,
 				36,68,
-				FALSE,{{20,0,0},{6,1,0}}
+				FALSE,{{8,0,0},{4,1,0}}
 			},
 			{
 				"i‰»ƒ_ƒ[ƒW",
@@ -439,11 +439,11 @@ void CEnemy::Update(void)
 		}
 	}
 
-	//“G‚Ì—Ž‰º”»’è
-	if (enemy_Position.y > 1000)
-	{
-		enemy_Show = false;
-	}
+	////“G‚Ì—Ž‰º”»’è
+	//if (enemy_Position.y > 1000)
+	//{
+	//	enemy_Show = false;
+	//}
 }
 
 void CEnemy::Render(float wx, float wy)
@@ -676,7 +676,7 @@ void CEnemy::SkeletonShot(void)
 				}
 				if (!enemy_Dead)
 				{
-					enemy_ShotWait = 80;
+					enemy_ShotWait = 70;
 					enemy_Motion.ChangeMotion(SKELETONMOTION_ATTACK);
 				}
 				m_ShotArray[i].Fire(enemy_Position.x + 30, enemy_Position.y + 10,
@@ -1353,7 +1353,7 @@ void CEnemy::MarioActionModeFire()
 {
 	if (!one)
 	{
-		if (loop < 3)
+		if (loop <= 3)
 		{
 			if (!fire)
 			{
@@ -1363,9 +1363,10 @@ void CEnemy::MarioActionModeFire()
 					enemy_Motion.ChangeMotion(MARIOMOTION_FIRE_ATTACK);
 				}
 
-				if (enemy_Motion.IsEndMotion())
+				if (enemy_Motion.IsEndMotion() && enemy_Motion.GetMotionNo() == MARIOMOTION_FIRE_ATTACK)
 				{
 					fire = true;
+					
 
 				}
 			}
@@ -1379,7 +1380,7 @@ void CEnemy::MarioActionModeFire()
 				{
 					enemy_Reverse = false;
 				}
-				if (enemy_ShotWait <= 0)
+				if (enemy_ShotWait < 0)
 				{
 
 					for (int i = 0; i < ENEMYSHOT_COUNT; i++)
@@ -1396,17 +1397,23 @@ void CEnemy::MarioActionModeFire()
 							5, 5, enemy_Reverse);
 						break;
 					}
-					loop++;
-					//fire = false;
+					
+					
 				}
 				else
 				{
 					enemy_ShotWait--;
 					
 				}
+				if (enemy_ShotWait < 0)
+				{
+					loop++;
+					fire = false;
+					enemy_Motion.SetTime(0);
+				}
 			}
 		}
-		else if(enemy_ShotWait <= 0 && loop >= 3)
+		else if(enemy_ShotWait <= 0 && loop > 3)
 		{
 			one = false;
 			fire = false;
@@ -1416,7 +1423,7 @@ void CEnemy::MarioActionModeFire()
 			enemy_ShotWait = 0;
 			return;
 		}
-		else if(enemy_ShotWait > 0 && loop >= 3)
+		else if(enemy_ShotWait > 0 && loop > 3)
 		{
 			enemy_ShotWait--;
 		}

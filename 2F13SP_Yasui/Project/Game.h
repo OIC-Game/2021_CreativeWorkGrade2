@@ -32,6 +32,7 @@ private:
 	CSoundBuffer	game_MarioDeadSE;
 	CSoundBuffer	game_BossClearSE;
 	bool			game_ab;
+	bool			game_MarioFireSEFlg;
 
 	std::array<const char*, 2 >stagePathArray;
 

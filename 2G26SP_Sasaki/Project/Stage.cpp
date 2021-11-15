@@ -37,7 +37,23 @@ bool CStage::Load()
 	{
 		return false;
 	}
+	if (!m_EnemyTextureWhite.Load("EnemyWhite.png"))
+	{
+		return false;
+	}
+	if (!m_EnemyTextureBlack.Load("EnemyBlack.png"))
+	{
+		return false;
+	}
 	if (!m_EnemyShotTexture.Load("E_missileBlack.png"))
+	{
+		return false;
+	}
+	if (!m_EnemyShotTextureBlack.Load("E_missileBlack.png"))
+	{
+		return false;
+	}
+	if (!m_EnemyShotTextureWhite.Load("E_missileWhite.png"))
 	{
 		return false;
 	}
@@ -68,11 +84,18 @@ void CStage::Update(CEnemy* ene,int ecnt)
 			if (ene[i].GetShow()) { continue; }
 			//F‚ª‚Ç‚¿‚ç‚©
 			//if(EnemyColor)
-
-
-			//“GoŒ»
-			ene[i].SetTexture(&m_EnemyTexture,&m_EnemyShotTexture);
-			ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0 , m_pEnemyStart[m_EnemyNo].Color);
+			if (m_pEnemyStart[m_EnemyNo].Color == 0)
+			{
+				//“GoŒ»
+				ene[i].SetTexture(&m_EnemyTextureWhite,&m_EnemyShotTextureWhite);
+				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color);
+			}
+			if (m_pEnemyStart[m_EnemyNo].Color == 1)
+			{
+				//“GoŒ»
+				ene[i].SetTexture(&m_EnemyTextureBlack, &m_EnemyShotTextureBlack);
+				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color);
+			}
 			break;
 		}
 		//“GoŒ»”‚ğ‰ÁZ
@@ -100,7 +123,11 @@ void CStage::Release()
 	//”wŒiƒeƒNƒXƒ`ƒƒ‚ğ‰ğ•ú
 	m_Texture.Release();
 	m_EnemyTexture.Release();
+	m_EnemyTextureBlack.Release();
+	m_EnemyTextureWhite.Release();
 	m_EnemyShotTexture.Release();
+	m_EnemyShotTextureBlack.Release();
+	m_EnemyShotTextureWhite.Release();
 }
 
 //void CStage::RenderDebug(void)

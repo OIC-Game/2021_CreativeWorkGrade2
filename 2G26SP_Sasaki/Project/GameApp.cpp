@@ -162,6 +162,15 @@ MofBool CGameApp::Render(void){
 	{
 		g_EnemyArray[i].Render();
 	}
+	
+	if (g_Player.IsPlayerColor() == 1)
+	{
+		CGraphicsUtilities::RenderString(0, 0, MOF_COLOR_BLACK, "Zキーで色変換");
+	}
+	else
+	{
+		CGraphicsUtilities::RenderString(0, 0, MOF_COLOR_WHITE, "Zキーで色変換");
+	}
 
 	/*if (g_pInput->IsKeyPush(MOFKEY_E))
 	{
@@ -171,7 +180,6 @@ MofBool CGameApp::Render(void){
 			g_EnemyArray[0].Start(100, 100);
 		}
 	}*/
-
 	
 	
 	//デバッグ表示をする場合の処理

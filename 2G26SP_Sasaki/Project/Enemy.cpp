@@ -57,7 +57,7 @@ void CEnemy::Start(float px,float py ,int encol){
 	m_SpeedX = 0;
 	m_SpeedY = 1;
 	m_bShow = true;
-	m_HP = 5;
+	m_HP = 2;
 	m_ShotWaitSet = 40;
 	m_ShotWait = m_ShotWaitSet;
 	for (int i = 0; i < ENEMYSHOT_COUNT; i++)

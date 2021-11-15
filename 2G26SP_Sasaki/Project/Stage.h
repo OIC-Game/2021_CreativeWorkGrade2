@@ -23,9 +23,12 @@ private:
 	int         m_EnemyCount;
 	CTexture    m_EnemyTexture;
 	CTexture    m_EnemyTextureWhite;
+	CTexture    m_EnemyTextureBlack;
 	int         m_EnemyNo;
 	int			m_EnemyShotColor;
 	CTexture    m_EnemyShotTexture;
+	CTexture    m_EnemyShotTextureBlack;
+	CTexture    m_EnemyShotTextureWhite;
 
 public:
 	CStage();

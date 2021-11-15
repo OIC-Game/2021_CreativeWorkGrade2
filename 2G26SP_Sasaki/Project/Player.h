@@ -49,6 +49,8 @@ public:
 		return m_bDead;
 	}
 
+	int IsPlayerColor(){ return m_PlayerColor; }
+
 	void PlayerColorChange(void);
 
 	//ƒvƒŒƒCƒ„[‚Ì

@@ -214,10 +214,13 @@ bool CPlayer::Collision(CEnemy& ene)
 	CRectangle prec = GetRect();
 	CRectangle erec = ene.GetRect();
 	int enecolor    = ene.GetEnemyColor();
-	if (prec.CollisionRect(erec))
-	{
-		m_bDead = true;
-		return true;
+	if(m_PlayerColor != enecolor)
+	{ 
+		if (prec.CollisionRect(erec))
+		{
+			m_bDead = true;
+			return true;
+		}
 	}
 
 	for (int i = 0; i < PLAYERSHOT_COUNT; i++)

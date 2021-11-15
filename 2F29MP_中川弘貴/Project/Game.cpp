@@ -174,7 +174,7 @@ void CGame::Initialize(void)
 
 void CGame::ChainCheck(int y, int x)
 {
-	if (m_field[y][x] != 0 && m_field[y][x] != 1 &&
+	if (m_field[y][x] != Empty && m_field[y][x] != Wall &&
 		!m_puyoCheckFlg[y][x])
 	{
 		m_puyoCheckFlg[y][x] = true;
@@ -262,12 +262,12 @@ void CGame::Update(void)
 		if (m_dropTimeCnt < 0)
 		{
 			//確定しているか
-			if ((m_field[sFPos.y + 1][sFPos.x] != 0 && eStep == Top) ||
-				(m_field[sFPos.y + 2][sFPos.x] != 0 && eStep == Bottom) ||
-				((m_field[sFPos.y + 1][sFPos.x - 1] != 0 ||
-					m_field[sFPos.y + 1][sFPos.x] != 0) && eStep == Left) ||
-					((m_field[sFPos.y + 1][sFPos.x + 1] != 0 ||
-						m_field[sFPos.y + 1][sFPos.x] != 0) && eStep == Right))
+			if ((m_field[sFPos.y + 1][sFPos.x] != Empty && eStep == Top) ||
+				(m_field[sFPos.y + 2][sFPos.x] != Empty && eStep == Bottom) ||
+				((m_field[sFPos.y + 1][sFPos.x - 1] != Empty ||
+					m_field[sFPos.y + 1][sFPos.x] != Empty) && eStep == Left) ||
+					((m_field[sFPos.y + 1][sFPos.x + 1] != Empty ||
+						m_field[sFPos.y + 1][sFPos.x] != Empty) && eStep == Right))
 			{
 
 				//画面外に設置しないように
@@ -309,12 +309,12 @@ void CGame::Update(void)
 
 		//左に移動
 		if (g_pInput->IsKeyPush(MOFKEY_A) &&
-			((m_field[sFPos.y][sFPos.x - 1] == 0 &&
-				m_field[sFPos.y - 1][sFPos.x - 1] == 0 && eStep == Top) ||
-				(m_field[sFPos.y][sFPos.x - 1] == 0 &&
-					m_field[sFPos.y + 1][sFPos.x - 1] == 0 && eStep == Bottom) ||
-					(m_field[sFPos.y][sFPos.x - 1] == 0 && eStep == Right) ||
-				(m_field[sFPos.y][sFPos.x - 2] == 0 && eStep == Left)))
+			((m_field[sFPos.y][sFPos.x - 1] == Empty &&
+				m_field[sFPos.y - 1][sFPos.x - 1] == Empty && eStep == Top) ||
+				(m_field[sFPos.y][sFPos.x - 1] == Empty &&
+					m_field[sFPos.y + 1][sFPos.x - 1] == Empty && eStep == Bottom) ||
+					(m_field[sFPos.y][sFPos.x - 1] == Empty && eStep == Right) ||
+				(m_field[sFPos.y][sFPos.x - 2] == Empty && eStep == Left)))
 		{
 			//移動音
 			m_moveSound.Play();
@@ -325,12 +325,12 @@ void CGame::Update(void)
 			sFPos.x -= 1;
 		}
 		else if (g_pInput->IsKeyHold(MOFKEY_A) &&
-			((m_field[sFPos.y][sFPos.x - 1] == 0 &&
-				m_field[sFPos.y - 1][sFPos.x - 1] == 0 && eStep == Top) ||
-				(m_field[sFPos.y][sFPos.x - 1] == 0 &&
-					m_field[sFPos.y + 1][sFPos.x - 1] == 0 && eStep == Bottom) ||
-					(m_field[sFPos.y][sFPos.x - 1] == 0 && eStep == Right) ||
-				(m_field[sFPos.y][sFPos.x - 2] == 0 && eStep == Left)))
+			((m_field[sFPos.y][sFPos.x - 1] == Empty &&
+				m_field[sFPos.y - 1][sFPos.x - 1] == Empty && eStep == Top) ||
+				(m_field[sFPos.y][sFPos.x - 1] == Empty &&
+					m_field[sFPos.y + 1][sFPos.x - 1] == Empty && eStep == Bottom) ||
+					(m_field[sFPos.y][sFPos.x - 1] == Empty && eStep == Right) ||
+				(m_field[sFPos.y][sFPos.x - 2] == Empty && eStep == Left)))
 		{
 			if (m_leftHoldTime <= 0)
 			{
@@ -349,12 +349,12 @@ void CGame::Update(void)
 
 		//右に移動
 		if (g_pInput->IsKeyPush(MOFKEY_D) &&
-			((m_field[sFPos.y][sFPos.x + 1] == 0 &&
-				m_field[sFPos.y - 1][sFPos.x + 1] == 0 && eStep == Top) ||
-				(m_field[sFPos.y][sFPos.x + 1] == 0 &&
-					m_field[sFPos.y + 1][sFPos.x + 1] == 0 && eStep == Bottom) ||
-					(m_field[sFPos.y][sFPos.x + 1] == 0 && eStep == Left) ||
-				(m_field[sFPos.y][sFPos.x + 2] == 0 && eStep == Right)))
+			((m_field[sFPos.y][sFPos.x + 1] == Empty &&
+				m_field[sFPos.y - 1][sFPos.x + 1] == Empty && eStep == Top) ||
+				(m_field[sFPos.y][sFPos.x + 1] == Empty &&
+					m_field[sFPos.y + 1][sFPos.x + 1] == Empty && eStep == Bottom) ||
+					(m_field[sFPos.y][sFPos.x + 1] == Empty && eStep == Left) ||
+				(m_field[sFPos.y][sFPos.x + 2] == Empty && eStep == Right)))
 		{
 			//移動音
 			m_moveSound.Play();
@@ -365,12 +365,12 @@ void CGame::Update(void)
 			sFPos.x += 1;
 		}
 		else if (g_pInput->IsKeyHold(MOFKEY_D) &&
-			((m_field[sFPos.y][sFPos.x + 1] == 0 &&
-				m_field[sFPos.y - 1][sFPos.x + 1] == 0 && eStep == Top) ||
-				(m_field[sFPos.y][sFPos.x + 1] == 0 &&
-					m_field[sFPos.y + 1][sFPos.x + 1] == 0 && eStep == Bottom) ||
-					(m_field[sFPos.y][sFPos.x + 1] == 0 && eStep == Left) ||
-				(m_field[sFPos.y][sFPos.x + 2] == 0 && eStep == Right)))
+			((m_field[sFPos.y][sFPos.x + 1] == Empty &&
+				m_field[sFPos.y - 1][sFPos.x + 1] == Empty && eStep == Top) ||
+				(m_field[sFPos.y][sFPos.x + 1] == Empty &&
+					m_field[sFPos.y + 1][sFPos.x + 1] == Empty && eStep == Bottom) ||
+					(m_field[sFPos.y][sFPos.x + 1] == Empty && eStep == Left) ||
+				(m_field[sFPos.y][sFPos.x + 2] == Empty && eStep == Right)))
 		{
 			if (m_rightHoldTime <= 0)
 			{
@@ -412,10 +412,10 @@ void CGame::Update(void)
 		{
 			if (eStep == Top)
 			{
-				if (m_field[sFPos.y][sFPos.x - 1] == 0 ||
-					m_field[sFPos.y][sFPos.x + 1] == 0)
+				if (m_field[sFPos.y][sFPos.x - 1] == Empty ||
+					m_field[sFPos.y][sFPos.x + 1] == Empty)
 				{
-					if (m_field[sFPos.y][sFPos.x - 1] != 0)
+					if (m_field[sFPos.y][sFPos.x - 1] != Empty)
 					{
 						pos.x += PUYO_SIZE;
 						sFPos.x += 1;
@@ -428,7 +428,7 @@ void CGame::Update(void)
 			}
 			else if (eStep == Left)
 			{
-				if (m_field[sFPos.y + 1][sFPos.x] != 0)
+				if (m_field[sFPos.y + 1][sFPos.x] != Empty)
 				{
 					pos.y -= PUYO_SIZE;
 					sFPos.y -= 1;
@@ -439,10 +439,10 @@ void CGame::Update(void)
 			}
 			else if (eStep == Bottom)
 			{
-				if (m_field[sFPos.y][sFPos.x - 1] == 0 ||
-					m_field[sFPos.y][sFPos.x + 1] == 0)
+				if (m_field[sFPos.y][sFPos.x - 1] == Empty ||
+					m_field[sFPos.y][sFPos.x + 1] == Empty)
 				{
-					if (m_field[sFPos.y][sFPos.x + 1] != 0)
+					if (m_field[sFPos.y][sFPos.x + 1] != Empty)
 					{
 						pos.x -= PUYO_SIZE;
 						sFPos.x -= 1;
@@ -468,10 +468,10 @@ void CGame::Update(void)
 		{
 			if (eStep == Top)
 			{
-				if (m_field[sFPos.y][sFPos.x - 1] == 0 ||
-					m_field[sFPos.y][sFPos.x + 1] == 0)
+				if (m_field[sFPos.y][sFPos.x - 1] == Empty ||
+					m_field[sFPos.y][sFPos.x + 1] == Empty)
 				{
-					if (m_field[sFPos.y][sFPos.x + 1] != 0)
+					if (m_field[sFPos.y][sFPos.x + 1] != Empty)
 					{
 						pos.x -= PUYO_SIZE;
 						sFPos.x -= 1;
@@ -483,7 +483,7 @@ void CGame::Update(void)
 			}
 			else if (eStep == Right)
 			{
-				if (m_field[sFPos.y + 1][sFPos.x] != 0)
+				if (m_field[sFPos.y + 1][sFPos.x] != Empty)
 				{
 					pos.y -= PUYO_SIZE;
 					sFPos.y -= 1;
@@ -494,10 +494,10 @@ void CGame::Update(void)
 			}
 			else if (eStep == Bottom)
 			{
-				if (m_field[sFPos.y][sFPos.x - 1] == 0 ||
-					m_field[sFPos.y][sFPos.x + 1] == 0)
+				if (m_field[sFPos.y][sFPos.x - 1] == Empty ||
+					m_field[sFPos.y][sFPos.x + 1] == Empty)
 				{
-					if (m_field[sFPos.y][sFPos.x - 1] != 0)
+					if (m_field[sFPos.y][sFPos.x - 1] != Empty)
 					{
 						pos.x += PUYO_SIZE;
 						sFPos.x += 1;
@@ -530,15 +530,15 @@ void CGame::Update(void)
 				for (int x = FW - 1; x >= 1; x--)
 				{
 					//ぷよが宙に浮いているとき
-					if (m_field[y][x] != 0 &&
-						m_field[y + 1][x] == 0)
+					if (m_field[y][x] != Empty &&
+						m_field[y + 1][x] == Empty)
 					{
 
 						for (int i = y; i <= FH - 2; i++) 
 						{
 							m_field[i + 1][x] = m_field[i][x];
 							m_field[i][x] = 0;
-							if (m_field[i + 2][x] != 0)
+							if (m_field[i + 2][x] != Empty)
 							{
 								break;
 							}
@@ -604,7 +604,7 @@ void CGame::Update(void)
 				{
 					if (m_destroyFlg[i][j])
 					{
-						m_field[i][j] = 0;
+						m_field[i][j] = Empty;
 						m_chainFlg = true;
 					}
 					m_destroyFlg[i][j] = false;
@@ -631,10 +631,10 @@ void CGame::Update(void)
 				m_sleepTime = 20;
 
 				//バツ部分に(2,3,4,5)のどれかしらがあればゲームオーバー
-				if (m_field[0][3] == 2 ||
-					m_field[0][3] == 3 ||
-					m_field[0][3] == 4 ||
-					m_field[0][3] == 5)
+				if (m_field[0][3] == Red ||
+					m_field[0][3] == Blue ||
+					m_field[0][3] == Yellow ||
+					m_field[0][3] == Green)
 				{
 					m_gameBGM.Stop();
 					m_gameOverSound.Play();
@@ -673,8 +673,8 @@ void CGame::Update(void)
 
 		//次回のぷよを格納しておくため
 		//ぷよの色をランダムで決める
-		m_type[1][0] = random.Random(2, 6);
-		m_type[1][1] = random.Random(2, 6);
+		m_type[1][0] = random.Random(Red, TypeCount);
+		m_type[1][1] = random.Random(Red, TypeCount);
 
 		//色々初期値
 		m_dropTimeCnt = DROP_SPEED;
@@ -732,23 +732,23 @@ void CGame::Render(void)
 	{
 		for (int x = 0; x < FW; x++)
 		{
-			if (m_field[y][x] == 5)
+			if (m_field[y][x] == Green)
 				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_GREEN);
 				m_GreenPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
-			if (m_field[y][x] == 4)
+			if (m_field[y][x] == Yellow)
 				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_YELLOW);
 				m_YellowPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
-			if (m_field[y][x] == 3)
+			if (m_field[y][x] == Blue)
 				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_BLUE);
 				m_BluePuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
-			if (m_field[y][x] == 2)
+			if (m_field[y][x] == Red)
 				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_RED);
 				m_RedPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
-			if (m_field[y][x] == 1)
+			if (m_field[y][x] == Wall)
 				CGraphicsUtilities::RenderFillRect(BL + x * BL, BL * 2 + y * BL, x * BL + BL * 2, y * BL + BL * 3, MOF_COLOR_BLACK);
 
 			//if (field[y][x] == 0)
@@ -760,57 +760,57 @@ void CGame::Render(void)
 	//待機中のぷよ
 	CGraphicsUtilities::RenderString(490, 100, "NEXT");
 	CGraphicsUtilities::RenderFillRect(480, 130, 550, 250, MOF_COLOR_CBLACK);
-	if (m_type[1][1] == 2)
+	if (m_type[1][1] == Red)
 		m_RedPuyoTexture.Render(490, 140);
 
-	else if (m_type[1][1] == 3)
+	else if (m_type[1][1] == Blue)
 		m_BluePuyoTexture.Render(490, 140);
 
-	else if (m_type[1][1] == 4)
+	else if (m_type[1][1] == Yellow)
 		m_YellowPuyoTexture.Render(490, 140);
 
-	else if (m_type[1][1] == 5)
+	else if (m_type[1][1] == Green)
 		m_GreenPuyoTexture.Render(490, 140);
 
-	if (m_type[1][0] == 2)
+	if (m_type[1][0] == Red)
 		m_RedPuyoTexture.Render(490, 190);
 
-	else if (m_type[1][0] == 3)
+	else if (m_type[1][0] == Blue)
 		m_BluePuyoTexture.Render(490, 190);
 
-	else if (m_type[1][0] == 4)
+	else if (m_type[1][0] == Yellow)
 		m_YellowPuyoTexture.Render(490, 190);
 
-	else if (m_type[1][0] == 5)
+	else if (m_type[1][0] == Green)
 		m_GreenPuyoTexture.Render(490, 190);
 
 
 	//操作中のぷよの描画
 	if (eFlow == drop || eFlow == pause) {
 		//本体
-		if (m_type[0][0] == 2)
+		if (m_type[0][0] == Red)
 			m_RedPuyoTexture.Render(pos.x, pos.y);
 
-		if (m_type[0][0] == 3)
+		if (m_type[0][0] == Blue)
 			m_BluePuyoTexture.Render(pos.x, pos.y);
 
-		if (m_type[0][0] == 4)
+		if (m_type[0][0] == Yellow)
 			m_YellowPuyoTexture.Render(pos.x, pos.y);
 
-		if (m_type[0][0] == 5)
+		if (m_type[0][0] == Green)
 			m_GreenPuyoTexture.Render(pos.x, pos.y);
 
 		//サブ
-		if (m_type[0][1] == 2)
+		if (m_type[0][1] == Red)
 			
 			m_RedPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
-		if (m_type[0][1] == 3)
+		if (m_type[0][1] == Blue)
 			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_BLUE);
 			m_BluePuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
-		if (m_type[0][1] == 4)
+		if (m_type[0][1] == Yellow)
 			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_YELLOW);
 			m_YellowPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
-		if (m_type[0][1] == 5)
+		if (m_type[0][1] == Green)
 			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_GREEN);
 			m_GreenPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
 	}

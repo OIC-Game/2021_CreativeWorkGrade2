@@ -7,23 +7,27 @@
 #include "Enemy.h"
 #include "Item.h"
 #include "Pipe.h"
+#include "CheckPoint.h"
 
 class CStageParent				//複数のステージを管理する
 {
 private:
-	char*		m_StageName;
-	CPipe*		m_PipeArray;		//土管の配列
-	int			m_PipeCount;
-	CStage*		m_StageArray;		//ステージの配列
-	int			m_StageCount;
-	int			m_StageCursor;
-	int			m_GoalIdx; 
-	int			m_GoalType;
-	int			m_GoalX;
-	int			m_GoalTop;
-	int			m_GoalBottom;
 
-	CSoundBuffer* m_pSkillSound;
+	char*			m_StageName;
+	CPipe*			m_PipeArray;		//土管の配列
+	int				m_PipeCount;
+	CStage*			m_StageArray;		//ステージの配列
+	int				m_StageCount;
+	int				m_StageCursor;
+	int				m_CheckPointCount;
+	CCheckPoint*	m_CheckPointArray;
+	int				m_GoalIdx; 
+	int				m_GoalType;
+	int				m_GoalX;
+	int				m_GoalTop;
+	int				m_GoalBottom;
+
+	CSoundBuffer*	m_pSkillSound;
 
 	//bool		m_DebugFlg;
 

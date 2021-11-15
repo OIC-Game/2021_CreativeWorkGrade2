@@ -158,7 +158,7 @@ void CItem::BShow(CVector2 pos, int marioType, CTexture* itemTextures) {
 	m_Pos.y -= CHIPSIZE;
 	m_bShow = true;
 	m_animShow = true;
-	if (m_Define->itemType == ITEM_NORMAL && m_Define->ext1 == CGameDefine::GetGameDefine()->GetMarioIdx(marioType) && marioType == MARIO_SUPER) {
+	if (m_Define->itemType == ITEM_NORMAL && m_Define->ext1 <= CGameDefine::GetGameDefine()->GetMarioIdx(marioType) && (marioType == MARIO_SUPER || marioType == MARIO_FIRE)) {
 		CItemDefine* def = CGameDefine::GetGameDefine()->GetItemByIdx(m_Define->ext2);
 		if (def == NULL) return;
 		m_Type = def->idx - 1;

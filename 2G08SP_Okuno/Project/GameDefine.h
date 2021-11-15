@@ -23,7 +23,7 @@ enum t_MARIO_TYPE {
 	MARIO_SUPER = 2,
 	MARIO_FIRE = 4,
 
-	MARIO_COUNT,
+	MARIO_COUNT = 3,
 
 	MARIO_DEATH = 0,
 };

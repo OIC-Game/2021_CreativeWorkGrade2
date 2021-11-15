@@ -1,12 +1,14 @@
 #include "StageParent.h"
 
-CStageParent::CStageParent():
+CStageParent::CStageParent() :
 	m_StageName(),
 	m_PipeArray(),
 	m_PipeCount(0),
 	m_StageArray(),
 	m_StageCount(0),
 	m_StageCursor(0),
+	m_CheckPointCount(0),
+	m_CheckPointArray(),
 	m_GoalFlg(false)
 	//m_DebugFlg(false)
 {
@@ -55,7 +57,19 @@ bool CStageParent::Load(std::string fname, CSoundBuffer* skillSound)
 		}
 	}
 
-	m_GoalIdx = atoi(strtok(wk, ","));
+	m_CheckPointCount = atoi(strtok(wk, ","));
+	m_CheckPointArray = new CCheckPoint[m_CheckPointCount];
+
+	for (int i = 0; i < m_CheckPointCount; i++) {
+		int idx = atoi(strtok(NULL, ","));
+		float x = atof(strtok(NULL, ",")) * CHIPSIZE;
+		float y = atof(strtok(NULL, ",")) * CHIPSIZE;
+
+		m_CheckPointArray[i].SetStageIdx(idx);
+		m_CheckPointArray[i].SetRect(CRectangle(x, y, x + CHIPSIZE, y + CHIPSIZE));
+	}
+
+	m_GoalIdx = atoi(strtok(NULL, ","));
 	m_GoalType = atoi(strtok(NULL, ","));
 	m_GoalX = atoi(strtok(NULL, ","));
 	m_GoalTop = atoi(strtok(NULL, ","));
@@ -177,6 +191,17 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 		}
 	}
 
+
+	for (int i = 0; i < m_CheckPointCount; i++) {
+		if (m_CheckPointArray[i].IsThrough() || m_CheckPointArray[i].GetStageIdx() != m_StageCursor) continue;
+
+		if (m_CheckPointArray[i].GetRect().CollisionRect(pl.GetRect(true))) {
+			m_CheckPointArray[i].SetThrough(true);
+
+			//チェックポイント到達時の処理
+		}
+	}
+
 	//if (g_pInput->IsKeyPush(MOFKEY_F3)) {
 	//	m_DebugFlg = !m_DebugFlg;
 	//}
@@ -215,6 +240,10 @@ void CStageParent::Release()
 
 		delete[] m_StageArray;
 		m_StageArray = NULL;
+	}
+	if (m_CheckPointArray) {
+		delete[] m_CheckPointArray;
+		m_CheckPointArray = NULL;
 	}
 }
 

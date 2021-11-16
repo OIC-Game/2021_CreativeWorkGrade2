@@ -23,6 +23,8 @@ private:
 
 	int      m_PosWait;
 
+	bool	m_bTouched;
+
 public:
 	CbreakBlock();
 	~CbreakBlock();
@@ -46,4 +48,14 @@ public:
 
 	void GetPos(void);
 	void GetShow(void);
+
+//	void MovePos();
+//  void SetPos(int pos);
+//	void AdjustPosition();
+
+	void AddPos(Vector2 pos) { 
+		m_bTouched = true;
+		m_Pos += pos; 
+	}
+	
 };

@@ -648,7 +648,7 @@ bool CPlayer::CollisionbreakBlock(CbreakBlock& blo, float ox, float oy)
 		m_PosY += bl.Bottom - prec.Top;
 		if (m_Power == 0)
 		{
-			blo.GetPos();
+			blo.AddPos(Vector2(0,-2));
 		}
 		else if (m_Power == 1)
 		{

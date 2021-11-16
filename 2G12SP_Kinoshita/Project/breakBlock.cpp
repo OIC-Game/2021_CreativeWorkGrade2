@@ -20,6 +20,7 @@ void CbreakBlock::Initialize(float px, float py, int type)
 	m_bShow = true;
 	m_PosWait = 0;
 	m_Type = type;
+	m_bTouched = false;
 }
 
 void CbreakBlock::Update(void)
@@ -58,8 +59,16 @@ void CbreakBlock::Render(float wx, float wy)
 		dr.Right = dr.Left;
 		dr.Left = tmp;
 	}*/
+
+	
 	//テクスチャの描画
 	m_pTexture->Render(m_Pos.x - wx, m_Pos.y - wy, dr);
+	
+	// -2 Adjust ?
+	if (m_bTouched) {
+		m_Pos.y += 2;
+		m_bTouched = false;
+	}
 }
 
 void CbreakBlock::RenderDebug(float wx, float wy)
@@ -77,6 +86,8 @@ bool CbreakBlock::Collision(CRectangle r, float& ox, float& oy)
 	return false;
 }
 
+
+// TODO: 修正しましょうか？Getterなので、それだけするように
 void CbreakBlock::GetPos(void)
 {
 	m_PosY = m_Pos.y;
@@ -90,9 +101,6 @@ void CbreakBlock::GetPos(void)
 			m_Pos.y = m_PosY;
 		}
 	}
- 
-	
-	
 }
 
 void CbreakBlock::GetShow(void)

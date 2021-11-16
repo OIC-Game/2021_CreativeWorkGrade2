@@ -99,7 +99,8 @@ void CGame::Update(void)
 	{
 		float ox = 0, oy = 0;
 		
-		if (m_Stage.Collision(m_BlockArray[i].GetRect(), ox, oy))
+		// TODO: –¾‚ç‚©‚É‚¨‚©‚µ‚¢
+		if(m_Stage.Collision(m_BlockArray[i].GetRect() , ox, oy));
 		{
 			m_BlockArray[i].CollisionStage(ox, oy);
 			m_Player.CollisionBlock(m_BlockArray[i], ox, oy);

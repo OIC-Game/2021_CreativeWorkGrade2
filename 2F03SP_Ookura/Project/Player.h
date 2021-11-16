@@ -2,6 +2,7 @@
 
 #include	"Mof.h"
 #include	"Enemy.h"
+#include"Game.h"
 #include	"PlayerShot.h"
 
 //ˆÚ“®‘¬“x

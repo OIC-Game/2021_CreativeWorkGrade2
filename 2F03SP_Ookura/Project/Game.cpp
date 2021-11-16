@@ -3,7 +3,10 @@
 #include	"Player.h"
 #include	"Stage.h"
 #include	"Enemy.h"
+#include"GameOver.h"
 #include"Stage1.h"
+//変更するシーン(外部参照、実体はGameApp.cpp)
+extern int						gChangeScene;
 //プレイヤー
 CPlayer		g_Player;
 //敵
@@ -114,6 +117,15 @@ void CGame::Update(void)
 			}
 		}
 	}
+	//ゲームオーバー画面遷移
+	if (!g_Player.IsDead() == false)
+	{
+			gChangeScene = SCENENO_GAMEOVER;
+	}
+	else if (g_bClear)
+	{
+		gChangeScene = SCENENO_GAMECLEAR;
+	}
 }
 
 void CGame::Render(void)
@@ -142,16 +154,16 @@ void CGame::Render(void)
 		}
 	}
 
-	//ゲームオーバー表示
+	/*/ゲームオーバー表示
 	if (g_Player.IsDead())
 	{
 		CGraphicsUtilities::RenderString(240, 350, MOF_COLOR_RED, "ゲームオーバー　：　Enterキーでもう一度最初から");
-	}
+	}*/
 	//ゲームクリア表示
-	else if (g_bClear)
+	/*else if (g_bClear)
 	{
 		CGraphicsUtilities::RenderString(240, 350, MOF_COLOR_RED, "ゲームクリア　：　Enterキーでもう一度最初から");
-	}
+	}*/
 }
 
 void CGame::RenderDebug(void)

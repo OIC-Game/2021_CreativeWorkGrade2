@@ -61,7 +61,7 @@ void CEnemy::Start(float px, float py, int t) {
 	m_SpeedY = 1;
 	m_Type = t;
 	m_bShow = true;
-	m_HP = ((m_Type == 1) ? 200 : 1);
+	m_HP = ((m_Type == 1) ? 10 : 1);
 	m_ShotWaitSet = ((m_Type == 1) ? 120 : 40);
 	m_ShotWait = m_ShotWaitSet;
 	for (int i = 0; i < ENEMYSHOT_COUNT; i++)
@@ -99,42 +99,7 @@ void CEnemy::Update(void) {
 /*Type0‚Ì“G
 updaate‚©‚çswitch‚Åˆê’v‚µ‚½Žž‚Ì‚ÝŽÀs*/
 void CEnemy::UpdateType0(void) {
-	/*if (m_PosY < 1000)
-	{
-		m_PosY += m_SpeedY;
-	}
-	else
-	{
-		if (m_ShotWait <= 0)
-		{
-			int sCnt = 12;
-			//kakudo
-			float ad = 0.0f;
-			for (int cnt = 0; cnt < sCnt; cnt++)
-			{
-				for (int i = 0; i < ENEMYSHOT_COUNT; i++)
-				{
-					if (m_ShotArray[i].GetShow())
-					{
-						continue;
-					}
-					m_ShotWait = m_ShotWaitSet;
-					//hassya ichi
-					float stx = m_PosX + m_pTexture->GetWidth() * 0.5f;
-					float sty = m_PosY + m_pTexture->GetHeight();
-					//tama susumu houkou
-					m_ShotArray[i].Fire(stx, sty, cos(MOF_ToRadian(ad)) * 5, sin(MOF_ToRadian(ad)) * 5);
-					break;
-				}
-				//360 / kazu
-				ad += 360.0f / sCnt;
-			}
-		}
-		else
-		{
-			m_ShotWait--;
-		}
-	}*/
+	
 	//‰æ–Ê‰º‚ÉŒü‚©‚Á‚ÄˆÚ“®
 	m_PosY += m_SpeedY;
 	m_PosX += m_SpeedX;
@@ -192,56 +157,7 @@ void CEnemy::UpdateType0(void) {
 switch‚Åˆê’v‚µ‚½Žž‚Ì‚ÝŽÀs*/
 void CEnemy::UpdateType1(void) {
 
-	/*m_PosY += m_SpeedY;
-	m_PosX += m_SpeedX;
-
-	//‰æ–ÊŠO‚ÅÁ‹Ž
-	if (m_PosY >= g_pGraphics->GetTargetHeight())
-	{
-		m_bShow = false;
-	}
-	if (m_SpeedX > 0 && m_PosX + m_pTexture->GetWidth() > g_pGraphics->GetTargetWidth())
-	{
-		m_SpeedX *= -1;
-	}
-	else if (m_SpeedX < 0 && m_PosX < 100)
-	{
-		m_SpeedX *= -1;
-	}
-	if (m_PosY + m_pTexture->GetHeight() > 500)
-	{
-		m_SpeedY *= -1;
-	}
-	//’e‚Ì”­ŽË
-	if (m_ShotWait <= 0)
-	{
-		for (int i = 0; i < ENEMYSHOT_COUNT; i++)
-		{
-			if (m_ShotArray[i].GetShow())
-			{
-				continue;
-			}
-			m_ShotWait = m_ShotWaitSet;
-			float stx = m_PosX + m_pTexture->GetWidth() * 0.5f;
-			float sty = m_PosY + m_pTexture->GetHeight();
-			float dx = m_TargetPosX - stx;
-			float dy = m_TargetPosY - sty;
-			float d = sqrt(dx * dx + dy * dy);
-			if (d <= 0)
-			{
-				break;
-			}
-			dx /= d;
-			dy /= d;
-			m_ShotArray[i].Fire(stx, sty, dx * 5, dy * 5);
-			//m_ShotArray[i].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f,m_PosY + m_pTexture->GetHeight(),0,5);
-			break;
-		}
-	}
-	else
-	{
-		m_ShotWait--;*
-	}*/
+	
 	if (m_PosY < 100)
 	{
 		m_PosY += m_SpeedY;

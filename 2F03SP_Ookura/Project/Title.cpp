@@ -65,7 +65,7 @@ void CTitle::Update(void)
  */
 void CTitle::Render(void) {
 	title_Texture.Render(0, 0);
-	CGraphicsUtilities::RenderString(400, 500, "PRESS ENTER TO START");
+	CGraphicsUtilities::RenderString(400, 500, "エンターキーですたーと");
 
 }
 

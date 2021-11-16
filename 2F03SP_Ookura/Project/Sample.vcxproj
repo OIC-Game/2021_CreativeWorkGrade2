@@ -94,6 +94,8 @@
     <ClCompile Include="EnemyShot.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameApp.cpp" />
+    <ClCompile Include="GameClear.cpp" />
+    <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerShot.cpp" />
     <ClCompile Include="Stage.cpp" />
@@ -106,6 +108,8 @@
     <ClInclude Include="EnemyShot.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameApp.h" />
+    <ClInclude Include="GameClear.h" />
+    <ClInclude Include="GameOver.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerShot.h" />
     <ClInclude Include="Stage.h" />

@@ -14,7 +14,8 @@
 
 #include    "Title.h"
 #include"Game.h"
-
+#include"GameOver.h"
+#include"GameClear.h"
 //現在のシーン
 int						gScene = SCENENO_TITLE;
 //変更するシーン
@@ -22,7 +23,8 @@ int                     gChangeScene = SCENENO_TITLE;
 
 CTitle		g_Title;
 CGame		g_Game;
-
+CGameOver g_GameOver;
+CGameClear g_GameClear;
 
 /*************************************************************************//*!
 		@brief			アプリケーションの初期化
@@ -36,8 +38,9 @@ MofBool CGameApp::Initialize(void){
 	CUtilities::SetCurrentDirectory("Resource");
 	g_Title.Load();
 	g_Game.Load();
-	
 	g_Title.Initialize();
+	g_GameOver.Load();
+	g_GameClear.Load();
 	return TRUE;
 }
 /*************************************************************************//*!
@@ -59,6 +62,12 @@ MofBool CGameApp::Update(void) {
 	case SCENENO_GAME:
 		g_Game.Update();
 		break;
+	case SCENENO_GAMEOVER:
+		g_GameOver.Update();
+		break;
+	case SCENENO_GAMECLEAR:
+		g_GameClear.Update();
+		break;
 	}
 	if (gChangeScene != gScene)
 	{
@@ -69,6 +78,12 @@ MofBool CGameApp::Update(void) {
 			break;
 		case SCENENO_GAME:
 			g_Game.Initialize();
+			break;
+		case SCENENO_GAMEOVER:
+			g_GameOver.Initialize();
+			break;
+		case SCENENO_GAMECLEAR:
+			g_GameClear.Initialize();
 			break;
 		}
 		gScene = gChangeScene;
@@ -118,7 +133,13 @@ MofBool CGameApp::Render(void){
 		break;
 	case SCENENO_GAME:
 		g_Game.Render();
+		break;
+	case SCENENO_GAMEOVER:
+		g_GameOver.Render();
 		break; 
+	case SCENENO_GAMECLEAR:
+		g_GameClear.Render();
+		break;
 	}
 	
 	//描画の終了
@@ -135,5 +156,7 @@ MofBool CGameApp::Render(void){
 MofBool CGameApp::Release(void){
 	g_Title.Release();
 	g_Game.Release();
+	g_GameOver.Release();
+	g_GameClear.Release();
 	return TRUE;
 }

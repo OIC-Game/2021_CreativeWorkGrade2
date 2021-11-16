@@ -460,7 +460,7 @@ void CField::CheckHollow(void) {
 	}
 	else if (isZero) 
 	{
-		if (combo >= 2) stopCnt = 1.0f;
+		if (combo >= 2) stopCnt = 0.4f;
 		else stopCnt = 0.05f;
 
 		nowState = eSet;
@@ -519,9 +519,9 @@ void CField::SpeedCheck(void)
 	else if (score > ((accelNum * 6) * 4)) obstacleAmount = 6;
 
 	if (floor(score / (accelNum * 4) != 0) && score <= ((accelNum * 4) * 15)) {
-		obstacleTime = 10.0f - (floor(score / (accelNum * 4)) * 0.2f);
+		obstacleTime = 30.0f - (floor(score / (accelNum * 4)) * 0.5f);
 	}
-	else if (score > ((accelNum * 4) * 15)) obstacleTime = 7.0f;
+	else if (score > ((accelNum * 4) * 20)) obstacleTime = 20.0f;
 }
 
 bool CField::CheckStop(void) 

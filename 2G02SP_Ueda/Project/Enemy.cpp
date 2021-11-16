@@ -131,17 +131,19 @@ void CEnemy::Damage(int dmg,bool way)
 	if (m_Type == ENEMY_N && m_HP == 1)
 	{
 		if (!m_bkMove)
+		{
 			m_bkMove = true;
+		}
 		else if (m_bkMove)
 		{
 			m_MoveX = 0;
 			m_bkMove = false;
 		}
-		if (/*m_bkMove && */m_MoveX == 0.0f && m_way)
+		if (m_bkMove && m_MoveX == 0.0f && m_way)
 		{
 			m_MoveX = 5.0f;
 		}
-		else if (/*m_bkMove && */m_MoveX == 0.0f && !m_way)
+		else if (m_bkMove && m_MoveX == 0.0f && !m_way)
 		{
 			m_MoveX = -5.0f;
 		}

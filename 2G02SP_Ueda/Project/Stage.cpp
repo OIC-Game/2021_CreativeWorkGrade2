@@ -432,6 +432,7 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy)
 				oy += cr.Bottom - trec.Top;
 				r.Top += cr.Bottom - trec.Top;
 				r.Bottom += cr.Bottom - trec.Top;
+				m_pChipData[y * m_XCount + x] = 0;
 			}
 		}
 	}

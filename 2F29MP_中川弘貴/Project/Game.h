@@ -57,9 +57,10 @@ private:
 
 	//自動落下まで待つ変数
 	int			m_dropTimeCnt;
+	int			m_leftRotateTimeCnt;
 	//また後で名前変える　　間を生み出すためタイム変数
 	int			m_sleepTime;
-	//
+	//readyカウント
 	int			m_readyTime;
 	int			m_downHoldTime;
 	int			m_leftHoldTime;
@@ -82,6 +83,10 @@ private:
 	//連鎖数
 	int			m_chainCnt;
 
+	bool		m_endFlg;
+
+
+
 	//ぷよ素材
 	CTexture    m_RedPuyoTexture;
 	CTexture    m_BluePuyoTexture;
@@ -89,7 +94,7 @@ private:
 	CTexture    m_GreenPuyoTexture;
 	//背景
 	CTexture	m_BackTexture;
-	//ゲームオーバーのバツ
+	//ゲームオーバーのバツ部分
 	CTexture	m_CrossMarkTexture;
 	CTexture	m_GameOverTexture;
 	CTexture    m_PauseTexture;
@@ -110,7 +115,6 @@ private:
 	CSoundBuffer	m_gameOverSound;
 
 	CFade			fade;
-	bool			endFlg;
 
 public:
 	CGame();

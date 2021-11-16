@@ -167,7 +167,7 @@ void CGame::Initialize(void)
 	sFPos.x = 3;
 	sFPos.y = 0;
 	eStep = E_Rotation::Top;
-	endFlg = false;
+	m_endFlg = false;
 
 	fade.FadeIn();
 }
@@ -209,7 +209,7 @@ void CGame::Update(void)
 	{
 		return;
 	}
-	else if (endFlg)
+	else if (m_endFlg)
 	{
 		m_gameBGM.Stop();
 		m_gameOverSound.Stop();
@@ -242,7 +242,7 @@ void CGame::Update(void)
 		if (g_pInput->IsKeyPush(MOFKEY_RETURN))
 		{
 			fade.FadeOut();
-			endFlg = true;
+			m_endFlg = true;
 
 		}
 	}
@@ -458,6 +458,11 @@ void CGame::Update(void)
 				spin.x = 0;
 				spin.y = -PUYO_SIZE;
 			}
+			//左右に壁やぷよがあり回転が行えなかった場合
+			else
+			{
+
+			}
 
 			//回転音
 			m_rotateSound.Play();
@@ -563,7 +568,7 @@ void CGame::Update(void)
 	{
 		if (m_sleepTime < 0) {
 			//連鎖のチェック
-			//連鎖が行われた場合はちぎりに戻り一度整地する。その際、連鎖数はどっかしらの変数にとっておく
+			//連鎖が行われた場合はちぎりに戻り一度整地する。
 			//連鎖が行われなかった場合、リスタートへ
 			m_chainFlg = false;
 
@@ -700,7 +705,7 @@ void CGame::Update(void)
 		if (g_pInput->IsKeyPush(MOFKEY_RETURN))
 		{
 			fade.FadeOut();
-			endFlg = true;
+			m_endFlg = true;
 
 		}
 	}
@@ -733,26 +738,19 @@ void CGame::Render(void)
 		for (int x = 0; x < FW; x++)
 		{
 			if (m_field[y][x] == Green)
-				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_GREEN);
 				m_GreenPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
 			if (m_field[y][x] == Yellow)
-				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_YELLOW);
 				m_YellowPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
 			if (m_field[y][x] == Blue)
-				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_BLUE);
 				m_BluePuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
 			if (m_field[y][x] == Red)
-				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_RED);
 				m_RedPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
 
 			if (m_field[y][x] == Wall)
 				CGraphicsUtilities::RenderFillRect(BL + x * BL, BL * 2 + y * BL, x * BL + BL * 2, y * BL + BL * 3, MOF_COLOR_BLACK);
-
-			//if (field[y][x] == 0)
-				//CGraphicsUtilities::RenderFillRect(BL + x * BL, BL + y * BL, x * BL + BL * 2, y * BL + BL * 2, MOF_COLOR_WHITE);
 
 		}
 	}
@@ -801,17 +799,16 @@ void CGame::Render(void)
 			m_GreenPuyoTexture.Render(pos.x, pos.y);
 
 		//サブ
-		if (m_type[0][1] == Red)
-			
+		if (m_type[0][1] == Red)	
 			m_RedPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
+
 		if (m_type[0][1] == Blue)
-			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_BLUE);
 			m_BluePuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
+
 		if (m_type[0][1] == Yellow)
-			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_YELLOW);
 			m_YellowPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
+
 		if (m_type[0][1] == Green)
-			//CGraphicsUtilities::RenderFillRect(pos.x + spin.x, pos.y + spin.y, pos.x + spin.x + PUYO_SIZE, pos.y + spin.y + PUYO_SIZE, MOF_COLOR_GREEN);
 			m_GreenPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
 	}
 

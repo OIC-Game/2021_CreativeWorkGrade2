@@ -389,6 +389,7 @@ void CGame::Update(void) {
 	}
 	else if (game_Time <= 0 && !g_Player.Getplayer_ClearFlg())
 	{
+		game_Time = 0.0f;
 		g_Player.Setplayer_DeadFlg(true);
 	}
 
@@ -477,7 +478,7 @@ void CGame::Update(void) {
 		}
 		else
 		{
-			
+			game_Time = 0.0f;
 			if (!game_GameClearSE.IsPlay())
 			{
 				m_NextScene = SCENENO_INFOMATION;
@@ -532,7 +533,7 @@ void CGame::Render(void) {
 	}
 	CGraphicsUtilities::RenderString(300, 50, "COIN");
 	CGraphicsUtilities::RenderString(100, 50, "%.6d", score);
-	CGraphicsUtilities::RenderString(800, 50, "%.0f", game_Time);
+	CGraphicsUtilities::RenderString(800, 50, "%.3d", (int)game_Time);
 	CGraphicsUtilities::RenderString(350, 50, "~%d", getCoinCount);
 	switch (game_NowStage)
 	{

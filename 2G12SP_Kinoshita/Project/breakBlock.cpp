@@ -79,11 +79,19 @@ bool CbreakBlock::Collision(CRectangle r, float& ox, float& oy)
 
 void CbreakBlock::GetPos(void)
 {
+	m_PosY = m_Pos.y;
 	m_PosWait = 2;
-	if (m_PosWait > 0 )
+	if (m_PosWait > 0 && m_PosY<m_Pos.y )
 	{
-		m_Pos.y -= 2;
+		m_PosWait--;
+		m_Pos.y -= 3;
+		if (m_Pos.y < m_PosY)
+		{
+			m_Pos.y = m_PosY;
+		}
 	}
+ 
+	
 	
 }
 

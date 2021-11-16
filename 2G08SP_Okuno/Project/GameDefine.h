@@ -71,6 +71,15 @@ enum t_DISPLAY_STATE {	//ï\é¶èÛë‘
 
 constexpr int CHIPSIZE = 32;
 
+enum t_CHECKPOINT_CHIPS {
+	CHECKPOINT_B1 = 100,
+	CHECKPOINT_B2 = 101,
+	CHECKPOINT_B3 = 110,
+	CHECKPOINT_B4 = 111,
+
+	CHECKPOINT_AN = 2,
+};
+
 class CItemDefine {
 public:
 	int idx;
@@ -101,6 +110,7 @@ public:
 	float x_ext2;
 	float y_ext1;
 	float y_ext2;
+	int layer;
 	int broken;
 	int nextIdx;
 	int nextIdx_Item;
@@ -115,6 +125,7 @@ public:
 		x_ext2(0),
 		y_ext1(0),
 		y_ext2(0),
+		layer(0),
 		broken(0),
 		nextIdx(0),
 		nextIdx_Item(0) {

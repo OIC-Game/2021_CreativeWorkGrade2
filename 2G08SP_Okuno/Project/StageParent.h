@@ -47,6 +47,7 @@ public:
 	void Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, bool clearBgmPlay);
 
 	void Render();
+	void RenderLayerOver();
 
 	void RenderDebug();
 
@@ -54,7 +55,9 @@ public:
 
 	bool GoalCheck(CPlayer& pl, float& ox);
 
-	Vector2 GetStartPos() { return m_StageArray[m_StageCursor].GetStartPos(); };
+	Vector2 GetStartPos();
+
+	void ResetCheckPoint();
 
 	float GetGoalBottom() { return CHIPSIZE * m_GoalBottom; };
 

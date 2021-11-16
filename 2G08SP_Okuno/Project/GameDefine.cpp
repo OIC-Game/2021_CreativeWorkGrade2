@@ -30,6 +30,7 @@ bool CGameDefine::Load_Block(const char* fname) {
 		m_pGameDefine->m_BlockDefine[i].x_ext2 = atof(strtok(NULL, ","));
 		m_pGameDefine->m_BlockDefine[i].y_ext1 = atof(strtok(NULL, ","));
 		m_pGameDefine->m_BlockDefine[i].y_ext2 = atof(strtok(NULL, ","));
+		m_pGameDefine->m_BlockDefine[i].layer = atoi(strtok(NULL, ","));
 		m_pGameDefine->m_BlockDefine[i].broken = atoi(strtok(NULL, ","));
 		m_pGameDefine->m_BlockDefine[i].nextIdx = atoi(strtok(NULL, ","));
 		m_pGameDefine->m_BlockDefine[i].nextIdx_Item = atoi(strtok(NULL, ","));

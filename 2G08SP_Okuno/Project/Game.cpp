@@ -122,6 +122,7 @@ void CGame::Update()
 		if (g_pInput->IsKeyPush(MOFKEY_RETURN)) {
 			m_Life = pllifeDefault;
 			m_Player.SetLife(m_Life);
+			m_Stage.ResetCheckPoint();
 
 			m_nScene = G_SCENE_LIFE;
 		}
@@ -208,6 +209,8 @@ void CGame::Render()
 		m_Stage.Render();
 
 		m_Player.Render(m_Stage.GetScrollX(), m_Stage.GetScrollY());
+
+		m_Stage.RenderLayerOver();//•`‰æ‡‚ªƒvƒŒƒCƒ„[‚æ‚èã‚Ì•`‰æ
 
 		CGraphicsUtilities::RenderString(10, 10, "ƒQ[ƒ€");
 		CGraphicsUtilities::RenderString(300, 10, "LIFE~%d TIME %3.0f", m_Player.GetLife(), m_Time);

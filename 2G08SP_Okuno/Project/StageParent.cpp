@@ -112,6 +112,14 @@ void CStageParent::Initialize()
 	for (int i = 0; i < m_StageCount; i++) {
 		m_StageArray[i].Initialize(i == m_GoalIdx, m_GoalType, m_GoalX, m_GoalTop, m_pSkillSound);
 	}
+
+	for (int i = 0; i < m_CheckPointCount; i++) {
+		if (!m_CheckPointArray[i].IsThrough() || m_CheckPointArray[i].GetStageIdx() >= m_StageCount) continue;
+
+		m_StageCursor = m_CheckPointArray[i].GetStageIdx();
+
+		m_StageArray[m_StageCursor].CheckPointThrough(m_CheckPointArray[i].GetRect());
+	}
 }
 
 void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, bool clearBgmPlay)
@@ -199,6 +207,7 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 			m_CheckPointArray[i].SetThrough(true);
 
 			//チェックポイント到達時の処理
+			m_StageArray[m_StageCursor].CheckPointThrough(m_CheckPointArray[i].GetRect());
 		}
 	}
 
@@ -212,6 +221,11 @@ void CStageParent::Render()
 {
 	m_StageArray[m_StageCursor].Render();
 	//CGraphicsUtilities::RenderString(450, 10, "upd :%3d fps:%2d", m_updTime, CUtilities::GetFPS());
+}
+
+void CStageParent::RenderLayerOver()
+{
+	m_StageArray[m_StageCursor].RenderLayerOver();
 }
 
 void CStageParent::RenderDebug()
@@ -273,4 +287,22 @@ bool CStageParent::GoalCheck(CPlayer& pl, float& ox)
 	}
 
 	return re;
+}
+
+Vector2 CStageParent::GetStartPos()
+{
+	Vector2 startPos = m_StageArray[m_StageCursor].GetStartPos();
+	for (int i = 0; i < m_CheckPointCount; i++) {
+		if (!m_CheckPointArray[i].IsThrough() || m_CheckPointArray[i].GetStageIdx() >= m_StageCount) continue;
+
+		startPos = Vector2(m_CheckPointArray[i].GetRect().Left, m_CheckPointArray[i].GetRect().Top);
+	}
+	return startPos;
+}
+
+void CStageParent::ResetCheckPoint()
+{
+	for (int i = 0; i < m_CheckPointCount; i++) {
+		m_CheckPointArray[i].SetThrough(false);
+	}
 }

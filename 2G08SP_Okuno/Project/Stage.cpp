@@ -330,6 +330,7 @@ void CStage::Render()
 	}*/
 
 	for (int i = 0; i < GetBlockCount(); i++) {
+		if (m_BlockArray[i].GetLayer() != 0) continue;
 		m_BlockArray[i].Render(GetScrollX(), GetScrollY());
 	}
 
@@ -339,6 +340,14 @@ void CStage::Render()
 
 	for (int i = 0; i < GetItemCount(); i++) {
 		m_ItemArray[i].Render(GetScrollX(), GetScrollY());
+	}
+}
+
+void CStage::RenderLayerOver()
+{
+	for (int i = 0; i < GetBlockCount(); i++) {
+		if (m_BlockArray[i].GetLayer() == 0) continue;
+		m_BlockArray[i].Render(GetScrollX(), GetScrollY());
 	}
 }
 
@@ -576,4 +585,22 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 	}
 
 	return coll;
+}
+
+void CStage::CheckPointThrough(CRectangle rect)
+{
+	int tcx = m_ChipTexture.GetWidth() / CHIPSIZE;
+	for (int i = 0; i < m_BlockCount; i++) {
+		int type = m_BlockArray[i].GetType();
+		if (type < 0 || (type != CHECKPOINT_B1 && type != CHECKPOINT_B2 && type != CHECKPOINT_B3 && type != CHECKPOINT_B4)) continue;
+		CRectangle cr = m_BlockArray[i].GetRect();
+		if (rect.Left > cr.Right && cr.Right > rect.Right + CHIPSIZE && rect.Top > cr.Bottom && cr.Bottom > rect.Bottom + CHIPSIZE) continue;
+
+		//中間ポイント通過後のチップに置き換える
+		type += CHECKPOINT_AN;
+		CRectangle tr = CRectangle(type % tcx, type / tcx, type % tcx + 1, type / tcx + 1) * CHIPSIZE;
+
+		CBlockDefine* bd = CGameDefine::GetGameDefine()->GetBlockByIdx(type + 1);
+		m_BlockArray[i].Load(&m_ChipTexture, CVector2(cr.Left, cr.Top) , tr, m_BlockArray[i].GetItem(), type, bd->broken, bd);
+	}
 }

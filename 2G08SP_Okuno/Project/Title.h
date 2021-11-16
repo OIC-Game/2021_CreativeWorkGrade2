@@ -32,7 +32,10 @@ public:
 
 	void SetClearStage(int stageIdx) { m_ClearStageCursor = stageIdx; }
 
-	void SetStageCursor(int cursor) { m_StageCursor = cursor; }
+	void SetStageCursor(int cursor) {
+		m_StageCursor = cursor;
+		if (m_StageCursor < 0) m_StageCursor = 0;
+	}
 
 	int GetClearStageIdx() {
 		return m_ClearStageCursor;

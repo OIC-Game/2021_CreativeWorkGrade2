@@ -56,6 +56,12 @@ public:
 		if (m_define == NULL) return false;
 		return (m_define->damageDirection & dir) == dir;
 	};
+	int GetLayer() {
+		if (m_define == NULL) return 0;
+		return m_define->layer;
+	}
+
+	CItem* GetItem() { return m_Item; }
 
 	CRectangle GetRect() { return CRectangle(m_Pos.x, m_Pos.y, m_Pos.x + m_Rect.GetWidth(), m_Pos.y + m_Rect.GetHeight()); };
 };

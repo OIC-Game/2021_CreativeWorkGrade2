@@ -46,6 +46,7 @@ public:
 	void Update(CPlayer& pl);
 
 	void Render();
+	void RenderLayerOver();
 
 	void RenderDebug_Enemy();
 
@@ -61,7 +62,9 @@ public:
 	/// <returns>ÚGî•ñ‚ğ•Ô‚·</returns>
 	CCollisionData Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRectangle ra, CVector2 move);
 
-	Vector2 GetStartPos() { return Vector2(CHIPSIZE * m_StartX, CHIPSIZE * m_StartY); };
+	void CheckPointThrough(CRectangle rect);
+
+	Vector2 GetStartPos() { return Vector2(CHIPSIZE * m_StartX, CHIPSIZE * m_StartY); }
 
 	bool IsGEnemy() {
 		for (int i = 0; i < m_EnemyCount; i++) {

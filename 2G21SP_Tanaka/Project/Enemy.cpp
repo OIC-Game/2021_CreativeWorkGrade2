@@ -24,6 +24,7 @@ void CEnemy::Initialize(float px, float py, int type){
 	m_MoveY = 0.0f;
 	m_bShow = true;
 	m_bMove = false;
+	m_bKame = false;
 	m_bDead = false;
 	m_DamageWait = 10;
 	//アニメーションを作成
@@ -150,7 +151,23 @@ void CEnemy::CollisonEnemy(void){
 }
 
 void CEnemy::Damege(void){
-	m_Motion.ChangeMotion(MOTION_DEATH);
-	m_bDead = true;
-	return;
+	switch (GetType())
+	{
+		case ENEMY_01:
+			m_Motion.ChangeMotion(MOTION_DEATH);
+			m_bDead = true;
+			return;
+			break;
+		case ENEMY_02:
+			//m_Motion.ChangeMotion()
+			m_bKame = true;
+			m_bMove = false;
+			return;
+			break;
+	}
+}
+
+void CEnemy::CollisionPlayer(bool reverse){
+	m_bReverse = reverse;
+	m_bMove = true;
 }

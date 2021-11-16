@@ -49,6 +49,7 @@ private:
 	int						m_DamageWait;
 	CRectangle				m_SrcRect;
 
+	int						m_Time;
 	int						m_Score;
 
 	CSoundBuffer			m_JumpSound;

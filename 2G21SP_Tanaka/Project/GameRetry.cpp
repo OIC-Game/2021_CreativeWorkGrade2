@@ -4,7 +4,7 @@
 //•ÏX‚·‚éƒV[ƒ“
 extern int						gChangeScene;
 
-float				Time = 0;
+float							Time = 0;
 CGameRetry::CGameRetry()
 {
 }

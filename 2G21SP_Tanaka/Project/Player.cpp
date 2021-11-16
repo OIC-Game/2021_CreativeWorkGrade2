@@ -18,6 +18,7 @@ m_bClear(false),
 m_bDead(false),
 m_DamageWait(0),
 m_SrcRect(),
+m_Time(0),
 m_Score(0){
 }
 
@@ -114,6 +115,7 @@ void CPlayer::Initialize(void){
 		m_Coin = 0;
 		m_Score = 0;
 	}
+	m_Time = 300;
 	m_Comb = 0;
 	m_bJump = false;
 	m_bShow = true;

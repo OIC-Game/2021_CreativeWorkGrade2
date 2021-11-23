@@ -9,6 +9,8 @@ CStageParent::CStageParent() :
 	m_StageCursor(0),
 	m_CheckPointCount(0),
 	m_CheckPointArray(),
+	m_ThroughPipe(),
+	m_PipeFlg(false),
 	m_GoalFlg(false)
 	//m_DebugFlg(false)
 {
@@ -141,10 +143,12 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 
 	float ox = 0;
 
-	//CRectangle pr = pl.GetRect();
-	bool jump = pl.IsJumpingUp();
-	CCollisionData coll = m_StageArray[m_StageCursor].Collision(&pl, NULL, prec_b, prec_a, pl.GetMove());
-	pl.CollisionStage(coll);
+	if (!m_PipeFlg) {
+		//CRectangle pr = pl.GetRect();
+		bool jump = pl.IsJumpingUp();
+		CCollisionData coll = m_StageArray[m_StageCursor].Collision(&pl, NULL, prec_b, prec_a, pl.GetMove());
+		pl.CollisionStage(coll);
+	}
 
 	if (!m_GoalFlg) {
 		m_GoalFlg = GoalCheck(pl, ox);
@@ -158,42 +162,50 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 		return;
 	}
 
-	CPipe::PipeData plPipe = pl.GetPipeData(m_StageCursor); //
-	if (plPipe.Root) { //土管に入る操作の条件を満たしているか
-		for (int i = 0; i < m_PipeCount; i++) { //土管を
-			CPipe::PipeData p = m_PipeArray[i].CanToPassThrough(plPipe); //プレイヤーの状態を引数として、ステージ移動の情報を取得する
-			if (p.Root) { //移動できるかどうか
+	if (m_PipeFlg) {
+		bool psFlg = m_StageCursor == m_ThroughPipe.GetOutPipe().Id;
+		if (psFlg || pl.PipeInFn(m_ThroughPipe.GetInPipe())) {
+			if (pl.PipeOutFn(m_ThroughPipe.GetOutPipe())) {
+				m_PipeFlg = false;
+			}
+		}
+		else {
+			if (pl.PipeInFn(m_ThroughPipe.GetInPipe())) {
+				CPipe::PipeData p = m_ThroughPipe.GetOutPipe();
 				m_StageCursor = p.Id; //現在のステージを移動先のステージに
 
 				/*マリオの大きさと土管の向きに合わせて移動先の位置を変える*/
 				CVector2 v(p.Rect.Left, p.Rect.Top);
 				if ((p.Dir & BlockRight) == BlockRight) {
-					v.x = p.Rect.Left - pl.GetRect(true).GetWidth();
-					v.y = p.Rect.Bottom - pl.GetRect(true).GetHeight();
+					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
 				}
 				else if ((p.Dir & BlockDown) == BlockDown) {
-					v.y = p.Rect.Top - pl.GetRect(true).GetHeight();
+					v.y = p.Rect.Top;
 				}
 				else if ((p.Dir & BlockLeft) == BlockLeft) {
-					v.x = p.Rect.Right;
-					v.y = p.Rect.Bottom - pl.GetRect(true).GetHeight();
+					v.x = p.Rect.Right - pl.GetRect(false).GetWidth();
+					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
 				}
 				else {
-					v.y = p.Rect.Bottom + pl.GetRect(true).GetHeight();
+					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
 				}
 
 				//CVector2 v(200, 300); //一つのステージで作る時は位置を変える
 
 				pl.ChangeStage(v); //プレイヤーにステージが切り替わったことを伝える
 				pl.SetStageHeight(GetStageHeight()); //ステージの高さを更新する
+			}
+		}
+		return;
+	}
 
-
-				/*
-				* 
-				* ・敵の種類を増やす
-				* ・ステージ選択
-				* 
-				 */
+	CPipe::PipeData plPipe = pl.GetPipeData(m_StageCursor); //
+	if (plPipe.Root) { //土管に入る操作の条件を満たしているか
+		for (int i = 0; i < m_PipeCount; i++) { //土管を
+			CPipe::PipeData p = m_PipeArray[i].CanToPassThrough(plPipe); //プレイヤーの状態を引数として、ステージ移動の情報を取得する
+			if (p.Root) { //移動できるかどうか
+				m_ThroughPipe = m_PipeArray[i];
+				m_PipeFlg = true;
 				return;
 			}
 		}

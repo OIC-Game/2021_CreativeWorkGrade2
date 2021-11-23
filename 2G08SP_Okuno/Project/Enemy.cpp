@@ -49,7 +49,7 @@ void CEnemy::Initialize(Vector2 pos, bool bGoal, int stgh)
 	m_bGoal = bGoal;
 	m_bShow = true;
 	m_JumpSp = 0;
-	m_ShowState = STATE_YET;
+	m_ShowState = STATE_SHOW;
 }
 
 void CEnemy::Update(float wx, float wy, CRectangle prec)

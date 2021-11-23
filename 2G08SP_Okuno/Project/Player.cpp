@@ -129,7 +129,7 @@ void CPlayer::Update(float wx, float wy)
 	//このフレームで横移動(入力)があったかどうか
 	bool bMove = false;
 
-	if (!m_bGoal && !m_bDead) {
+	if (!m_bGoal && !m_bDead && !m_bPipe && m_JumpStatus != Manualing) {
 		//左（マイナス）移動（←又はA）
 		if (g_pInput->IsKeyHold(MOFKEY_LEFT) || g_pInput->IsKeyHold(MOFKEY_A)) {
 			bMove = true;
@@ -243,7 +243,7 @@ void CPlayer::Update(float wx, float wy)
 	}
 
 	//このフレームで横移動（入力）されなかった場合
-	if (!bMove && !m_bGoal) {
+	if (!bMove && !m_bGoal && !m_bPipe && m_JumpStatus != Manualing) {
 		//次第に減速する
 		if (m_Move.x > 0) {
 			m_Move.x -= MoveSpeed;
@@ -541,6 +541,86 @@ bool CPlayer::GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPla
 	if (m_Pos.x < stw) {//ステージ外に行くまでは処理中(FALSE)を返す
 		return false;
 	}
+	return true;
+}
+
+bool CPlayer::PipeInFn(CPipe::PipeData pipe)
+{
+	if (!m_bPipe) {
+		m_bPipe = true;
+		if ((pipe.Dir & BlockRight) == BlockRight) {
+			m_Pos.x = pipe.Rect.Left - GetRect(false).GetWidth();
+			m_Pos.y = pipe.Rect.Bottom - GetRect(false).GetHeight();
+		}
+		else if ((pipe.Dir & BlockDown) == BlockDown) {
+			m_Pos.x = pipe.Rect.Left;
+			m_Pos.y = pipe.Rect.Top - GetRect(false).GetHeight();
+		}
+		else if ((pipe.Dir & BlockLeft) == BlockLeft) {
+			m_Pos.x = pipe.Rect.Right;
+			m_Pos.y = pipe.Rect.Bottom - GetRect(false).GetHeight();
+		}
+		else {
+			m_Pos.x = pipe.Rect.Left;
+			m_Pos.y = pipe.Rect.Bottom;
+		}
+		return false;
+	}
+	if ((pipe.Dir & BlockRight) == BlockRight) {
+		if (m_Pos.x < pipe.Rect.Left) {
+			m_Pos.x += 1.0f;
+			return false;
+		}
+	}
+	else if ((pipe.Dir & BlockDown) == BlockDown) {
+		if (m_Pos.y < pipe.Rect.Top) {
+			m_Pos.y += 1.0f;
+			return false;
+		}
+	}
+	else if ((pipe.Dir & BlockLeft) == BlockLeft) {
+		if (m_Pos.x > pipe.Rect.Right) {
+			m_Pos.x -= 1.0f;
+			return false;
+		}
+	}
+	else {
+		if (m_Pos.y > pipe.Rect.Bottom) {
+			m_Pos.y -= 1.0f;
+			return false;
+		}
+	}
+	return true;
+}
+
+bool CPlayer::PipeOutFn(CPipe::PipeData pipe)
+{
+	if (!m_bPipe) return true;
+	if ((pipe.Dir & BlockRight) == BlockRight) {
+		if (m_Pos.x + GetRect(false).GetWidth() > pipe.Rect.Left) {
+			m_Pos.x -= 1.0f;
+			return false;
+		}
+	}
+	else if ((pipe.Dir & BlockDown) == BlockDown) {
+		if (m_Pos.y + GetRect(false).GetHeight() > pipe.Rect.Top) {
+			m_Pos.y -= 1.0f;
+			return false;
+		}
+	}
+	else if ((pipe.Dir & BlockLeft) == BlockLeft) {
+		if (m_Pos.x < pipe.Rect.Right) {
+			m_Pos.x += 1.0f;
+			return false;
+		}
+	}
+	else {
+		if (m_Pos.y < pipe.Rect.Bottom) {
+			m_Pos.y += 1.0f;
+			return false;
+		}
+	}
+	m_bPipe = false;
 	return true;
 }
 

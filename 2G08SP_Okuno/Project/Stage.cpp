@@ -235,6 +235,8 @@ void CStage::Update(CPlayer& pl)
 		m_ScrollY = (stgh - sh) / 2;
 	}
 
+	if (pl.IsPipe()) return;
+
 	for (int i = 0; i < GetBlockCount(); i++) {
 		m_BlockArray[i].Update();
 	}
@@ -301,6 +303,7 @@ void CStage::Render()
 	float s = 1.0f;
 	int bw = m_BgTexture.GetWidth();
 	int bh = m_BgTexture.GetHeight();
+	float stgw = CHIPSIZE * m_XSize;
 	float stgh = CHIPSIZE * m_YSize;
 	if (bh < MOF_MAX(stgh, sch)) {
 		s = (float)MOF_MAX(stgh, sch) / bh;
@@ -348,6 +351,23 @@ void CStage::RenderLayerOver()
 	for (int i = 0; i < GetBlockCount(); i++) {
 		if (m_BlockArray[i].GetLayer() == 0) continue;
 		m_BlockArray[i].Render(GetScrollX(), GetScrollY());
+	}
+
+	int scw = g_pGraphics->GetTargetWidth();
+	int sch = g_pGraphics->GetTargetHeight();
+	float stgw = CHIPSIZE * m_XSize;
+	float stgh = CHIPSIZE * m_YSize;
+	if (m_ScrollY < 0) {
+		CGraphicsUtilities::RenderFillRect(0, 0, scw, -m_ScrollY, MOF_COLOR_BLACK);
+	}
+	if (m_ScrollX < 0) {
+		CGraphicsUtilities::RenderFillRect(0, 0, -m_ScrollX, sch, MOF_COLOR_BLACK);
+	}
+	if (m_ScrollY + stgh < sch) {
+		CGraphicsUtilities::RenderFillRect(0, -m_ScrollY + stgh, scw, sch, MOF_COLOR_BLACK);
+	}
+	if (m_ScrollX + stgw < scw) {
+		CGraphicsUtilities::RenderFillRect(-m_ScrollX + stgw, 0, scw, sch, MOF_COLOR_BLACK);
 	}
 }
 

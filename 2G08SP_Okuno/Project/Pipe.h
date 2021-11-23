@@ -39,6 +39,10 @@ public:
 
 	CPipe::PipeData CanToPassThrough(CPipe::PipeData in);
 
+	CPipe::PipeData GetInPipe();
+
+	CPipe::PipeData GetOutPipe();
+
 	void RenderDebug(int id, float wx, float wy);
 };
 

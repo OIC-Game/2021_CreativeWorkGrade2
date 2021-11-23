@@ -54,6 +54,26 @@ CPipe::PipeData CPipe::CanToPassThrough(CPipe::PipeData in)
 	return p;
 }
 
+CPipe::PipeData CPipe::GetInPipe()
+{
+	CPipe::PipeData p = CPipe::PipeData();
+	p.Root = true;
+	p.Id = m_InId;
+	p.Dir = m_InDir;
+	p.Rect = m_In;
+	return p;
+}
+
+CPipe::PipeData CPipe::GetOutPipe()
+{
+	CPipe::PipeData p = CPipe::PipeData();
+	p.Root = m_bRoot;
+	p.Id = m_OutId;
+	p.Dir = m_OutDir;
+	p.Rect = m_Out;
+	return p;
+}
+
 void CPipe::RenderDebug(int id, float wx, float wy)
 {
 	if (m_InId == id) {

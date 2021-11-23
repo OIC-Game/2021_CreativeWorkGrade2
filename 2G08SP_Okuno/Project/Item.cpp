@@ -36,7 +36,7 @@ void CItem::Initialize(CVector2 pos, CVector2 spd, CItemDefine* def, int type, i
 	m_Type = type;
 	m_bShow = dfShow;
 	m_stgh = stgh;
-	m_ShowState = STATE_YET;
+	m_ShowState = STATE_SHOW;
 	m_animShowTime = 0;
 }
 

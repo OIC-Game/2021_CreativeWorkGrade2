@@ -31,6 +31,8 @@ private:
 
 	//bool		m_DebugFlg;
 
+	CPipe		m_ThroughPipe;
+	bool		m_PipeFlg;
 	bool		m_GoalFlg;
 	bool		m_SceneChangeFlg;
 	int			m_SceneNext;

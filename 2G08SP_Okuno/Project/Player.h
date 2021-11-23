@@ -67,6 +67,7 @@ private:
 	int				m_TypeIdx;		//マリオの状態のインデックス
 	bool			m_bDead;		//死亡フラグ
 	int				m_bDeadEnd;
+	bool			m_bPipe;
 	bool			m_bGoal;		//ゴールフラグ
 	float			m_DmgTime;		//ダメージを受けた場合の無敵時間
 	int				m_Life;			//マリオのライフ
@@ -119,6 +120,9 @@ public:
 	/// <returns>ゴールの処理が終わったどうか</returns>
 	bool GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPlay);
 
+	bool PipeInFn(CPipe::PipeData pipe);
+	bool PipeOutFn(CPipe::PipeData pipe);
+
 	bool DeadFn();
 
 	void SlideMove(CVector2 v);
@@ -150,6 +154,8 @@ public:
 	bool GetDead() { return m_bDead; };
 
 	bool GetGoal() { return m_bGoal; };
+
+	bool IsPipe() { return m_bPipe; }
 
 	bool IsJumpingUp() { return m_JumpStatus == Jumping && m_Move.y < 0; };
 

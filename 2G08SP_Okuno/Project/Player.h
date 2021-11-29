@@ -66,6 +66,7 @@ private:
 	float			m_sth;			//ステージの縦幅
 	int				m_TypeIdx;		//マリオの状態のインデックス
 	bool			m_bDead;		//死亡フラグ
+	float			m_DeadWait;
 	int				m_bDeadEnd;
 	bool			m_bPipe;
 	bool			m_bGoal;		//ゴールフラグ

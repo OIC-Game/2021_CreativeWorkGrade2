@@ -4,6 +4,7 @@ CPlayer::CPlayer() :
 	m_sth(0),
 	m_TypeIdx(0),
 	m_bDead(false),
+	m_DeadWait(0),
 	m_bDeadEnd(0),
 	m_bGoal(false),
 	m_DmgTime(false),
@@ -45,6 +46,7 @@ void CPlayer::Initialize(Vector2 pos, int life)
 	m_Move.y = 0;
 	m_bReverse = false;
 	m_bDead = false;
+	m_DeadWait = 0;
 	m_bDeadEnd = 0;
 	m_bGoal = false;
 	m_DmgTime = 0;
@@ -628,16 +630,28 @@ bool CPlayer::DeadFn()
 {
 	if (m_bDeadEnd == 0) {
 		m_bDeadEnd = 1;
+		m_JumpStatus = Manualing;
 		m_Move.x = 0;
-		JumpStart(-10.6f);
+		m_Move.y = 0;
 	}
 	else if (m_bDeadEnd == 1) {
-		if (m_Pos.y > m_sth + 50) {
+		m_DeadWait += CUtilities::GetFrameSecond();
+		if (m_DeadWait >= 0.3f) {
 			m_bDeadEnd = 2;
+			JumpStart(-10.6f);
+		}
+		else if (m_DeadWait >= 0.1f && m_Pos.y >= m_sth) {
+			m_bDeadEnd = 2;
+			JumpStart(-12.6f);
+		}
+	}
+	else if (m_bDeadEnd == 2) {
+		if (m_Pos.y > m_sth + 50) {
+			m_bDeadEnd = 3;
 		}
 	}
 
-	return m_bDeadEnd == 2;
+	return m_bDeadEnd == 3;
 }
 
 void CPlayer::SlideMove(CVector2 v)

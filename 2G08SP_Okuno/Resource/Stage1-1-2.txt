@@ -15,7 +15,7 @@ bg2.png,sample.png,
   62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,
   62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,  62,
 
-1,goomba.png,
+8,goomba.png,KoopaTroopa.png,KoopaTroopa_C.png,KoopaTroopa_C.png,Koopa.png,RedKoopaTroopa.png,RedKoopaTroopa_C.png,RedKoopaTroopa_C.png,
    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,

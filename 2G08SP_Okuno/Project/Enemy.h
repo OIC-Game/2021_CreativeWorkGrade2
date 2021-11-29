@@ -97,6 +97,7 @@ public:
 	};
 
 	int CheckDamageFlg(int flg) { return (m_define->damageFlg & flg) != 0; };
+	int CheckMoveFlg(int flg) { return (m_define->move & flg) != 0; };
 	int GetDamageFlg() { return m_define->damageFlg; }
 	int GetDamageDirection() { return m_define->damageDirection; };
 	int GetChangeFlg() { return m_define->changeFlg; };

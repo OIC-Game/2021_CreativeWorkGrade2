@@ -21,8 +21,10 @@ private:
 	CSoundBuffer*	m_SoundArray;
 	CSoundBuffer	m_BGM;
 	CSoundBuffer	m_BGMClear;
+	CSoundBuffer	m_BGMFailed;
 	CSoundBuffer	m_SkillSound;
 	bool			m_ClearBgmFlg;
+	bool			m_FailedBgmFlg;
 	int				m_Life;
 	int				m_nScene;
 	float			m_SceneChangeTime;
@@ -59,6 +61,7 @@ public:
 		}
 		m_BGM.SetVolume(v);
 		m_BGMClear.SetVolume(v);
+		m_BGMFailed.SetVolume(v);
 	}
 };
 

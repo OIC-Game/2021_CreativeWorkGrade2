@@ -9,9 +9,11 @@ CGame::CGame() :
 	m_Player(),
 	m_SoundCount(0),
 	m_SoundArray(),
+	m_BGMFailed(),
 	m_BGMClear(),
 	m_BGM(),
 	m_ClearBgmFlg(false),
+	m_FailedBgmFlg(false),
 	m_Life(0),
 	m_nScene(0),
 	m_nStageIdx(0),
@@ -43,6 +45,12 @@ bool CGame::Load(CTexture* playerTex)
 	}
 	m_BGMClear.SetLoop(false);
 	m_BGMClear.SetVolume(g_SettingWin.GetSoundVolume());
+
+	if (!m_BGMFailed.Load("failed.wav")) {
+		return false;
+	}
+	m_BGMFailed.SetLoop(false);
+	m_BGMFailed.SetVolume(g_SettingWin.GetSoundVolume());
 
 	if (!m_SkillSound.Load("firedown.mp3")) {
 		return false;
@@ -96,6 +104,7 @@ bool CGame::Initialize(std::string fname, int stageIdx)
 	m_nScene = G_SCENE_LIFE;
 	m_SceneChangeTime = 3.0f;
 	m_ClearBgmFlg = false;
+	m_FailedBgmFlg = false;
 	m_nStageIdx = stageIdx;
 	m_Time = 100;
 	return true;
@@ -131,6 +140,7 @@ void CGame::Update()
 		m_SceneChangeTime -= CUtilities::GetFrameSecond();
 		if (m_SceneChangeTime <= 0) {
 			m_SceneChangeTime = 3.0f;
+			m_FailedBgmFlg = false;
 			m_Time = 100;
 			m_nScene = G_SCENE_GAME;
 
@@ -165,9 +175,18 @@ void CGame::Update()
 					m_Time = 0;
 					m_Player.Damage(true);
 				}
+				if (!m_BGM.IsPlay()) {
+					m_BGM.Play();
+				}
 			}
-			if (!m_BGM.IsPlay()) {
-				m_BGM.Play();
+			else {
+				if (!m_FailedBgmFlg) {
+					if (m_BGM.IsPlay()) {
+						m_BGM.Stop();
+					}
+					m_BGMFailed.Play();
+					m_FailedBgmFlg = true;
+				}
 			}
 		}
 
@@ -243,4 +262,5 @@ void CGame::Release()
 
 	m_BGM.Release();
 	m_BGMClear.Release();
+	m_BGMFailed.Release();
 }

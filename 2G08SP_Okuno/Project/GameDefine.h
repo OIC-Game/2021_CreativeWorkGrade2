@@ -52,6 +52,7 @@ enum t_MOVE_TYPE {
 	MOVE_UP = 4,
 	MOVE_DOWN = 8,
 	MOVE_SENSE = 16,
+	MOVE_UNFALL = 32,
 };
 
 enum t_ITEM_TYPE {

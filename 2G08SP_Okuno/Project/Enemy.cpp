@@ -41,7 +41,7 @@ void CEnemy::Initialize(Vector2 pos, bool bGoal, int stgh)
 	m_bReverse = false;
 	m_Move.x = m_define->x_ext1;
 	m_hp = m_define->hp;
-	if ((m_define->move & MOVE_LEFT) == MOVE_LEFT) {
+	if (CheckMoveFlg(MOVE_LEFT)) {
 		m_Move.x *= -1;
 		m_bReverse = true;
 	}
@@ -146,14 +146,14 @@ void CEnemy::CollisionStage(CCollisionData coll)
 		m_Move.y = 0;
 	}
 
-	//‰EˆÚ“®‚©‚Â‰E•ûŒü‚Ö‚Ì–„‚Ü‚è
-	if (coll.ox < 0 && m_Move.x > 0) {
+	//‰EˆÚ“®‚©‚Â‰E•ûŒü‚Ö‚Ì–„‚Ü‚èor—Ž‰º–hŽ~
+	if (((coll.unfallrightflg && CheckMoveFlg(MOVE_UNFALL)) || coll.ox < 0) && m_Move.x > 0) {
 		//¶ˆÚ“®‚É‚·‚é
 		m_Move.x *= -1;
 		m_bReverse = true;
 	}
-	//¶ˆÚ“®‚©‚Â¶•ûŒü‚Ö‚Ì–„‚Ü‚è
-	else if (coll.ox > 0 && m_Move.x < 0) {
+	//¶ˆÚ“®‚©‚Â¶•ûŒü‚Ö‚Ì–„‚Ü‚èor—Ž‰º–hŽ~
+	else if (((coll.unfallleftflg && CheckMoveFlg(MOVE_UNFALL)) || coll.ox > 0) && m_Move.x < 0) {
 		//‰EˆÚ“®‚É‚·‚é
 		m_Move.x *= -1;
 		m_bReverse = false;
@@ -310,7 +310,7 @@ void CEnemy::Trampled(CRectangle prec)
 		m_Motion.Create(m_define->anim, m_define->animCount);
 		m_Pos.y += bHeight - GetRect().GetHeight();
 		m_Move.x = m_define->x_ext1;
-		if ((m_define->move & MOVE_LEFT) == MOVE_LEFT) {
+		if (CheckMoveFlg(MOVE_LEFT)) {
 			m_Move.x *= -1;
 		}
 		else if ((m_define->move & MOVE_SENSE) == MOVE_SENSE) {
@@ -348,7 +348,7 @@ bool CEnemy::Touched(CRectangle prec, bool sence)
 		}
 		m_Motion.Create(m_define->anim, m_define->animCount);
 		m_Move.x = m_define->x_ext1;
-		if ((m_define->move & MOVE_LEFT) == MOVE_LEFT) {
+		if (CheckMoveFlg(MOVE_LEFT)) {
 			m_Move.x *= -1;
 		}
 		else if ((m_define->move & MOVE_SENSE) == MOVE_SENSE) {

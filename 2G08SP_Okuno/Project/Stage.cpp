@@ -431,6 +431,9 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 
 	float sw = g_pGraphics->GetTargetWidth();
 	float sh = g_pGraphics->GetTargetHeight();
+
+	bool leftFallFlg = false;
+	bool rightFallFlg = false;
 	for (int i = 0; i < m_BlockCount; i++) {
 		if (m_BlockArray[i].GetType() < 0) continue;
 		CRectangle cr = m_BlockArray[i].GetRect();
@@ -456,6 +459,16 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 					}
 
 					if (ene != NULL) {
+						CRectangle bleft_rec = CRectangle(brec.Left - 2, brec.Top, brec.Left, brec.Bottom);
+						CRectangle bright_rec = CRectangle(brec.Right, brec.Top, brec.Right + 2, brec.Bottom);
+
+						if (!leftFallFlg && b_trec.CollisionRect(bleft_rec)) {
+							leftFallFlg = true;
+						}
+						if (!rightFallFlg && b_trec.CollisionRect(bright_rec)) {
+							rightFallFlg = true;
+						}
+
 						if (m_BlockArray[i].IsAttacked()) { //ƒuƒƒbƒN‚ª‰ó‚³‚ê‚½ó‘Ô
 							ene->PushedUp();
 						}
@@ -602,6 +615,13 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 				}
 			}
 		}
+	}
+
+	if (!leftFallFlg) {
+		coll.unfallleftflg = true;
+	}
+	if (!rightFallFlg) {
+		coll.unfallrightflg = true;
 	}
 
 	return coll;

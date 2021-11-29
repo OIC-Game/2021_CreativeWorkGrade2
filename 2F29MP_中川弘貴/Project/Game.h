@@ -123,6 +123,13 @@ public:
 	void Initialize(void);
 	void ChainCheck(int y, int x);
 	void Update(void);
+	void ReadyUpdate();
+	void PauseUpdate();
+	void DropUpdate();
+	void TearUpdate();
+	void ChainUpdate();
+	void ReStartUpdate();
+	void GameOverUpdate();
 	void Render(void);
 	void Release(void);
 };

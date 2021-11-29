@@ -136,7 +136,7 @@ public:
 	~CEnemy();
 	bool Load(void);
 	void Initialize(float px, float py, int type);
-	void Update(void);
+	void Update(float wx);
 	void Render(float wx, float wy);
 	void RenderDebug(float wx, float wy);
 	void Release(void);

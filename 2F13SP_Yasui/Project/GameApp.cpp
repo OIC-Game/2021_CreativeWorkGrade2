@@ -72,8 +72,8 @@ MofBool CGameApp::Update(void){
 			break;
 		case SCENENO_GAME:
 			g_pSceneBase = new CGame;
-			g_pSceneBase->SetStageNumber(stage_number);
-			//g_pSceneBase->SetStageNumber(STAGE_LAST);
+			//g_pSceneBase->SetStageNumber(stage_number);
+			g_pSceneBase->SetStageNumber(STAGE_LAST);
 			break;
 		case SCENENO_GAMEOVER:
 			g_pSceneBase = new CGameOver;

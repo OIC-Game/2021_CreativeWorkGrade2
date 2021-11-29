@@ -28,7 +28,7 @@ private:
 	CSoundBuffer	player_GoalFlagSE;
 	CSoundBuffer	player_GetCoinSE;
 	bool			player_DeadFlg;
-	bool			player_a;
+	bool			player_DeadOnceRunFlg;
 	int				player_TimeWait;
 	int				player_ChangeWait;
 	bool			player_ChangeWaitFlg;

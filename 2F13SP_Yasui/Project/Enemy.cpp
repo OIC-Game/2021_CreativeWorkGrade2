@@ -328,8 +328,12 @@ void CEnemy::Initialize(float px, float py, int type)
 
 }
 
-void CEnemy::Update(void)
+void CEnemy::Update(float wx)
 {
+	if (wx > enemy_Position.x + 16 || wx + g_pGraphics->GetTargetWidth() < enemy_Position.x)
+	{
+		return;
+	}
 	//”ñ•\Ž¦
 	if (!enemy_Show)
 	{

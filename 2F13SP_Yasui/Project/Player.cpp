@@ -36,7 +36,7 @@ CPlayer::CPlayer() :
 	player_GoalFlagSE(),
 	player_DeadFlg(false),
 	player_DeadTransitionFlg(false),
-	player_a(false),
+	player_DeadOnceRunFlg(false),
 	player_TimeWait(0),
 	player_ClearFlg(false),
 	player_ClearTransitionFlg(false),
@@ -119,7 +119,7 @@ void CPlayer::Initialize(void)
 	player_MoveFlg = false;
 	player_DeadFlg = false;
 	player_DeadTransitionFlg = false;
-	player_a = false;
+	player_DeadOnceRunFlg = false;
 	player_ClearFlg = false;
 	player_ClearTransitionFlg = false;
 	player_HP = PLAYER_HP;
@@ -208,7 +208,7 @@ void CPlayer::Update(void)
 	else if (player_DeadFlg)
 	{
 		//プレイヤーが死んだときの処理(1回だけ実行)
-		if (!player_a)
+		if (!player_DeadOnceRunFlg)
 		{
 			if (!player_ChangeBig)
 			{
@@ -227,7 +227,7 @@ void CPlayer::Update(void)
 			player_Life--;
 			Sleep(300);
 			player_Jump = -PLAYER_JUMPSPEED;
-			player_a = true;
+			player_DeadOnceRunFlg = true;
 		}
 		//落ちる処理
 		player_Jump += PLAYER_GRAVITY;

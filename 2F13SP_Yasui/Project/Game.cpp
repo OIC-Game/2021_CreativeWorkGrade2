@@ -285,7 +285,7 @@ void CGame::Update(void) {
 			}
 
 		}
-			m_EnemyArray[i].Update();
+			m_EnemyArray[i].Update(g_Stage.GetScrollX());
 			ox = 0, oy = 0;
 			enemyDead = false;
 			jumpFlg = false;
@@ -367,7 +367,7 @@ void CGame::Update(void) {
 				m_ItemArray[i].BlockJump(jumpFlg);
 		}
 	}
-	//当たり判定の実行
+	
 	for (int i = 0; i < g_Stage.GetEnemyCount(); i++)
 	{
 			if (m_EnemyArray[i].GetType() == ENEMY_MARIO)
@@ -375,6 +375,7 @@ void CGame::Update(void) {
 				m_EnemyArray[i].GetPlayerInfo(g_Player.Getplayer_PositionX(), g_Player.GetPlayer_MoveX(),
 					g_Player.Getplayer_JumpFlg(), g_Player.GetTmpWorpFlg());
 			}
+			//当たり判定の実行
 			g_Player.CollisionEnemy(m_EnemyArray[i]);
 	}
 	for (int i = 0; i < g_Stage.GetItemCount(); i++)
@@ -384,7 +385,7 @@ void CGame::Update(void) {
 	//タイマー処理
 	if (g_Player.Getplayer_DeadFlg() == false && g_Player.Getplayer_ClearFlg() == false)
 	{
-		//クリア、ゲームオーバーをしていないとき
+		//クリア&ゲームオーバーをしていないとき
 		game_Time -= 1 * CUtilities::GetFrameSecond();
 	}
 	else if (game_Time <= 0 && !g_Player.Getplayer_ClearFlg())
@@ -551,15 +552,8 @@ void CGame::Render(void) {
 	default:
 		break;
 	}
-	if (game_NowStage == STAGE_1_1)
-	{
 
-	}
-	if (!scoreDisplayFlg)
-	{
-		
-	}
-	else if(scoreDesplayTime > 0)
+	if(scoreDisplayFlg && scoreDesplayTime > 0)
 	{
 		game_tempPlayerPositionX = g_Player.Getplayer_DispPositionX();
 		game_tempPlayerPositionY = g_Player.Getplayer_DispPositionY();

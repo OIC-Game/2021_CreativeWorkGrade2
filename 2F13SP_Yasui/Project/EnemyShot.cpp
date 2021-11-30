@@ -41,7 +41,7 @@ void CEnemyShot::Initialize(int type) {
 			{
 				"‰ñ“]",
 				0,0,
-				16,16,
+				32,32,
 				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0}},
 			},
 			};
@@ -98,7 +98,7 @@ void CEnemyShot::Initialize(int type) {
  * ”­ŽË
  */
 void CEnemyShot::Fire(float px, float py,float sx,float sy,bool Reverse) {
-	enemyShot_Position.x = px - m_pTexture->GetWidth() * 0.5f;
+	enemyShot_Position.x = px;
 	enemyShot_Position.y = py;
 	tmpEnemy_Reverse = Reverse;
 	switch (enemyShot_Type)

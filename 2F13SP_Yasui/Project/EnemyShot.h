@@ -37,8 +37,8 @@ public:
 	bool GetShow(void) { return m_bShow; }
 	void SetShow(bool bs) { m_bShow = bs; }
 	CRectangle GetRect() {
-		return CRectangle(enemyShot_Position.x, enemyShot_Position.y,
-			enemyShot_Position.x + enemyShot_RectTexture.GetWidth()+10, enemyShot_Position.y + enemyShot_RectTexture.GetHeight());
+		return CRectangle(enemyShot_Position.x + (enemyShot_RectTexture.GetWidth() * 0.2), enemyShot_Position.y,
+			enemyShot_Position.x + (enemyShot_RectTexture.GetWidth() * 0.8), enemyShot_Position.y + enemyShot_RectTexture.GetHeight());
 	}
 	float GetPositionX(void) { return enemyShot_Position.x; }
 	void  SetPositionX(float px) { enemyShot_Position.x = px; }

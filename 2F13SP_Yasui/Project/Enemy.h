@@ -155,8 +155,8 @@ public:
 	void BlockJump(bool jumpFlg) { enemy_BlockJump = jumpFlg; };
 	int GetType() { return enemy_Type; }
 	CRectangle GetAttackRangeRect() {
-		return CRectangle(enemy_Position.x - 120, enemy_Position.y - 100,
-			enemy_Position.x + enemy_RectTexture.GetWidth() + 120, enemy_Position.y + enemy_RectTexture.GetHeight());
+		return CRectangle(enemy_Position.x - 220, enemy_Position.y - 120,
+			enemy_Position.x + enemy_RectTexture.GetWidth() + 220, enemy_Position.y + enemy_RectTexture.GetHeight());
 	}
 	CEnemyShot& GetShot(int n) { return m_ShotArray[n]; }
 	bool GetShotShow(int n) { return m_ShotArray[n].GetShow(); }

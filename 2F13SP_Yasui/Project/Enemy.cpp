@@ -330,6 +330,7 @@ void CEnemy::Initialize(float px, float py, int type)
 
 void CEnemy::Update(float wx)
 {
+	//‰æ–ÊŠO‚Å“®‚©‚È‚¢
 	if (wx > enemy_Position.x + 16 || wx + g_pGraphics->GetTargetWidth() < enemy_Position.x)
 	{
 		return;
@@ -360,16 +361,6 @@ void CEnemy::Update(float wx)
 	{
 		enemy_Move.y = 20.0f;
 	}
-	if (enemy_Type == ENEMY_FISH)
-	{
-		if (enemy_Motion.GetMotionNo() != FISHMOTION_MOVE)
-		{
-			enemy_Motion.ChangeMotion(FISHMOTION_MOVE);
-		}
-		return;
-	}
-
-
 	//UŒ‚ˆ—
 	switch (enemy_Type)
 	{
@@ -384,6 +375,15 @@ void CEnemy::Update(float wx)
 		//ƒ}ƒŠƒI
 		if (tmp_playerWarpFlg)
 			MarioAttack();
+		break;
+	}
+	case ENEMY_FISH:
+	{
+		if (enemy_Motion.GetMotionNo() != FISHMOTION_MOVE)
+		{
+			enemy_Motion.ChangeMotion(FISHMOTION_MOVE);
+		}
+		return;
 		break;
 	}
 	}
@@ -683,8 +683,16 @@ void CEnemy::SkeletonShot(void)
 					enemy_ShotWait = 70;
 					enemy_Motion.ChangeMotion(SKELETONMOTION_ATTACK);
 				}
-				m_ShotArray[i].Fire(enemy_Position.x + 30, enemy_Position.y + 10,
-					(enemy_DistanceBetweenToPlayer * 0.01) + 1, (enemy_DistanceBetweenToPlayer * 0.01) + 7, enemy_Reverse);
+				if (enemy_Reverse)
+				{
+					m_ShotArray[i].Fire(GetRect().Left - 15, GetRect().Top + 10,
+						(enemy_DistanceBetweenToPlayer * 0.015f) + 1.0f, (enemy_DistanceBetweenToPlayer * 0.015f) + 7.0f, enemy_Reverse);
+				}
+				else
+				{
+					m_ShotArray[i].Fire(GetRect().Right - 15, GetRect().Top + 10,
+						(enemy_DistanceBetweenToPlayer * 0.015f) + 1.0f, (enemy_DistanceBetweenToPlayer * 0.015f) + 7.0f, enemy_Reverse);
+				}
 
 				break;
 			}

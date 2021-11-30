@@ -60,15 +60,6 @@ void CGame::Update(void) {
 	m_Player.Update();
 
 
-	//Player‘¤“G‚Æ‚Ì“–‚½‚è”»’è
-	for (int i = 0; i < m_Stage.GetEnemyCount(); i++)
-	{
-		m_Player.CollisionEneHed(m_EnemyArray[i]);
-
-		m_Player.CollisionEnemy(m_EnemyArray[i]);
-	}
-
-
 	//ƒXƒe[ƒW‚ÆƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è
 	float ox = 0, oy = 0;
 	if (m_Stage.Collision(m_Player.GetRect(), ox, oy))
@@ -83,14 +74,34 @@ void CGame::Update(void) {
 		{
 			continue;
 		}
+
 		m_EnemyArray[i].Update();
+
 		float ox = 0, oy = 0;
-		if (m_Stage.Collision(m_EnemyArray[i].GetRect(), ox, oy))
+
+
+		for (int i = 0; i < m_Stage.GetEnemyCount(); i++)
 		{
-			m_EnemyArray[i].CollisionStage(ox, oy);
+			//“G‚Ì“ª‚Æ‚ÌÚGŽž
+			if (m_Stage.Collision(m_EnemyArray[i].GetRect(), ox, oy))
+			{
+				m_EnemyArray[i].CollisionStage(ox, oy);
+			}
+
+			/*//“G‚Ì‘Ì‚Æ‚ÌÚGŽž
+			if (m_Player.CollisionEnemyBody(m_EnemyArray[i]))
+			{
+				m_Player.Damage();
+			}*/
 		}
-		if (m_Player.CollisionEneHed(m_EnemyArray[i]))
+
+
+		//
+		if (m_Player.CollisionEnemyHed(m_EnemyArray[i]))
 		{
+
+			m_Player.CollisionJump();
+
 			m_EnemyArray[i].Damage();
 		}
 

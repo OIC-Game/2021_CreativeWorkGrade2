@@ -348,6 +348,8 @@ void CPlayer::Release(void)
 
 
 
+
+
 float CPlayer::GetPosY()
 {
 	return py;
@@ -356,14 +358,12 @@ float CPlayer::GetPosY()
 
 
 //“G‚Æ‚Ì“–‚½‚è”»’è
-bool CPlayer::CollisionEnemy(CEnemy& ene)
+bool CPlayer::CollisionEnemyBody(CEnemy& ene)
 {
 	if (!ene.GetShow())
 	{
 		return false;
 	}
-
-
 
 	//ƒ_ƒ[ƒW’†‚Ì‚½‚ß“–‚½‚è”»’è‚ð‚¨‚±‚È‚í‚È‚¢
 	if (m_DamageWait > 0 || ene.GetDamageWait() > 0)
@@ -391,11 +391,22 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 			vx = 5.0f;
 			m_bReverse = true;
 		}
-		m_Motion.ChangeMotion(MOTION_DAMAGE);
+		
 	}
 }
 
-bool CPlayer::CollisionEneHed(CEnemy& ene)
+void CPlayer::Damage(void)
+{
+	m_DamageWait = 60;
+	if (LifeCount > 0)
+	{
+		LifeCount--;
+	}
+	m_Motion.ChangeMotion(MOTION_DAMAGE);
+}
+
+
+bool CPlayer::CollisionEnemyHed(CEnemy& ene)
 {
 
 	CRectangle plrec=GetLegRect();
@@ -403,14 +414,17 @@ bool CPlayer::CollisionEneHed(CEnemy& ene)
 
 	if (plrec.CollisionRect(ehrec))
 	{
-		float CollisionPy = py;
-
-		m_Motion.ChangeMotion(MOTION_JUMP);
-		
-			JumpSpd = -10;
-					 	
 		m_HedCollFlg = true;
-		return true;
 	}
 	return false;
 }
+
+void CPlayer::CollisionJump(void)
+{
+	m_Motion.ChangeMotion(MOTION_JUMP);
+
+	JumpSpd = -10;
+}
+
+
+

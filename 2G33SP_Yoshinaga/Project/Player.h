@@ -64,6 +64,8 @@ public:
 	void Render(float wx, float wy);
 	void renderDebug(float wx, float wy);
 	void Release(void);
+	void CollisionJump(void);
+	void Damage(void);
 
 	int GetLife() {
 		return LifeCount;
@@ -81,9 +83,9 @@ public:
 
 	float CPlayer::GetPosY();
 
-	bool CPlayer::CollisionEnemy(CEnemy& ene);
+	bool CPlayer::CollisionEnemyBody(CEnemy& ene);
 
-	bool CPlayer::CollisionEneHed(CEnemy& ene);
+	bool CPlayer::CollisionEnemyHed(CEnemy& ene);
 
 	bool GetCollisionFlg(){
 		return m_HedCollFlg;

@@ -200,7 +200,7 @@ bool CEnemy::CollisionPlayer()
 		m_Motion.ChangeMotion(MOTION_DAMAGE);
 		return true;
 	}
-	return true;
+	return false;
 }
 
 

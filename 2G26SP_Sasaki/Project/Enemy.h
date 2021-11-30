@@ -18,12 +18,13 @@ private:
 	int                     m_ShotWait;
 	int                     m_ShotWaitSet;
 	int						m_EnemyColor;
+	int						m_EnemyType;
 
 public:
 	CEnemy();
 	~CEnemy();
 	void Initialize(void);				//初期化処理
-	void Start(float px,float py,int encol);		//出現処理（px,pyの位置から出現させる）
+	void Start(float px,float py,int encol,int type);		//出現処理（px,pyの位置から出現させる）
 	void Update(void);					//移動等の更新処理
 	void Render(void);					//描画処理
 	void RenderDebug(int i);			//デバッグ描画処理

@@ -129,13 +129,13 @@ void CGame::Initialize(void)
 		}
 	}
 
-	random.SetSeed(time(NULL));
+	m_random.SetSeed(time(NULL));
 	//ぷよの色をランダムで決める
 	for (int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			m_type[i][j] = random.Random(Red, TypeCount);
+			m_type[i][j] = m_random.Random(Red, TypeCount);
 		}
 	}
 
@@ -154,19 +154,19 @@ void CGame::Initialize(void)
 	m_chainCnt = 0;
 	m_maxChainCnt = 0;
 	m_score = 0;
-	m_readyTime = 200;
-	m_sleepTime = 20;
-	m_downHoldTime = 10;
-	m_leftHoldTime = 10;
-	m_rightHoldTime = 10;
-	eFlow = ready;
-	pos.x = 200.0f;
-	pos.y = 100.0f;
-	spin.x = 0.0f;
-	spin.y = -50.0f;
-	sFPos.x = 3;
-	sFPos.y = 0;
-	eStep = E_Rotation::Top;
+	m_readyTimeCnt = READY_TIME;
+	m_waitTimeCnt = WAIT_TIME;
+	m_downHoldTimeCnt = INIT_HOLD_TIME;
+	m_leftHoldTimeCnt = INIT_HOLD_TIME;
+	m_rightHoldTimeCnt = INIT_HOLD_TIME;
+	m_eFlow = Flow::Ready;
+	m_pos.x = INIT_POSITION_X;
+	m_pos.y = INIT_POSITION_Y;
+	m_spin.x = INIT_SPIN_X;
+	m_spin.y = INIT_SPIN_Y;
+	m_sFldPos.x = INIT_FIELD_POSITION_X;
+	m_sFldPos.y = INIT_FIELD_POSITION_Y;
+	m_eRotation = Rotation::Top;
 	m_endFlg = false;
 
 	fade.FadeIn();
@@ -216,27 +216,28 @@ void CGame::Update(void)
 		gChangeScene = SCENENO_TITLE;
 	}
 
-	switch (eFlow)
+	//処理全体の流れ
+	switch (m_eFlow)
 	{
-		case E_Process::ready:
+		case Flow::Ready:
 			ReadyUpdate();
 			break;
-		case E_Process::pause:
+		case Flow::Pause:
 			PauseUpdate();
 			break;
-		case E_Process::drop:
+		case Flow::Drop:
 			DropUpdate();
 			break;
-		case E_Process::tear:
+		case Flow::Tear:
 			TearUpdate();
 			break;
-		case E_Process::chain:
+		case Flow::Chain:
 			ChainUpdate();
 			break;
-		case E_Process::reStart:
+		case Flow::ReStart:
 			ReStartUpdate();
 			break;
-		case E_Process::gameOver:
+		case Flow::GameOver:
 			GameOverUpdate();
 			break;
 	}
@@ -245,13 +246,13 @@ void CGame::Update(void)
 //ReadyGo カウントダウン の処理
 void CGame::ReadyUpdate()
 {
-	if (m_readyTime <= 0)
+	if (m_readyTimeCnt <= 0)
 	{
-		eFlow = drop;
+		m_eFlow = Drop;
 	}
 	else
 	{
-		m_readyTime--;
+		m_readyTimeCnt--;
 	}
 }
 //ポーズ(一時停止)中の処理
@@ -261,7 +262,7 @@ void CGame::PauseUpdate()
 	{
 		m_pauseSound.Play();
 		m_gameBGM.SetVolume(0.05f);
-		eFlow = drop;
+		m_eFlow = Drop;
 	}
 	if (g_pInput->IsKeyPush(MOFKEY_RETURN))
 	{
@@ -278,35 +279,35 @@ void CGame::DropUpdate()
 	{
 		m_pauseSound.Play();
 		m_gameBGM.SetVolume(0.01f);
-		eFlow = pause;
+		m_eFlow = Pause;
 	}
 
 	//自由落下
 	if (m_dropTimeCnt < 0)
 	{
 		//確定しているか
-		if ((m_field[sFPos.y + 1][sFPos.x] != Empty && eStep == Top) ||
-			(m_field[sFPos.y + 2][sFPos.x] != Empty && eStep == Bottom) ||
-			((m_field[sFPos.y + 1][sFPos.x - 1] != Empty ||
-				m_field[sFPos.y + 1][sFPos.x] != Empty) && eStep == Left) ||
-				((m_field[sFPos.y + 1][sFPos.x + 1] != Empty ||
-					m_field[sFPos.y + 1][sFPos.x] != Empty) && eStep == Right))
+		if ((m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty && m_eRotation == Top) ||
+			(m_field[m_sFldPos.y + 2][m_sFldPos.x] != Empty && m_eRotation == Bottom) ||
+			((m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] != Empty ||
+				m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty) && m_eRotation == Left) ||
+				((m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] != Empty ||
+					m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty) && m_eRotation == Right))
 		{
 
 			//画面外に設置しないように
-			if (sFPos.y >= 0) {
+			if (m_sFldPos.y >= 0) {
 				//メインのぷよを格納
-				m_field[sFPos.y][sFPos.x] = m_type[0][0];
+				m_field[m_sFldPos.y][m_sFldPos.x] = m_type[0][0];
 			}
 			//サブのぷよを格納
-			if (eStep == Top && sFPos.y - 1 >= 0)
-				m_field[sFPos.y - 1][sFPos.x] = m_type[0][1];
-			if (eStep == Left && sFPos.y >= 0)
-				m_field[sFPos.y][sFPos.x - 1] = m_type[0][1];
-			if (eStep == Right && sFPos.y >= 0)
-				m_field[sFPos.y][sFPos.x + 1] = m_type[0][1];
-			if (eStep == Bottom && sFPos.y + 1 >= 0)
-				m_field[sFPos.y + 1][sFPos.x] = m_type[0][1];
+			if (m_eRotation == Top && m_sFldPos.y - 1 >= 0)
+				m_field[m_sFldPos.y - 1][m_sFldPos.x] = m_type[0][1];
+			if (m_eRotation == Left && m_sFldPos.y >= 0)
+				m_field[m_sFldPos.y][m_sFldPos.x - 1] = m_type[0][1];
+			if (m_eRotation == Right && m_sFldPos.y >= 0)
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] = m_type[0][1];
+			if (m_eRotation == Bottom && m_sFldPos.y + 1 >= 0)
+				m_field[m_sFldPos.y + 1][m_sFldPos.x] = m_type[0][1];
 
 			//スコア加算
 			m_score += 10;
@@ -315,14 +316,14 @@ void CGame::DropUpdate()
 			m_setSound.Play();
 
 			//ちぎりの工程に移る
-			eFlow = tear;
+			m_eFlow = Tear;
 
 			return;
 		}
 
 		//確定してなければ一マス落ちる
-		pos.y += PUYO_SIZE;
-		sFPos.y += 1;
+		m_pos.y += PUYO_SIZE;
+		m_sFldPos.y += 1;
 		m_dropTimeCnt = DROP_SPEED;
 	}
 	else
@@ -332,159 +333,159 @@ void CGame::DropUpdate()
 
 	//左に移動
 	if (g_pInput->IsKeyPush(MOFKEY_A) &&
-		((m_field[sFPos.y][sFPos.x - 1] == Empty &&
-			m_field[sFPos.y - 1][sFPos.x - 1] == Empty && eStep == Top) ||
-			(m_field[sFPos.y][sFPos.x - 1] == Empty &&
-				m_field[sFPos.y + 1][sFPos.x - 1] == Empty && eStep == Bottom) ||
-				(m_field[sFPos.y][sFPos.x - 1] == Empty && eStep == Right) ||
-			(m_field[sFPos.y][sFPos.x - 2] == Empty && eStep == Left)))
+		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top || m_sFldPos.y == 0) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
 	{
 		//移動音
 		m_moveSound.Play();
 
-		m_leftHoldTime = 10;
+		m_leftHoldTimeCnt = INIT_HOLD_TIME;
 		//左に一マス動かす
-		pos.x -= PUYO_SIZE;
-		sFPos.x -= 1;
+		m_pos.x -= PUYO_SIZE;
+		m_sFldPos.x -= 1;
 	}
 	else if (g_pInput->IsKeyHold(MOFKEY_A) &&
-		((m_field[sFPos.y][sFPos.x - 1] == Empty &&
-			m_field[sFPos.y - 1][sFPos.x - 1] == Empty && eStep == Top) ||
-			(m_field[sFPos.y][sFPos.x - 1] == Empty &&
-				m_field[sFPos.y + 1][sFPos.x - 1] == Empty && eStep == Bottom) ||
-				(m_field[sFPos.y][sFPos.x - 1] == Empty && eStep == Right) ||
-			(m_field[sFPos.y][sFPos.x - 2] == Empty && eStep == Left)))
+		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top || m_sFldPos.y == 0) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
 	{
-		if (m_leftHoldTime <= 0)
+		if (m_leftHoldTimeCnt <= 0)
 		{
 			//移動音
 			m_moveSound.Play();
 
-			pos.x -= PUYO_SIZE;
-			sFPos.x -= 1;
-			m_leftHoldTime = 5;
+			m_pos.x -= PUYO_SIZE;
+			m_sFldPos.x -= 1;
+			m_leftHoldTimeCnt = PUYO_SPEED;
 		}
 		else
 		{
-			m_leftHoldTime--;
+			m_leftHoldTimeCnt--;
 		}
 	}
 
 	//右に移動
 	if (g_pInput->IsKeyPush(MOFKEY_D) &&
-		((m_field[sFPos.y][sFPos.x + 1] == Empty &&
-			m_field[sFPos.y - 1][sFPos.x + 1] == Empty && eStep == Top) ||
-			(m_field[sFPos.y][sFPos.x + 1] == Empty &&
-				m_field[sFPos.y + 1][sFPos.x + 1] == Empty && eStep == Bottom) ||
-				(m_field[sFPos.y][sFPos.x + 1] == Empty && eStep == Left) ||
-			(m_field[sFPos.y][sFPos.x + 2] == Empty && eStep == Right)))
+		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top || m_sFldPos.y == 0) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
 	{
 		//移動音
 		m_moveSound.Play();
 
-		m_rightHoldTime = 10;
+		m_rightHoldTimeCnt = INIT_HOLD_TIME;
 		//右に一マス動かす
-		pos.x += PUYO_SIZE;
-		sFPos.x += 1;
+		m_pos.x += PUYO_SIZE;
+		m_sFldPos.x += 1;
 	}
 	else if (g_pInput->IsKeyHold(MOFKEY_D) &&
-		((m_field[sFPos.y][sFPos.x + 1] == Empty &&
-			m_field[sFPos.y - 1][sFPos.x + 1] == Empty && eStep == Top) ||
-			(m_field[sFPos.y][sFPos.x + 1] == Empty &&
-				m_field[sFPos.y + 1][sFPos.x + 1] == Empty && eStep == Bottom) ||
-				(m_field[sFPos.y][sFPos.x + 1] == Empty && eStep == Left) ||
-			(m_field[sFPos.y][sFPos.x + 2] == Empty && eStep == Right)))
+		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top || m_sFldPos.y == 0) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
 	{
-		if (m_rightHoldTime <= 0)
+		if (m_rightHoldTimeCnt <= 0)
 		{
 			//移動音
 			m_moveSound.Play();
 
-			pos.x += PUYO_SIZE;
-			sFPos.x += 1;
-			m_rightHoldTime = 5;
+			m_pos.x += PUYO_SIZE;
+			m_sFldPos.x += 1;
+			m_rightHoldTimeCnt = PUYO_SPEED;
 		}
 		else
 		{
-			m_rightHoldTime--;
+			m_rightHoldTimeCnt--;
 		}
 	}
 
 	//キーによって下に移動(1マス)
 	if (g_pInput->IsKeyPush(MOFKEY_S))
 	{
-		m_downHoldTime = 10;
+		m_downHoldTimeCnt = INIT_HOLD_TIME;
 		//押したときに1マス落とす
 		m_dropTimeCnt = -1;
 	}
 	//キーによって下に移動(高速降下)
 	else if (g_pInput->IsKeyHold(MOFKEY_S))
 	{
-		if (m_downHoldTime <= 0) {
+		if (m_downHoldTimeCnt <= 0) {
 			//長押しで高速降下
-			m_dropTimeCnt -= 15;
+			m_dropTimeCnt -= PUYO_SPEED * 3;
 		}
 		else
 		{
-			m_downHoldTime--;
+			m_downHoldTimeCnt--;
 		}
 	}
 
 	//回転・左方向
 	if (g_pInput->IsKeyPush(MOFKEY_J))
 	{
-		if (eStep == Top)
+		if (m_eRotation == Top)
 		{
-			if (m_field[sFPos.y][sFPos.x - 1] == Empty ||
-				m_field[sFPos.y][sFPos.x + 1] == Empty)
+			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
 			{
-				if (m_field[sFPos.y][sFPos.x - 1] != Empty)
+				if (m_field[m_sFldPos.y][m_sFldPos.x - 1] != Empty)
 				{
-					pos.x += PUYO_SIZE;
-					sFPos.x += 1;
+					m_pos.x += PUYO_SIZE;
+					m_sFldPos.x += 1;
 				}
-				eStep = Left;
-				spin.x = -PUYO_SIZE;
-				spin.y = 0;
+				m_eRotation = Left;
+				m_spin.x = -PUYO_SIZE;
+				m_spin.y = 0;
 			}
 
 		}
-		else if (eStep == Left)
+		else if (m_eRotation == Left)
 		{
-			if (m_field[sFPos.y + 1][sFPos.x] != Empty)
+			if (m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty)
 			{
-				pos.y -= PUYO_SIZE;
-				sFPos.y -= 1;
+				m_pos.y -= PUYO_SIZE;
+				m_sFldPos.y -= 1;
 			}
-			eStep = Bottom;
-			spin.x = 0;
-			spin.y = PUYO_SIZE;
+			m_eRotation = Bottom;
+			m_spin.x = 0;
+			m_spin.y = PUYO_SIZE;
 		}
-		else if (eStep == Bottom)
+		else if (m_eRotation == Bottom)
 		{
-			if (m_field[sFPos.y][sFPos.x - 1] == Empty ||
-				m_field[sFPos.y][sFPos.x + 1] == Empty)
+			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
 			{
-				if (m_field[sFPos.y][sFPos.x + 1] != Empty)
+				if (m_field[m_sFldPos.y][m_sFldPos.x + 1] != Empty)
 				{
-					pos.x -= PUYO_SIZE;
-					sFPos.x -= 1;
+					m_pos.x -= PUYO_SIZE;
+					m_sFldPos.x -= 1;
 				}
-				eStep = Right;
-				spin.x = PUYO_SIZE;
-				spin.y = 0;
+				m_eRotation = Right;
+				m_spin.x = PUYO_SIZE;
+				m_spin.y = 0;
 			}
 		}
-		else if (eStep == Right)
+		else if (m_eRotation == Right)
 		{
-			eStep = Top;
-			spin.x = 0;
-			spin.y = -PUYO_SIZE;
+			m_eRotation = Top;
+			m_spin.x = 0;
+			m_spin.y = -PUYO_SIZE;
 		}
 		//左右に壁やぷよがあり回転が行えなかった場合
 		else
 		{
-
+			
 		}
 
 		//回転音
@@ -494,52 +495,52 @@ void CGame::DropUpdate()
 	//回転・右方向
 	if (g_pInput->IsKeyPush(MOFKEY_K))
 	{
-		if (eStep == Top)
+		if (m_eRotation == Top)
 		{
-			if (m_field[sFPos.y][sFPos.x - 1] == Empty ||
-				m_field[sFPos.y][sFPos.x + 1] == Empty)
+			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
 			{
-				if (m_field[sFPos.y][sFPos.x + 1] != Empty)
+				if (m_field[m_sFldPos.y][m_sFldPos.x + 1] != Empty)
 				{
-					pos.x -= PUYO_SIZE;
-					sFPos.x -= 1;
+					m_pos.x -= PUYO_SIZE;
+					m_sFldPos.x -= 1;
 				}
-				eStep = Right;
-				spin.x = PUYO_SIZE;
-				spin.y = 0;
+				m_eRotation = Right;
+				m_spin.x = PUYO_SIZE;
+				m_spin.y = 0;
 			}
 		}
-		else if (eStep == Right)
+		else if (m_eRotation == Right)
 		{
-			if (m_field[sFPos.y + 1][sFPos.x] != Empty)
+			if (m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty)
 			{
-				pos.y -= PUYO_SIZE;
-				sFPos.y -= 1;
+				m_pos.y -= PUYO_SIZE;
+				m_sFldPos.y -= 1;
 			}
-			eStep = Bottom;
-			spin.x = 0;
-			spin.y = PUYO_SIZE;
+			m_eRotation = Bottom;
+			m_spin.x = 0;
+			m_spin.y = PUYO_SIZE;
 		}
-		else if (eStep == Bottom)
+		else if (m_eRotation == Bottom)
 		{
-			if (m_field[sFPos.y][sFPos.x - 1] == Empty ||
-				m_field[sFPos.y][sFPos.x + 1] == Empty)
+			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
 			{
-				if (m_field[sFPos.y][sFPos.x - 1] != Empty)
+				if (m_field[m_sFldPos.y][m_sFldPos.x - 1] != Empty)
 				{
-					pos.x += PUYO_SIZE;
-					sFPos.x += 1;
+					m_pos.x += PUYO_SIZE;
+					m_sFldPos.x += 1;
 				}
-				eStep = Left;
-				spin.x = -PUYO_SIZE;
-				spin.y = 0;
+				m_eRotation = Left;
+				m_spin.x = -PUYO_SIZE;
+				m_spin.y = 0;
 			}
 		}
-		else if (eStep == Left)
+		else if (m_eRotation == Left)
 		{
-			eStep = Top;
-			spin.x = 0;
-			spin.y = -PUYO_SIZE;
+			m_eRotation = Top;
+			m_spin.x = 0;
+			m_spin.y = -PUYO_SIZE;
 		}
 
 		//回転音
@@ -549,7 +550,7 @@ void CGame::DropUpdate()
 //ちぎり　浮いているぷよへの対処
 void CGame::TearUpdate()
 {
-	if (m_sleepTime < 0) {
+	if (m_waitTimeCnt < 0) {
 		for (int y = FH - 2; y >= 0; y--)
 		{
 			for (int x = FW - 1; x >= 1; x--)
@@ -574,18 +575,18 @@ void CGame::TearUpdate()
 		}
 
 		//操作不能時間 sleepの代わり 20は適当
-		m_sleepTime = 20;
-		eFlow = chain;
+		m_waitTimeCnt = WAIT_TIME;
+		m_eFlow = Chain;
 	}
 	else
 	{
-		m_sleepTime--;
+		m_waitTimeCnt--;
 	}
 }
 //連鎖
 void CGame::ChainUpdate()
 {
-	if (m_sleepTime < 0) {
+	if (m_waitTimeCnt < 0) {
 		//連鎖のチェック
 		//連鎖が行われた場合はちぎりに戻り一度整地する。
 		//連鎖が行われなかった場合、リスタートへ
@@ -638,8 +639,8 @@ void CGame::ChainUpdate()
 
 		if (m_chainFlg)
 		{
-			//操作不能時間 sleepの代わり 40は適当
-			m_sleepTime = 40;
+			//操作不能時間 連鎖がわかりやすくなるよう少し長めに
+			m_waitTimeCnt = WAIT_TIME * 2;
 			//連鎖時の音
 			m_chainSound.Play();
 			//次に鳴らす連鎖音のピッチを上げる
@@ -647,12 +648,12 @@ void CGame::ChainUpdate()
 			//連鎖数をカウントする(+1)
 			m_chainCnt++;
 			//ちぎりに移る
-			eFlow = tear;
+			m_eFlow = Tear;
 		}
 		else if (!m_chainFlg)
 		{
 			//操作不能時間 sleepの代わり 40は適当
-			m_sleepTime = 20;
+			m_waitTimeCnt = WAIT_TIME;
 
 			//バツ部分に(2,3,4,5)のどれかしらがあればゲームオーバー
 			if (m_field[0][3] == Red ||
@@ -662,7 +663,7 @@ void CGame::ChainUpdate()
 			{
 				m_gameBGM.Stop();
 				m_gameOverSound.Play();
-				eFlow = gameOver;
+				m_eFlow = GameOver;
 			}
 			else
 			{
@@ -678,13 +679,13 @@ void CGame::ChainUpdate()
 					m_score += m_chainCnt * 100;
 				}
 
-				eFlow = reStart;
+				m_eFlow = ReStart;
 			}
 		}
 	}
 	else
 	{
-		m_sleepTime--;
+		m_waitTimeCnt--;
 	}
 }
 //ゲームオーバーになっていなければ 再度ぷよを降らす
@@ -696,8 +697,8 @@ void CGame::ReStartUpdate()
 
 	//次回のぷよを格納しておくため
 	//ぷよの色をランダムで決める
-	m_type[1][0] = random.Random(Red, TypeCount);
-	m_type[1][1] = random.Random(Red, TypeCount);
+	m_type[1][0] = m_random.Random(Red, TypeCount);
+	m_type[1][1] = m_random.Random(Red, TypeCount);
 
 	//色々初期値
 	m_dropTimeCnt = DROP_SPEED;
@@ -706,14 +707,14 @@ void CGame::ReStartUpdate()
 	//連鎖音のピッチのリセット
 	m_chainSound.SetPitch(1.0f);
 
-	eFlow = drop;
-	pos.x = 200.0f;
-	pos.y = 100.0f;
-	spin.x = 0.0f;
-	spin.y = -50.0f;
-	sFPos.x = 3;
-	sFPos.y = 0;
-	eStep = E_Rotation::Top;
+	m_eFlow = Drop;
+	m_pos.x = 200.0f;
+	m_pos.y = 100.0f;
+	m_spin.x = 0.0f;
+	m_spin.y = -50.0f;
+	m_sFldPos.x = 3;
+	m_sFldPos.y = 0;
+	m_eRotation = Rotation::Top;
 }
 //ゲームオーバー
 void CGame::GameOverUpdate()
@@ -798,36 +799,36 @@ void CGame::Render(void)
 
 
 	//操作中のぷよの描画
-	if (eFlow == drop || eFlow == pause) {
+	if (m_eFlow == Drop || m_eFlow == Pause) {
 		//本体
 		if (m_type[0][0] == Red)
-			m_RedPuyoTexture.Render(pos.x, pos.y);
+			m_RedPuyoTexture.Render(m_pos.x, m_pos.y);
 
 		if (m_type[0][0] == Blue)
-			m_BluePuyoTexture.Render(pos.x, pos.y);
+			m_BluePuyoTexture.Render(m_pos.x, m_pos.y);
 
 		if (m_type[0][0] == Yellow)
-			m_YellowPuyoTexture.Render(pos.x, pos.y);
+			m_YellowPuyoTexture.Render(m_pos.x, m_pos.y);
 
 		if (m_type[0][0] == Green)
-			m_GreenPuyoTexture.Render(pos.x, pos.y);
+			m_GreenPuyoTexture.Render(m_pos.x, m_pos.y);
 
 		//サブ
 		if (m_type[0][1] == Red)	
-			m_RedPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
+			m_RedPuyoTexture.Render(m_pos.x + m_spin.x, m_pos.y + m_spin.y);
 
 		if (m_type[0][1] == Blue)
-			m_BluePuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
+			m_BluePuyoTexture.Render(m_pos.x + m_spin.x, m_pos.y + m_spin.y);
 
 		if (m_type[0][1] == Yellow)
-			m_YellowPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
+			m_YellowPuyoTexture.Render(m_pos.x + m_spin.x, m_pos.y + m_spin.y);
 
 		if (m_type[0][1] == Green)
-			m_GreenPuyoTexture.Render(pos.x + spin.x, pos.y + spin.y);
+			m_GreenPuyoTexture.Render(m_pos.x + m_spin.x, m_pos.y + m_spin.y);
 	}
 
 	// ゲームオーバーメッセージ
-	if (eFlow == gameOver)
+	if (m_eFlow == GameOver)
 	{
 		m_GameOverTexture.Render(100, 100);
 		//CGraphicsUtilities::RenderString(500, 320, MOF_COLOR_BLACK, "ゲームオーバー");
@@ -835,11 +836,11 @@ void CGame::Render(void)
 	}
 
 	//カウントダウン表示
-	if (eFlow == ready)
+	if (m_eFlow == Ready)
 	{
-		if (m_readyTime >= 110)
+		if (m_readyTimeCnt >= 110)
 			CGraphicsUtilities::RenderString(210, 350, MOF_COLOR_BLACK, "Ready");
-		else if(m_readyTime >= 20)
+		else if(m_readyTimeCnt >= 20)
 			CGraphicsUtilities::RenderString(220, 350, MOF_COLOR_BLACK, "Go");
 	}
 
@@ -857,13 +858,13 @@ void CGame::Render(void)
 	CGraphicsUtilities::RenderString(900, 210, MOF_COLOR_BLACK, "%d", m_maxChainCnt);
 
 	//開幕にブロックが見えないように、画面上部を隠す
-	CGraphicsUtilities::RenderFillRect(BL, 50, BL * 9, BL * 2, MOF_COLOR_BLACK);
+	//CGraphicsUtilities::RenderFillRect(BL, 50, BL * 9, BL * 2, MOF_COLOR_BLACK);
 
 	//escでポーズ
 	CGraphicsUtilities::RenderString(885, 12, MOF_COLOR_BLACK, "Pause[Esc]");
 
 	//ポーズ
-	if (eFlow == pause)
+	if (m_eFlow == Pause)
 	{
 		//後ろを暗くする
 		CGraphicsUtilities::RenderFillRect(0, 0, 1024, 768, MOF_ARGB(150, 0, 0, 0));

@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include	"Mof.h"
 #include	"GameDefine.h"
 
@@ -62,8 +61,10 @@ public:
 	
 	int GetDamageWait(void) { return m_DamageWait;}
 
-	//敵の頭とプレイヤーの足元との当たり判定
-   void CEnemy::CollisionPlayer();
+		//敵の頭とプレイヤーの足元との当たり判定
+	   bool CollisionPlayer();
+	   void Damage();
+   
 
 };
 

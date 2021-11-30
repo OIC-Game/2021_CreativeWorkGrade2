@@ -1,7 +1,5 @@
 #include "Stage.h"
 
-// test
-
 CStage::CStage()
 {
 

@@ -91,15 +91,12 @@ void CPlayer::Initialize(void)
 	m_bReverse = false;
 	LifeCount = 3;
 	m_DamageWait=0;
-	m_Motion.ChangeMotion(MOTION_WAIT);
+//	m_Motion.ChangeMotion(MOTION_WAIT);
 	
 }
 
 void CPlayer::Update(void)
 {
-
-
-
 
 	MoveFlg = false;
 	//ダメージ中の動作
@@ -183,7 +180,7 @@ void CPlayer::UpdateKey(void)
 	}
 	
 	//スペースキーでジャンプ
-	if (g_pInput->IsKeyHold(MOFKEY_SPACE) && !JumpFlg)
+	if (g_pInput->IsKeyHold(MOFKEY_UP) && !JumpFlg)
 	{
 		//ジャンプ開始
 		JumpFlg = true;
@@ -275,6 +272,14 @@ void CPlayer::CollisionStage(float ox, float oy)
 
 void CPlayer::Render(float wx, float wy)
 {
+
+	/*if (CollisionEneHed)
+	{
+		CGraphicsUtilities::RenderString(100, 100, "当たっている！！", MOF_COLOR_BLACK);
+	}*/
+
+
+
 	//インターバル2フレームごとに描画をしない
 	if (m_DamageWait % 4 >= 2)
 	{
@@ -343,12 +348,6 @@ void CPlayer::Release(void)
 
 
 
-/*CRectangle CPlayer::GetRect()
-{
-//	return  CRectangle(px, py, px + gTexture.GetWidth(), py + gTexture.GetHeight());
-}*/
-
-
 float CPlayer::GetPosY()
 {
 	return py;
@@ -392,20 +391,26 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 			vx = 5.0f;
 			m_bReverse = true;
 		}
-		m_Motion.ChangeMotion(MOTION_DAMAGE);	
+		m_Motion.ChangeMotion(MOTION_DAMAGE);
 	}
-	
 }
 
 bool CPlayer::CollisionEneHed(CEnemy& ene)
 {
+
 	CRectangle plrec=GetLegRect();
 	CRectangle ehrec=ene.GetHedRect();
 
 	if (plrec.CollisionRect(ehrec))
 	{
-		vx -= 20;
+		float CollisionPy = py;
+
+		m_Motion.ChangeMotion(MOTION_JUMP);
+		
+			JumpSpd = -10;
+					 	
 		m_HedCollFlg = true;
+		return true;
 	}
 	return false;
 }

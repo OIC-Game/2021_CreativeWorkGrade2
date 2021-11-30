@@ -50,7 +50,7 @@ private:
 		MOTION_DAMAGE,
 		MOTION_COUNT,
 	};
-	
+
 public:
 	CPlayer();
 	~CPlayer();
@@ -61,7 +61,7 @@ public:
 	void UpdateKey(void);
 	void UpdateMove(void);
 	void CollisionStage(float ox, float oy);
-	void Render(float wx,float wy);
+	void Render(float wx, float wy);
 	void renderDebug(float wx, float wy);
 	void Release(void);
 
@@ -69,13 +69,13 @@ public:
 		return LifeCount;
 	}
 
-	CRectangle GetRect(){		
-		return CRectangle(px , py , px + m_SrcRect.GetWidth(), py + m_SrcRect.GetHeight());
+	CRectangle GetRect() {
+		return CRectangle(px+5, py, px + m_SrcRect.GetWidth()-5, py + m_SrcRect.GetHeight() - 5);
 	}
 
 	CRectangle GetLegRect(void)
 	{
-		return CRectangle(px, py + m_SrcRect.GetHeight(), px + m_SrcRect.GetWidth(), py + m_SrcRect.GetHeight() + 1);
+		return CRectangle(px+3, py + m_SrcRect.GetHeight(), px + m_SrcRect.GetWidth()-5, py + m_SrcRect.GetHeight() +5);
 	}
 
 
@@ -83,7 +83,9 @@ public:
 
 	bool CPlayer::CollisionEnemy(CEnemy& ene);
 
-
 	bool CPlayer::CollisionEneHed(CEnemy& ene);
-};
 
+	bool GetCollisionFlg(){
+		return m_HedCollFlg;
+	}
+};

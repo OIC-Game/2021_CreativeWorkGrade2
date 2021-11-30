@@ -55,17 +55,26 @@ void CGame::Initialize(void) {
 }
 
 void CGame::Update(void) {
-	//プレイヤーの移動処理
-	m_Player.Update();	
-
 	
+	//プレイヤーの移動処理
+	m_Player.Update();
+
+
+	//Player側敵との当たり判定
+	for (int i = 0; i < m_Stage.GetEnemyCount(); i++)
+	{
+		m_Player.CollisionEneHed(m_EnemyArray[i]);
+
+		m_Player.CollisionEnemy(m_EnemyArray[i]);
+	}
+
 
 	//ステージとプレイヤーの当たり判定
 	float ox = 0, oy = 0;
 	if (m_Stage.Collision(m_Player.GetRect(), ox, oy))
 	{
 		m_Player.CollisionStage(ox, oy);
-	}
+	}	
 
 	//敵の更新
 	for (int i = 0; i < m_Stage.GetEnemyCount(); i++)
@@ -80,22 +89,13 @@ void CGame::Update(void) {
 		{
 			m_EnemyArray[i].CollisionStage(ox, oy);
 		}
+		if (m_Player.CollisionEneHed(m_EnemyArray[i]))
+		{
+			m_EnemyArray[i].Damage();
+		}
+
 	}
 
-	//敵との当たり判定
-	for (int i = 0;i < m_Stage.GetEnemyCount();i++)
-	{
-		m_Player.CollisionEnemy(m_EnemyArray[i]);
-
-		
-	}
-
-	//敵の頭との当たり判定
-	for (int i = 0; i < m_Stage.GetEnemyCount(); i++)
-	{
-		
-	}
-	  
 
 	//ステージのスクロール処理
 	m_Stage.Update(m_Player);

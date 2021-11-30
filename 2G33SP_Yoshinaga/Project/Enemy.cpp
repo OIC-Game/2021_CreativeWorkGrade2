@@ -16,8 +16,8 @@ m_bReverse(false),
 m_SrcRect(){
 }
 
-CGame					gGame;
-
+CGame		gGame;
+CPlayer		gPlayer;
 
 CEnemy::~CEnemy(){
 }
@@ -59,7 +59,6 @@ void CEnemy::Initialize(float px, float py, int type) {
 
 void CEnemy::Update(void) {
 
-	CollisionPlayer();
 
 	//非表示
 	if (!m_bShow)
@@ -76,19 +75,7 @@ void CEnemy::Update(void) {
 		//終了で待機に戻す
 		if (m_Motion.IsEndMotion())
 		{
-			m_Motion.ChangeMotion(MOTION_MOVE);
-		/*	if (m_HP <= 0)
-			{
-				m_bShow = false;
-			}
-			if (m_bReverse)
-			{
-				m_MoveX = -3.0f;
-			}
-			else
-			{
-				m_MoveX = 3.0f;
-			}*/
+			m_Motion.ChangeMotion(MOTION_MOVE);		
 		}
 		else
 		{
@@ -195,9 +182,7 @@ void CEnemy::RenderDebug(float wx, float wy) {
 	//敵の頭の矩形のデバッグ表示
 	CGraphicsUtilities::RenderRect(hr.Left - wx,HeadRect.Top - wy, HeadRect.Right - wx, HeadRect.Bottom - wy, MOF_COLOR_HGREEN);
 
-
 }
-
 /**
  * 解放
  *
@@ -206,18 +191,20 @@ void CEnemy::Release(void) {
 	m_Motion.Release();
 }
 
-//void CEnemy::CollisionPlayer()
-//{
-//
-//	if (HedColflg==true)
-//	{
-//		m_Motion.ChangeMotion(MOTION_DAMAGE);
-//	}
-//	
-//}
+
+bool CEnemy::CollisionPlayer()
+{
+
+	if (gPlayer.GetCollisionFlg())
+	{		
+		m_Motion.ChangeMotion(MOTION_DAMAGE);
+		return true;
+	}
+	return true;
+}
 
 
-
-
-
-
+void CEnemy::Damage()
+{
+	m_Motion.ChangeMotion(MOTION_DAMAGE);
+}

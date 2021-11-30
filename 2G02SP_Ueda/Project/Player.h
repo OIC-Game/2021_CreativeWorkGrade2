@@ -99,6 +99,7 @@ public:
 	bool DeadEnd(void);
 	bool CollisionItem(CItem& itm);
 	bool GetGiant(void) { return m_bMotionGiant; };
+	bool GetbGiant(void) { return m_bGiant; };
 	void CollisionPipe(CRectangle tp,CRectangle bp, CRectangle lp, CRectangle rp, CRectangle up);
 	bool GetdPipe(void) { return m_bPipeDown; };
 	bool GetmPipe(void) { return m_bPipeMove; };

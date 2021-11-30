@@ -33,6 +33,7 @@ void CInformation::Initialize(float life)
 	m_bInfoCount = 150;
 	m_ChipSize = 16;
 	m_LIFE = 5 - life;
+	
 }
 
 void CInformation::Update(void)

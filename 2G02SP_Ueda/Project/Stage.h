@@ -14,8 +14,11 @@
 #define		CASTLELWINDOW 14
 #define		CASTLERWINDOW 15
 #define		NCHIPSIZE 16
+#define		ITEMBOX 3
+#define		ITEMBOXAFTER 4
 class CStage {
 private:
+	
 	CTexture				m_ChipTexture;
 	CTexture				m_BackTexture;
 	CTexture				m_InfoTexture;
@@ -25,6 +28,8 @@ private:
 	CRectangle m_lPipe;
 	CRectangle m_rPipe;
 	CRectangle m_uPipe;
+	
+	CPlayer* m_Player;
 
 	float					m_ChipSize;
 	int						m_XCount;
@@ -69,7 +74,7 @@ public:
 	CStage();
 	~CStage();
 	bool Load(char* pName, char* gpName);
-	void Initialize(CEnemy* pEnemy,CItem* pItem);
+	void Initialize(CPlayer* pPlayer, CEnemy* pEnemy,CItem* pItem);
 	void Update(CPlayer& pl);
 	void Render(void);
 	void RenderDebug(void);

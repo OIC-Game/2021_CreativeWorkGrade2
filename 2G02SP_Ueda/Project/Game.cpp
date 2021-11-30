@@ -1,7 +1,9 @@
 #include "Game.h"
 
 extern int						gChangeScene;
-CGame::CGame()
+CGame::CGame():
+	m_EnemyArray(),
+	m_ItemArray()
 {
 }
 
@@ -21,7 +23,7 @@ bool CGame::Load(void)
 void CGame::Initialize(void)
 {
     m_Player.Initialize();
-    m_Stage.Initialize(m_EnemyArray,m_ItemArray);
+    m_Stage.Initialize(&m_Player,m_EnemyArray,m_ItemArray);
 }
 
 void CGame::Update(void)

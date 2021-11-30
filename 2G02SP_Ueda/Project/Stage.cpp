@@ -185,7 +185,8 @@ bool CStage::Load(char* pName,char* gpName){
 	return true;
 }
 
-void CStage::Initialize(CEnemy* pEnemy,CItem* pItem){
+void CStage::Initialize(CPlayer* pPlayer, CEnemy* pEnemy,CItem* pItem){
+	m_Player = pPlayer;
 	m_bGoal = false;
 	m_bUnder = false;
 	m_bOn = false;
@@ -432,7 +433,14 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy)
 				oy += cr.Bottom - trec.Top;
 				r.Top += cr.Bottom - trec.Top;
 				r.Bottom += cr.Bottom - trec.Top;
-				m_pChipData[y * m_XCount + x] = 0;
+				if (cn == ITEMBOX)
+				{
+					m_pChipData[y * m_XCount + x] = 5;
+				}
+				else if (m_Player->GetbGiant() && cn != ITEMBOXAFTER)
+				{
+					m_pChipData[y * m_XCount + x] = 0;
+				}
 			}
 		}
 	}

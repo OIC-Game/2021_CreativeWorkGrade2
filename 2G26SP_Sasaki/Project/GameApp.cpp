@@ -117,7 +117,7 @@ MofBool CGameApp::Update(void){
 	{
 		if (g_pInput->IsKeyPush(MOFKEY_1))
 		{
-			for (int i = 0; i < ENEMYSHOT_COUNT; i++)
+			for (int i = 0; i < ENEMY_COUNT; i++)
 			{
 				g_EnemyArray[i].Damage(5);
 			}

@@ -7,9 +7,11 @@ class CPipe
 {
 private:
 	bool			m_bRoot;	//TRUE:行き来できる
+	int				m_InType;	//0 = 土管、1 = ドア
 	int				m_InId;		//入口のステージインデックス
-	int				m_InDir;	//入口の方向:0=↑、1=→、2=↓、3=←
+	int				m_InDir;	//入口の方向
 	CRectangle		m_In;		//入口の範囲
+	int				m_OutType;	//0 = 土管、1 = ドア
 	int				m_OutId;	//出口のステージインデックス
 	int				m_OutDir;	//出口の方向
 	CRectangle		m_Out;		//出口の範囲
@@ -19,12 +21,14 @@ public:
 	class PipeData {
 	public:
 		bool			Root;	//通行可否
+		int				Type;	//0 = 土管、1 = ドア
 		int				Id;		//ステージインデックス
 		int				Dir;	//方向
 		CRectangle		Rect;	//範囲
 
 		PipeData() :
 			Root(false),
+			Type(0),
 			Id(0),
 			Dir(0),
 			Rect()
@@ -34,7 +38,7 @@ public:
 	};
 
 	CPipe();
-	CPipe(bool _bRoot, int _InId, int _InDir, CRectangle _In, int _OutId, int _OutDir, CRectangle _Out);
+	CPipe(bool _bRoot, int _InType, int _InId, int _InDir, CRectangle _In, int _OutType, int _OutId, int _OutDir, CRectangle _Out);
 	~CPipe();
 
 	CPipe::PipeData CanToPassThrough(CPipe::PipeData in);

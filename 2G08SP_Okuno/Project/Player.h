@@ -5,6 +5,15 @@
 #include "Pipe.h"
 #include "SkillObj.h"
 
+enum t_PIPE_FLAGS {
+	PIPE_FLAG_UNKNOWN,
+	PIPE_FLAG_IN_NOW,
+	PIPE_FLAG_IN_END,
+	PIPE_FLAG_OUT_NOW,
+	PIPE_FLAG_OUT_END,
+
+};
+
 class CPlayer
 {
 private:
@@ -69,6 +78,7 @@ private:
 	float			m_DeadWait;
 	int				m_bDeadEnd;
 	bool			m_bPipe;
+	bool			m_bPipeIn;
 	bool			m_bGoal;		//ゴールフラグ
 	float			m_DmgTime;		//ダメージを受けた場合の無敵時間
 	int				m_Life;			//マリオのライフ
@@ -121,8 +131,10 @@ public:
 	/// <returns>ゴールの処理が終わったどうか</returns>
 	bool GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPlay);
 
-	bool PipeInFn(CPipe::PipeData pipe);
-	bool PipeOutFn(CPipe::PipeData pipe);
+	int PipeInFn(CPipe::PipeData pipe);
+	int PipeInFn_Door(CPipe::PipeData pipe);
+	int PipeOutFn(CPipe::PipeData pipe);
+	int PipeOutFn_Door(CPipe::PipeData pipe);
 
 	bool DeadFn();
 

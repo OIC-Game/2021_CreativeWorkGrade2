@@ -39,6 +39,7 @@ bool CPlayer::Load(CTexture* tex, CTexture* skillTex, CSoundBuffer* sounds)
 void CPlayer::Initialize(Vector2 pos, int life)
 {
 	m_Pos = pos;
+	m_bPipe = false;
 	m_JumpStatus = OnGround;
 	m_TypeIdx = 0;
 	m_JumpSp = 0;
@@ -546,10 +547,14 @@ bool CPlayer::GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPla
 	return true;
 }
 
-bool CPlayer::PipeInFn(CPipe::PipeData pipe)
+int CPlayer::PipeInFn(CPipe::PipeData pipe)
 {
+	if (pipe.Type == 1) {
+		return PipeInFn_Door(pipe);
+	}
 	if (!m_bPipe) {
 		m_bPipe = true;
+		m_bPipeIn = false;
 		if ((pipe.Dir & BlockRight) == BlockRight) {
 			m_Pos.x = pipe.Rect.Left - GetRect(false).GetWidth();
 			m_Pos.y = pipe.Rect.Bottom - GetRect(false).GetHeight();
@@ -566,64 +571,98 @@ bool CPlayer::PipeInFn(CPipe::PipeData pipe)
 			m_Pos.x = pipe.Rect.Left;
 			m_Pos.y = pipe.Rect.Bottom;
 		}
-		return false;
+		return PIPE_FLAG_IN_NOW;
+	}
+	else if (m_bPipeIn) {
+		return PIPE_FLAG_IN_END;
 	}
 	if ((pipe.Dir & BlockRight) == BlockRight) {
 		if (m_Pos.x < pipe.Rect.Left) {
 			m_Pos.x += 1.0f;
-			return false;
+			return PIPE_FLAG_IN_NOW;
 		}
 	}
 	else if ((pipe.Dir & BlockDown) == BlockDown) {
 		if (m_Pos.y < pipe.Rect.Top) {
 			m_Pos.y += 1.0f;
-			return false;
+			return PIPE_FLAG_IN_NOW;
 		}
 	}
 	else if ((pipe.Dir & BlockLeft) == BlockLeft) {
 		if (m_Pos.x > pipe.Rect.Right) {
 			m_Pos.x -= 1.0f;
-			return false;
+			return PIPE_FLAG_IN_NOW;
 		}
 	}
 	else {
 		if (m_Pos.y > pipe.Rect.Bottom) {
 			m_Pos.y -= 1.0f;
-			return false;
+			return PIPE_FLAG_IN_NOW;
 		}
 	}
-	return true;
+
+	m_bPipeIn = true;
+	return PIPE_FLAG_IN_END;
 }
 
-bool CPlayer::PipeOutFn(CPipe::PipeData pipe)
+int CPlayer::PipeInFn_Door(CPipe::PipeData pipe)
 {
-	if (!m_bPipe) return true;
+	if (!m_bPipe) {
+		m_bPipe = true;
+		m_bPipeIn = false;
+		m_Pos.x = pipe.Rect.Left - GetRect(false).GetWidth();
+		m_Pos.y = pipe.Rect.Bottom - GetRect(false).GetHeight();
+		return PIPE_FLAG_IN_NOW;
+	}
+	else if (m_bPipeIn) {
+		return PIPE_FLAG_OUT_NOW;
+	}
+	if (m_Pos.x < pipe.Rect.Left) {
+		m_Pos.x += 1.0f;
+		return PIPE_FLAG_IN_NOW;
+	}
+	m_bPipeIn = true;
+	return PIPE_FLAG_IN_END;
+}
+
+int CPlayer::PipeOutFn(CPipe::PipeData pipe)
+{
+	if (!m_bPipe) return PIPE_FLAG_OUT_END;
+	if (pipe.Type == 1) {
+		return PipeOutFn_Door(pipe);
+	}
 	if ((pipe.Dir & BlockRight) == BlockRight) {
 		if (m_Pos.x + GetRect(false).GetWidth() > pipe.Rect.Left) {
 			m_Pos.x -= 1.0f;
-			return false;
+			return PIPE_FLAG_OUT_NOW;
 		}
 	}
 	else if ((pipe.Dir & BlockDown) == BlockDown) {
 		if (m_Pos.y + GetRect(false).GetHeight() > pipe.Rect.Top) {
 			m_Pos.y -= 1.0f;
-			return false;
+			return PIPE_FLAG_OUT_NOW;
 		}
 	}
 	else if ((pipe.Dir & BlockLeft) == BlockLeft) {
 		if (m_Pos.x < pipe.Rect.Right) {
 			m_Pos.x += 1.0f;
-			return false;
+			return PIPE_FLAG_OUT_NOW;
 		}
 	}
 	else {
 		if (m_Pos.y < pipe.Rect.Bottom) {
 			m_Pos.y += 1.0f;
-			return false;
+			return PIPE_FLAG_OUT_NOW;
 		}
 	}
 	m_bPipe = false;
-	return true;
+	return PIPE_FLAG_OUT_END;
+}
+
+int CPlayer::PipeOutFn_Door(CPipe::PipeData pipe)
+{
+	m_bPipe = false;
+	return PIPE_FLAG_OUT_END;
 }
 
 bool CPlayer::DeadFn()

@@ -81,19 +81,21 @@ bool CStageParent::Load(std::string fname, CSoundBuffer* skillSound)
 
 	m_PipeArray = new CPipe[m_PipeCount];
 	for (int i = 0; i < m_PipeCount; i++) {
+		int inType = atoi(strtok(NULL, ","));
 		int inId = atoi(strtok(NULL, ","));
 		float inX = atof(strtok(NULL, ",")) * CHIPSIZE;
 		float inY = atof(strtok(NULL, ",")) * CHIPSIZE;
 		int inDir = atoi(strtok(NULL, ","));
 
+		int outType = atoi(strtok(NULL, ","));
 		int outId = atoi(strtok(NULL, ","));
 		float outX = atof(strtok(NULL, ",")) * CHIPSIZE;
 		float outY = atof(strtok(NULL, ",")) * CHIPSIZE;
 		int outDir = atoi(strtok(NULL, ","));
 
 		m_PipeArray[i] = CPipe(false,
-			inId, inDir, CRectangle(inX, inY, inX + CHIPSIZE, inY + CHIPSIZE),
-			outId, outDir, CRectangle(outX, outY, outX + CHIPSIZE, outY + CHIPSIZE));
+			inType, inId, inDir, CRectangle(inX, inY, inX + CHIPSIZE, inY + CHIPSIZE),
+			outType, outId, outDir, CRectangle(outX, outY, outX + CHIPSIZE, outY + CHIPSIZE));
 
 	}
 
@@ -163,30 +165,36 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 	}
 
 	if (m_PipeFlg) {
-		bool psFlg = m_StageCursor == m_ThroughPipe.GetOutPipe().Id;
-		if (psFlg || pl.PipeInFn(m_ThroughPipe.GetInPipe())) {
+		/*bool psFlg = m_StageCursor == m_ThroughPipe.GetOutPipe().Id && m_ThroughPipe.GetInPipe().Id != m_ThroughPipe.GetOutPipe().Id;
+		if (psFlg) {
 			if (pl.PipeOutFn(m_ThroughPipe.GetOutPipe())) {
 				m_PipeFlg = false;
 			}
 		}
-		else {
-			if (pl.PipeInFn(m_ThroughPipe.GetInPipe())) {
+		else {*/
+		int flg = pl.PipeInFn(m_ThroughPipe.GetInPipe());
+			if (flg == PIPE_FLAG_IN_END) {
 				CPipe::PipeData p = m_ThroughPipe.GetOutPipe();
 				m_StageCursor = p.Id; //現在のステージを移動先のステージに
 
 				/*マリオの大きさと土管の向きに合わせて移動先の位置を変える*/
 				CVector2 v(p.Rect.Left, p.Rect.Top);
-				if ((p.Dir & BlockRight) == BlockRight) {
-					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
+				if (p.Type == 0) {
+					if ((p.Dir & BlockRight) == BlockRight) {
+						v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
+					}
+					else if ((p.Dir & BlockDown) == BlockDown) {
+						v.y = p.Rect.Top;
+					}
+					else if ((p.Dir & BlockLeft) == BlockLeft) {
+						v.x = p.Rect.Right - pl.GetRect(false).GetWidth();
+						v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
+					}
+					else {
+						v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
+					}
 				}
-				else if ((p.Dir & BlockDown) == BlockDown) {
-					v.y = p.Rect.Top;
-				}
-				else if ((p.Dir & BlockLeft) == BlockLeft) {
-					v.x = p.Rect.Right - pl.GetRect(false).GetWidth();
-					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
-				}
-				else {
+				else if (p.Type == 1) {
 					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
 				}
 
@@ -195,7 +203,12 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 				pl.ChangeStage(v); //プレイヤーにステージが切り替わったことを伝える
 				pl.SetStageHeight(GetStageHeight()); //ステージの高さを更新する
 			}
-		}
+			else if (flg == PIPE_FLAG_OUT_NOW) {
+				if (pl.PipeOutFn(m_ThroughPipe.GetOutPipe()) == PIPE_FLAG_OUT_END) {
+					m_PipeFlg = false;
+				}
+			}
+		//}
 		return;
 	}
 

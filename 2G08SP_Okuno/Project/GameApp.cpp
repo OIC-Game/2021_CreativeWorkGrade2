@@ -150,6 +150,7 @@ MofBool CGameApp::Render(void) {
 		break;
 	case SCENE_GAME:
 		g_Game.Render();
+		//g_Game.RenderDebug();
 		break;
 	case SCENE_SETTING:
 		g_SettingWin.Render();

@@ -233,6 +233,12 @@ void CGame::Render()
 
 		CGraphicsUtilities::RenderString(10, 10, "ÉQÅ[ÉÄ");
 		CGraphicsUtilities::RenderString(300, 10, "LIFEÅ~%d TIME %3.0f", m_Player.GetLife(), m_Time);
+
+		if (m_Time <= 0) {
+			CRectangle tRect;
+			CGraphicsUtilities::CalculateStringRect(0, 0, "TIME UP", tRect);
+			CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() / 2 - tRect.Right / 2, g_pGraphics->GetTargetHeight() / 2 - tRect.Bottom / 2, "TIME UP");
+		}
 	}
 	m_renderTime = timeGetTime() - m_renderTime;
 }

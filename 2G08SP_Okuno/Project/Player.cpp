@@ -210,6 +210,7 @@ void CPlayer::Update(float wx, float wy)
 			}
 			for (int i = 0; i < 2; i++) {
 				if (!m_SkillObj[i].Fire(f_pos, f_move)) continue;
+				m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_ACTION);
 				m_SoundArray[SOUND_FIRE].Play();
 				break;
 			}
@@ -234,7 +235,7 @@ void CPlayer::Update(float wx, float wy)
 			m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_JUMP);
 		}
 	}
-	else {
+	else if (m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_ACTION || m_Motion.IsEndMotion()) {
 		if (m_Move.x != 0) {
 			if (m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_DASH) {
 				m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_DASH);
@@ -555,6 +556,8 @@ int CPlayer::PipeInFn(CPipe::PipeData pipe)
 	if (!m_bPipe) {
 		m_bPipe = true;
 		m_bPipeIn = false;
+		m_Move.x = 0;
+		m_Move.y = 0;
 		if ((pipe.Dir & BlockRight) == BlockRight) {
 			m_Pos.x = pipe.Rect.Left - GetRect(false).GetWidth();
 			m_Pos.y = pipe.Rect.Bottom - GetRect(false).GetHeight();
@@ -574,7 +577,7 @@ int CPlayer::PipeInFn(CPipe::PipeData pipe)
 		return PIPE_FLAG_IN_NOW;
 	}
 	else if (m_bPipeIn) {
-		return PIPE_FLAG_IN_END;
+		return PIPE_FLAG_OUT_NOW;
 	}
 	if ((pipe.Dir & BlockRight) == BlockRight) {
 		if (m_Pos.x < pipe.Rect.Left) {
@@ -610,16 +613,14 @@ int CPlayer::PipeInFn_Door(CPipe::PipeData pipe)
 	if (!m_bPipe) {
 		m_bPipe = true;
 		m_bPipeIn = false;
-		m_Pos.x = pipe.Rect.Left - GetRect(false).GetWidth();
+		m_Move.x = 0;
+		m_Move.y = 0;
+		m_Pos.x = pipe.Rect.Left;
 		m_Pos.y = pipe.Rect.Bottom - GetRect(false).GetHeight();
 		return PIPE_FLAG_IN_NOW;
 	}
 	else if (m_bPipeIn) {
 		return PIPE_FLAG_OUT_NOW;
-	}
-	if (m_Pos.x < pipe.Rect.Left) {
-		m_Pos.x += 1.0f;
-		return PIPE_FLAG_IN_NOW;
 	}
 	m_bPipeIn = true;
 	return PIPE_FLAG_IN_END;

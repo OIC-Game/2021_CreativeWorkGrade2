@@ -488,6 +488,8 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 	er.Top = er.Bottom - 1;
 	er.Expansion(-6, 0);
 	CRectangle erec = ene.GetRect();
+
+	CRectangle Lefterec = ene.Left();
 	
 	
 	if (er.CollisionRect(erec))
@@ -515,6 +517,10 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 			m_endSound.Play();
 			return true;
 		}
+	}
+	if (er.CollisionRect(Lefterec))
+	{
+		ene.KameMove(m_bReverse);
 	}
 	return false;
 }

@@ -21,10 +21,12 @@ private:
 	float						m_PosY;
 	float						m_MoveX;
 	float						m_MoveY;
+	float						m_MoveKameX;
 	bool						m_bShow;
 	bool						m_bMove;
 	bool						m_bReverse;
 	bool						m_bKame;
+	bool						m_bDamege;
 	bool						m_bDead;
 	int							m_DamageWait;
 	CRectangle					m_SrcRect;
@@ -36,6 +38,14 @@ private:
 
 		MOTION_COUNT,
 	};
+
+	enum tag_MOTION2 {
+		MOTION2_MOVE,
+		MOTION2_DEATH,
+		MOTION2_KAME,
+
+		MOTION2_COUNT,
+	};
 public:
 	CEnemy();
 	~CEnemy();
@@ -45,9 +55,9 @@ public:
 	void RenderDebug(float wx, float wy);
 	void Release();
 	void CollisionStage(float ox, float oy);
-	void CollisonEnemy(void);
 	void SetTexture(CTexture* pt) { m_pTexture = pt; }
 	bool GetShow(void) { return m_bShow; }
+	//bool GetDamege(void) { return m_bDamege; }
 	int GetType(void) { return m_Type; }
 	bool GetDead(void) { return m_bDead; }
 	CRectangle GetRect() {
@@ -63,7 +73,6 @@ public:
 	}
 
 	void Damege(void);
-
-	void CollisionPlayer(bool reverse);
+	void KameMove(bool reverse);
 };
 

@@ -22,27 +22,62 @@ void CEnemy::Initialize(float px, float py, int type){
 	m_PosY = py;
 	m_MoveX = -1.0f;
 	m_MoveY = 0.0f;
+	m_MoveKameX = -6.0f;
 	m_bShow = true;
 	m_bMove = false;
 	m_bKame = false;
+	m_bDamege = true;
 	m_bDead = false;
 	m_DamageWait = 10;
-	//アニメーションを作成
-	SpriteAnimationCreate anim[] = {
-		{
-			"移動",
-			0,0,
-			32,32,
-			TRUE,{{5,0,0},{5,1,0}}
-		},
-		{
-			"死亡",
-			96,0,
-			32,32,
-			FALSE,{{5,0,0}}
-		},
-	};
-	m_Motion.Create(anim, MOTION_COUNT);
+	switch (GetType())
+	{
+		case ENEMY_01:
+		//アニメーションを作成
+		SpriteAnimationCreate anim[] = {
+			{
+				"移動",
+				0,0,
+				32,32,
+				TRUE,{{5,0,0},{5,1,0}}
+			},
+			{
+				"死亡",
+				96,0,
+				32,32,
+				FALSE,{{5,0,0}}
+			},
+		};
+		m_Motion.Create(anim, MOTION_COUNT);
+		break;
+	}
+
+	switch (GetType())
+	{
+		case ENEMY_02:
+		//アニメーションを作成
+		SpriteAnimationCreate anim2[] = {
+			{
+				"移動",
+				0,0,
+				32,44,
+				TRUE,{{5,0,0},{5,1,0}}
+			},
+			{
+				"死亡",
+				64,0,
+				32,44,
+				FALSE,{{5,0,0}}
+			},
+			{
+				"カメ",
+				96,0,
+				32,44,
+				FALSE,{{5,0,0}}
+			},
+		};
+		m_Motion.Create(anim2, MOTION2_COUNT);
+		break;
+	}
 }
 
 void CEnemy::Update(float wx, float wy){
@@ -61,7 +96,10 @@ void CEnemy::Update(float wx, float wy){
 	}
 	if (m_PosX - wx < 1100)
 	{
-		m_bMove = true;
+		if (!m_bKame)
+		{
+			m_bMove = true;
+		}
 	}
 
 	//重力により下に少しずつ下がる
@@ -73,7 +111,15 @@ void CEnemy::Update(float wx, float wy){
 	//実際に座標を移動させる
 	if (m_bMove)
 	{
-		m_PosX += m_MoveX;
+		if (m_bKame)
+		{
+			m_PosX += m_MoveKameX;
+		}
+		else
+		{
+			m_PosX += m_MoveX;
+
+		}
 		m_PosY += m_MoveY;
 	}
 	//アニメーションの更新
@@ -144,10 +190,17 @@ void CEnemy::CollisionStage(float ox, float oy){
 		m_MoveX *= -1;
 		m_bReverse = false;
 	}
-}
-
-void CEnemy::CollisonEnemy(void){
-	
+	//左移動中の左埋まり、右移動中の右埋まりの場合は移動を初期化する。
+	else if (ox < 0 && m_MoveKameX > 0)
+	{
+		m_MoveKameX *= -1;
+		m_bReverse = true;
+	}
+	else if (ox > 0 && m_MoveKameX < 0)
+	{
+		m_MoveKameX *= -1;
+		m_bReverse = false;
+	}
 }
 
 void CEnemy::Damege(void){
@@ -159,15 +212,19 @@ void CEnemy::Damege(void){
 			return;
 			break;
 		case ENEMY_02:
-			//m_Motion.ChangeMotion()
+			m_Motion.ChangeMotion(MOTION_DEATH);
 			m_bKame = true;
 			m_bMove = false;
+			m_bDamege = false;
 			return;
 			break;
 	}
 }
 
-void CEnemy::CollisionPlayer(bool reverse){
-	m_bReverse = reverse;
+void CEnemy::KameMove(bool reverse){
 	m_bMove = true;
+	m_bDamege = true;
+	m_bReverse = reverse;
+
 }
+

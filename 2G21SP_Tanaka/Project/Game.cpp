@@ -18,7 +18,7 @@ bool CGame::Load(void){
 	switch (gStage)
 	{
 		case STAGENO_01:
-		m_Stage.Load("Stage01.txt");
+		m_Stage.Load("Stage03.txt");
 		break;
 		case STAGENO_02:
 		m_Stage.Load("Stage02.txt");
@@ -42,7 +42,7 @@ void CGame::Initialize(void){
 	switch (gStage)
 	{
 		case STAGENO_01:
-			m_Stage.Initialize("Stage01.txt", m_EnemyArray, m_ItemArray);
+			m_Stage.Initialize("Stage03.txt", m_EnemyArray, m_ItemArray);
 			break;
 		case STAGENO_02:
 			m_Stage.Initialize("Stage02.txt", m_EnemyArray, m_ItemArray);

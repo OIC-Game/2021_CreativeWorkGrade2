@@ -334,7 +334,7 @@ void CGame::DropUpdate()
 	//ç∂Ç…à⁄ìÆ
 	if (g_pInput->IsKeyPush(MOFKEY_A) &&
 		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top || m_sFldPos.y == 0) ||
+			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
 			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
 				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
 				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
@@ -350,7 +350,7 @@ void CGame::DropUpdate()
 	}
 	else if (g_pInput->IsKeyHold(MOFKEY_A) &&
 		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top || m_sFldPos.y == 0) ||
+			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
 			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
 				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
 				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
@@ -374,7 +374,7 @@ void CGame::DropUpdate()
 	//âEÇ…à⁄ìÆ
 	if (g_pInput->IsKeyPush(MOFKEY_D) &&
 		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top || m_sFldPos.y == 0) ||
+			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
 			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
 				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
 				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
@@ -390,7 +390,7 @@ void CGame::DropUpdate()
 	}
 	else if (g_pInput->IsKeyHold(MOFKEY_D) &&
 		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top || m_sFldPos.y == 0) ||
+			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
 			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
 				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
 				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
@@ -482,11 +482,7 @@ void CGame::DropUpdate()
 			m_spin.x = 0;
 			m_spin.y = -PUYO_SIZE;
 		}
-		//ç∂âEÇ…ï«Ç‚Ç’ÇÊÇ™Ç†ÇËâÒì]Ç™çsÇ¶Ç»Ç©Ç¡ÇΩèÍçá
-		else
-		{
-			
-		}
+
 
 		//âÒì]âπ
 		m_rotateSound.Play();

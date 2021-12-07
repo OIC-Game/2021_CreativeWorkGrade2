@@ -11,7 +11,7 @@ m_PosX(0.0f),
 m_PosY(0.0f),
 m_MoveX(0.0f),
 m_MoveY(0.0f),
-m_bShow(false),
+m_bShow(true),
 m_bReverse(false),
 m_SrcRect(){
 }
@@ -33,6 +33,7 @@ void CEnemy::Initialize(float px, float py, int type) {
 	m_bReverse = true;
 	m_bShow = true;
 	m_DamageWait = 0;
+	
 
 
 	//アニメーションを作成
@@ -146,6 +147,9 @@ void CEnemy::CollisionStage(float ox, float oy) {
 
 
 void CEnemy::Render(float wx, float wy) {
+
+
+
 	//非表示
 	if (!m_bShow)
 	{
@@ -194,10 +198,9 @@ void CEnemy::Release(void) {
 
 bool CEnemy::CollisionPlayer()
 {
-
+	
 	if (gPlayer.GetCollisionFlg())
 	{		
-		m_Motion.ChangeMotion(MOTION_DAMAGE);
 		return true;
 	}
 	return false;
@@ -207,4 +210,7 @@ bool CEnemy::CollisionPlayer()
 void CEnemy::Damage()
 {
 	m_Motion.ChangeMotion(MOTION_DAMAGE);
+
+		m_bShow = false;
+			
 }

@@ -25,6 +25,9 @@ private:
 	CRectangle				m_SrcRect;
 	int						m_DamageWait;
 
+	bool					m_DeadFlg;
+	float Count ;
+
 
 
 	//モーション種類定義
@@ -58,13 +61,11 @@ public:
 		return CRectangle(m_PosX - 5, m_PosY - 1, m_PosX + m_SrcRect.GetWidth() - 5, m_PosY);
 	}
 
-	
 	int GetDamageWait(void) { return m_DamageWait;}
 
 		//敵の頭とプレイヤーの足元との当たり判定
 	   bool CollisionPlayer();
 	   void Damage();
    
-
 };
 

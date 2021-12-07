@@ -50,7 +50,7 @@ if(!HP3.Load("Heart_3.png"))
 			"待機",  
 			0,8,
 			30,35,
-			TRUE,{{10,0,0},{10,1,0},{10,2,0}}
+			FALSE,{{10,0,0},{10,1,0},{10,2,0}}
 		},
 		{
 			"移動",
@@ -192,7 +192,7 @@ void CPlayer::UpdateKey(void)
 
 	if (JumpFlg == false)
 	{
-		m_Motion.ChangeMotion(MOTION_WAIT);
+		m_Motion.ChangeMotion(MOTION_MOVE);
 	}
 	
 }
@@ -273,13 +273,6 @@ void CPlayer::CollisionStage(float ox, float oy)
 void CPlayer::Render(float wx, float wy)
 {
 
-	/*if (CollisionEneHed)
-	{
-		CGraphicsUtilities::RenderString(100, 100, "当たっている！！", MOF_COLOR_BLACK);
-	}*/
-
-
-
 	//インターバル2フレームごとに描画をしない
 	if (m_DamageWait % 4 >= 2)
 	{
@@ -346,15 +339,10 @@ void CPlayer::Release(void)
 }
 
 
-
-
-
-
 float CPlayer::GetPosY()
 {
 	return py;
 }
-
 
 
 //敵との当たり判定
@@ -370,17 +358,11 @@ bool CPlayer::CollisionEnemyBody(CEnemy& ene)
 	{
 		return false;
 	}
-	//敵の矩形と自分の矩形でダメージ
+	//敵の矩形と自分の矩形の当たり判定
 	CRectangle prec = GetRect();
 	CRectangle erec = ene.GetRect();
 	if (prec.CollisionRect(erec))
-	{
-		m_DamageWait = 60;
-		if (LifeCount > 0)
-		{
-			LifeCount--;
-		}
-
+	{	
 		if (prec.Left < erec.Left)
 		{
 			vx = -5.0f;
@@ -391,8 +373,9 @@ bool CPlayer::CollisionEnemyBody(CEnemy& ene)
 			vx = 5.0f;
 			m_bReverse = true;
 		}
-		
+		return true;
 	}
+	return false;
 }
 
 void CPlayer::Damage(void)
@@ -408,21 +391,23 @@ void CPlayer::Damage(void)
 
 bool CPlayer::CollisionEnemyHed(CEnemy& ene)
 {
+	
 
 	CRectangle plrec=GetLegRect();
 	CRectangle ehrec=ene.GetHedRect();
 
-	if (plrec.CollisionRect(ehrec))
-	{
-		m_HedCollFlg = true;
-	}
+	
+		if (plrec.CollisionRect(ehrec))
+		{
+			return true;
+		}
 	return false;
 }
+
 
 void CPlayer::CollisionJump(void)
 {
 	m_Motion.ChangeMotion(MOTION_JUMP);
-
 	JumpSpd = -10;
 }
 

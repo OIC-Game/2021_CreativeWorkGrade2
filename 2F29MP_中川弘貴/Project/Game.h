@@ -14,10 +14,10 @@
 #define		PUYO_SPEED				5
 //初期位置
 #define		INIT_POSITION_X			200.0f
-#define		INIT_POSITION_Y			100.0f
+#define		INIT_POSITION_Y			150.0f
 //フィールド座標
 #define		INIT_FIELD_POSITION_X	3
-#define		INIT_FIELD_POSITION_Y	0
+#define		INIT_FIELD_POSITION_Y	1
 //スピン初期値
 #define		INIT_SPIN_X				0
 #define		INIT_SPIN_Y				-50.0f
@@ -27,6 +27,8 @@
 #define		INIT_HOLD_TIME			10
 //操作不能待ち時間
 #define		WAIT_TIME				20
+//クイックターン入力受付時間
+#define		QUICKTURN_RECEIPTION_TIME	20
 
 enum Type
 {
@@ -80,7 +82,7 @@ private:
 
 	//自動落下まで待つ変数
 	int			m_dropTimeCnt;
-	int			m_leftRotateTimeCnt;
+	int			m_rotateTimeCnt;
 	//また後で名前変える　　間を生み出すためタイム変数
 	int			m_waitTimeCnt;
 	//readyカウント
@@ -94,6 +96,9 @@ private:
 	int			m_maxChainCnt;
 	int			m_score;
 
+
+	//回転回数
+	int			m_rotateCnt;
 
 	//連鎖
 
@@ -163,6 +168,8 @@ public:
 	void ChainUpdate();
 	void ReStartUpdate();
 	void GameOverUpdate();
+	void Movement();
+	void Rotate();
 	void Render(void);
 	void Release(void);
 };

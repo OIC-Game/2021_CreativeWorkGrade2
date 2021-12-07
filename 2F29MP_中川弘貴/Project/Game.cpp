@@ -167,6 +167,8 @@ void CGame::Initialize(void)
 	m_sFldPos.x = INIT_FIELD_POSITION_X;
 	m_sFldPos.y = INIT_FIELD_POSITION_Y;
 	m_eRotation = Rotation::Top;
+	m_rotateTimeCnt = QUICKTURN_RECEIPTION_TIME;
+	m_rotateCnt = 0;
 	m_endFlg = false;
 
 	fade.FadeIn();
@@ -331,217 +333,10 @@ void CGame::DropUpdate()
 		m_dropTimeCnt--;
 	}
 
-	//左に移動
-	if (g_pInput->IsKeyPush(MOFKEY_A) &&
-		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
-				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
-	{
-		//移動音
-		m_moveSound.Play();
+	Movement();
 
-		m_leftHoldTimeCnt = INIT_HOLD_TIME;
-		//左に一マス動かす
-		m_pos.x -= PUYO_SIZE;
-		m_sFldPos.x -= 1;
-	}
-	else if (g_pInput->IsKeyHold(MOFKEY_A) &&
-		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
-				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
-	{
-		if (m_leftHoldTimeCnt <= 0)
-		{
-			//移動音
-			m_moveSound.Play();
+	Rotate();
 
-			m_pos.x -= PUYO_SIZE;
-			m_sFldPos.x -= 1;
-			m_leftHoldTimeCnt = PUYO_SPEED;
-		}
-		else
-		{
-			m_leftHoldTimeCnt--;
-		}
-	}
-
-	//右に移動
-	if (g_pInput->IsKeyPush(MOFKEY_D) &&
-		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
-				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
-	{
-		//移動音
-		m_moveSound.Play();
-
-		m_rightHoldTimeCnt = INIT_HOLD_TIME;
-		//右に一マス動かす
-		m_pos.x += PUYO_SIZE;
-		m_sFldPos.x += 1;
-	}
-	else if (g_pInput->IsKeyHold(MOFKEY_D) &&
-		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
-				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
-	{
-		if (m_rightHoldTimeCnt <= 0)
-		{
-			//移動音
-			m_moveSound.Play();
-
-			m_pos.x += PUYO_SIZE;
-			m_sFldPos.x += 1;
-			m_rightHoldTimeCnt = PUYO_SPEED;
-		}
-		else
-		{
-			m_rightHoldTimeCnt--;
-		}
-	}
-
-	//キーによって下に移動(1マス)
-	if (g_pInput->IsKeyPush(MOFKEY_S))
-	{
-		m_downHoldTimeCnt = INIT_HOLD_TIME;
-		//押したときに1マス落とす
-		m_dropTimeCnt = -1;
-	}
-	//キーによって下に移動(高速降下)
-	else if (g_pInput->IsKeyHold(MOFKEY_S))
-	{
-		if (m_downHoldTimeCnt <= 0) {
-			//長押しで高速降下
-			m_dropTimeCnt -= PUYO_SPEED * 3;
-		}
-		else
-		{
-			m_downHoldTimeCnt--;
-		}
-	}
-
-	//回転・左方向
-	if (g_pInput->IsKeyPush(MOFKEY_J))
-	{
-		if (m_eRotation == Top)
-		{
-			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
-				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
-			{
-				if (m_field[m_sFldPos.y][m_sFldPos.x - 1] != Empty)
-				{
-					m_pos.x += PUYO_SIZE;
-					m_sFldPos.x += 1;
-				}
-				m_eRotation = Left;
-				m_spin.x = -PUYO_SIZE;
-				m_spin.y = 0;
-			}
-
-		}
-		else if (m_eRotation == Left)
-		{
-			if (m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty)
-			{
-				m_pos.y -= PUYO_SIZE;
-				m_sFldPos.y -= 1;
-			}
-			m_eRotation = Bottom;
-			m_spin.x = 0;
-			m_spin.y = PUYO_SIZE;
-		}
-		else if (m_eRotation == Bottom)
-		{
-			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
-				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
-			{
-				if (m_field[m_sFldPos.y][m_sFldPos.x + 1] != Empty)
-				{
-					m_pos.x -= PUYO_SIZE;
-					m_sFldPos.x -= 1;
-				}
-				m_eRotation = Right;
-				m_spin.x = PUYO_SIZE;
-				m_spin.y = 0;
-			}
-		}
-		else if (m_eRotation == Right)
-		{
-			m_eRotation = Top;
-			m_spin.x = 0;
-			m_spin.y = -PUYO_SIZE;
-		}
-
-
-		//回転音
-		m_rotateSound.Play();
-	}
-
-	//回転・右方向
-	if (g_pInput->IsKeyPush(MOFKEY_K))
-	{
-		if (m_eRotation == Top)
-		{
-			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
-				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
-			{
-				if (m_field[m_sFldPos.y][m_sFldPos.x + 1] != Empty)
-				{
-					m_pos.x -= PUYO_SIZE;
-					m_sFldPos.x -= 1;
-				}
-				m_eRotation = Right;
-				m_spin.x = PUYO_SIZE;
-				m_spin.y = 0;
-			}
-		}
-		else if (m_eRotation == Right)
-		{
-			if (m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty)
-			{
-				m_pos.y -= PUYO_SIZE;
-				m_sFldPos.y -= 1;
-			}
-			m_eRotation = Bottom;
-			m_spin.x = 0;
-			m_spin.y = PUYO_SIZE;
-		}
-		else if (m_eRotation == Bottom)
-		{
-			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
-				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
-			{
-				if (m_field[m_sFldPos.y][m_sFldPos.x - 1] != Empty)
-				{
-					m_pos.x += PUYO_SIZE;
-					m_sFldPos.x += 1;
-				}
-				m_eRotation = Left;
-				m_spin.x = -PUYO_SIZE;
-				m_spin.y = 0;
-			}
-		}
-		else if (m_eRotation == Left)
-		{
-			m_eRotation = Top;
-			m_spin.x = 0;
-			m_spin.y = -PUYO_SIZE;
-		}
-
-		//回転音
-		m_rotateSound.Play();
-	}
 }
 //ちぎり　浮いているぷよへの対処
 void CGame::TearUpdate()
@@ -703,13 +498,13 @@ void CGame::ReStartUpdate()
 	//連鎖音のピッチのリセット
 	m_chainSound.SetPitch(1.0f);
 
-	m_eFlow = Drop;
-	m_pos.x = 200.0f;
-	m_pos.y = 100.0f;
-	m_spin.x = 0.0f;
-	m_spin.y = -50.0f;
-	m_sFldPos.x = 3;
-	m_sFldPos.y = 0;
+	m_eFlow = Flow::Drop;
+	m_pos.x = INIT_POSITION_X;
+	m_pos.y = INIT_POSITION_Y;
+	m_spin.x = INIT_SPIN_X;
+	m_spin.y = INIT_SPIN_Y;
+	m_sFldPos.x = INIT_FIELD_POSITION_X;
+	m_sFldPos.y = INIT_FIELD_POSITION_Y;
 	m_eRotation = Rotation::Top;
 }
 //ゲームオーバー
@@ -720,6 +515,276 @@ void CGame::GameOverUpdate()
 		fade.FadeOut();
 		m_endFlg = true;
 
+	}
+}
+
+void CGame::Movement()
+{
+	//左に移動
+	if (g_pInput->IsKeyPush(MOFKEY_A) &&
+		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
+	{
+		//移動音
+		m_moveSound.Play();
+
+		m_leftHoldTimeCnt = INIT_HOLD_TIME;
+		//左に一マス動かす
+		m_pos.x -= PUYO_SIZE;
+		m_sFldPos.x -= 1;
+	}
+	else if (g_pInput->IsKeyHold(MOFKEY_A) &&
+		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
+	{
+		if (m_leftHoldTimeCnt <= 0)
+		{
+			//移動音
+			m_moveSound.Play();
+
+			m_pos.x -= PUYO_SIZE;
+			m_sFldPos.x -= 1;
+			m_leftHoldTimeCnt = PUYO_SPEED;
+		}
+		else
+		{
+			m_leftHoldTimeCnt--;
+		}
+	}
+
+	//右に移動
+	if (g_pInput->IsKeyPush(MOFKEY_D) &&
+		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
+	{
+		//移動音
+		m_moveSound.Play();
+
+		m_rightHoldTimeCnt = INIT_HOLD_TIME;
+		//右に一マス動かす
+		m_pos.x += PUYO_SIZE;
+		m_sFldPos.x += 1;
+	}
+	else if (g_pInput->IsKeyHold(MOFKEY_D) &&
+		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
+			(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
+	{
+		if (m_rightHoldTimeCnt <= 0)
+		{
+			//移動音
+			m_moveSound.Play();
+
+			m_pos.x += PUYO_SIZE;
+			m_sFldPos.x += 1;
+			m_rightHoldTimeCnt = PUYO_SPEED;
+		}
+		else
+		{
+			m_rightHoldTimeCnt--;
+		}
+	}
+
+	//キーによって下に移動(1マス)
+	if (g_pInput->IsKeyPush(MOFKEY_S))
+	{
+		m_downHoldTimeCnt = INIT_HOLD_TIME;
+		//押したときに1マス落とす
+		m_dropTimeCnt = -1;
+	}
+	//キーによって下に移動(高速降下)
+	else if (g_pInput->IsKeyHold(MOFKEY_S))
+	{
+		if (m_downHoldTimeCnt <= 0) {
+			//長押しで高速降下
+			m_dropTimeCnt -= PUYO_SPEED * 3;
+		}
+		else
+		{
+			m_downHoldTimeCnt--;
+		}
+	}
+}
+
+void CGame::Rotate()
+{
+	//回転・左方向
+	if (g_pInput->IsKeyPush(MOFKEY_J))
+	{
+		if (m_eRotation == Top)
+		{
+			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
+			{
+				if (m_field[m_sFldPos.y][m_sFldPos.x - 1] != Empty)
+				{
+					m_pos.x += PUYO_SIZE;
+					m_sFldPos.x += 1;
+				}
+				m_eRotation = Left;
+				m_spin.x = -PUYO_SIZE;
+				m_spin.y = 0;
+			}
+			else
+			{
+				m_rotateTimeCnt = QUICKTURN_RECEIPTION_TIME;
+				m_rotateCnt++;
+			}
+
+		}
+		else if (m_eRotation == Left)
+		{
+			if (m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty)
+			{
+				m_pos.y -= PUYO_SIZE;
+				m_sFldPos.y -= 1;
+			}
+			m_eRotation = Bottom;
+			m_spin.x = 0;
+			m_spin.y = PUYO_SIZE;
+		}
+		else if (m_eRotation == Bottom)
+		{
+			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
+			{
+				if (m_field[m_sFldPos.y][m_sFldPos.x + 1] != Empty)
+				{
+					m_pos.x -= PUYO_SIZE;
+					m_sFldPos.x -= 1;
+				}
+				m_eRotation = Right;
+				m_spin.x = PUYO_SIZE;
+				m_spin.y = 0;
+			}
+			else
+			{
+				m_rotateTimeCnt = QUICKTURN_RECEIPTION_TIME;
+				m_rotateCnt++;
+			}
+		}
+		else if (m_eRotation == Right)
+		{
+			m_eRotation = Top;
+			m_spin.x = 0;
+			m_spin.y = -PUYO_SIZE;
+		}
+
+
+		//回転音
+		m_rotateSound.Play();
+	}
+
+	//回転・右方向
+	if (g_pInput->IsKeyPush(MOFKEY_K))
+	{
+		if (m_eRotation == Top)
+		{
+			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
+			{
+				if (m_field[m_sFldPos.y][m_sFldPos.x + 1] != Empty)
+				{
+					m_pos.x -= PUYO_SIZE;
+					m_sFldPos.x -= 1;
+				}
+				m_eRotation = Right;
+				m_spin.x = PUYO_SIZE;
+				m_spin.y = 0;
+			}
+			else
+			{
+				m_rotateTimeCnt = QUICKTURN_RECEIPTION_TIME;
+				m_rotateCnt++;
+			}
+		}
+		else if (m_eRotation == Right)
+		{
+			if (m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty)
+			{
+				m_pos.y -= PUYO_SIZE;
+				m_sFldPos.y -= 1;
+			}
+			m_eRotation = Bottom;
+			m_spin.x = 0;
+			m_spin.y = PUYO_SIZE;
+		}
+		else if (m_eRotation == Bottom)
+		{
+			if (m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty ||
+				m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty)
+			{
+				if (m_field[m_sFldPos.y][m_sFldPos.x - 1] != Empty)
+				{
+					m_pos.x += PUYO_SIZE;
+					m_sFldPos.x += 1;
+				}
+				m_eRotation = Left;
+				m_spin.x = -PUYO_SIZE;
+				m_spin.y = 0;
+			}
+			else
+			{
+				m_rotateTimeCnt = QUICKTURN_RECEIPTION_TIME;
+				m_rotateCnt++;
+			}
+		}
+		else if (m_eRotation == Left)
+		{
+			m_eRotation = Top;
+			m_spin.x = 0;
+			m_spin.y = -PUYO_SIZE;
+		}
+
+		//回転音
+		m_rotateSound.Play();
+	}
+
+	//クイックターン
+	if (m_rotateCnt >= 2)
+	{
+		if (m_eRotation == Rotation::Top)
+		{
+			m_pos.y -= PUYO_SIZE;
+			m_sFldPos.y -= 1;
+
+			m_eRotation = Rotation::Bottom;
+			m_spin.y = PUYO_SIZE;
+			m_rotateCnt = 0;
+		}
+		else
+		{
+			m_pos.y += PUYO_SIZE;
+			m_sFldPos.y += 1;
+
+			m_eRotation = Rotation::Top;
+			m_spin.y = -PUYO_SIZE;
+			m_rotateCnt = 0;
+		}
+	}
+
+	if (m_rotateTimeCnt < 0)
+	{
+		m_rotateCnt = 0;
+	}
+	else
+	{
+		m_rotateTimeCnt--;
 	}
 }
 
@@ -854,7 +919,7 @@ void CGame::Render(void)
 	CGraphicsUtilities::RenderString(900, 210, MOF_COLOR_BLACK, "%d", m_maxChainCnt);
 
 	//開幕にブロックが見えないように、画面上部を隠す
-	//CGraphicsUtilities::RenderFillRect(BL, 50, BL * 9, BL * 2, MOF_COLOR_BLACK);
+	CGraphicsUtilities::RenderFillRect(BL, 50, BL * 9, BL * 2, MOF_COLOR_BLACK);
 
 	//escでポーズ
 	CGraphicsUtilities::RenderString(885, 12, MOF_COLOR_BLACK, "Pause[Esc]");

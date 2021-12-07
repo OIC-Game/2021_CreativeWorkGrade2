@@ -1,6 +1,7 @@
 #pragma once
 #include "Mof.h"
 #include "Puyo.h"
+#include<array>
 
 class CField
 {
@@ -12,7 +13,7 @@ private:
 
 	//int field[6][13];						//主配列　画面描写/ぷよ保持用
 	int altField[6][13];					//副配列　連結数計算に使用
-	int drop[2][3];							//操作中のぷよの座標・色を保持
+	int puyoCon[2][3];							//操作中のぷよの座標・色を保持
 	int next[2][2];							//２個先までのぷよの色を保持
 	int stock[2];							//ストック中のぷよの色を保持
 
@@ -38,7 +39,7 @@ private:
 	float dropTime = 2.0f;							//落下周期
 	int accelNum = 1500;							//dropTimeが減るスコアの倍数(数値*10で最高速)
 
-	float obstacleTime = 10.0f;						//おじゃまぷよの生成周期
+	float obstacleTime = 30.0f;						//おじゃまぷよの生成周期
 	int obstacleAmount = 2;							//生成数
 
 	int nowState;
@@ -61,11 +62,11 @@ public:
 	void Render();
 	void Release();
 
-	void Right();
-	void Left();
+	bool Right();
+	bool Left();
+	bool RRotate();
+	bool LRotate();
 	void Down();
-	void RRotate();
-	void LRotate();
 	void Stock();
 
 	bool CheckDelete(bool isCheck);
@@ -76,10 +77,11 @@ public:
 	void Set(int x, int y, int c);
 
 	void AddPuyo();
-	void SpeedCheck();
+	void ScoreCheck();
 	bool CheckStop();
 	bool CheckBottom(int x, int y);
 	void Wait();
+	void Banish();
 
 
 	bool CheckGameOver() { return !mainField[2][1].GetIsHide(); }
@@ -94,5 +96,8 @@ public:
 	float GetObstacleTime() { return obstacleTime; }
 	int GetObstacleAmount() { return obstacleAmount; }
 	int GetScore() { return score; }
-	void Banish();
+
+	std::array<int, 3> GetPuyoConM() { return { puyoCon[0][0],puyoCon[0][1],puyoCon[0][2] }; }
+	std::array<int, 3> GetPuyoConS() { return { puyoCon[1][0],puyoCon[1][1],puyoCon[1][2] }; }
+	std::array< std::array<int, 13>, 6> GetField();
 };

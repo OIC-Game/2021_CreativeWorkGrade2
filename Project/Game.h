@@ -1,6 +1,10 @@
 #pragma once
 #include "SceneBase.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <array>
+
 class CGame : public CSceneBase
 {
 private:
@@ -8,6 +12,8 @@ private:
 	float obstacleDTime = 0.0f;
 	float obstacleCreateTime = 10.0f;
 	CSoundBuffer gSound[2];
+
+	float aiControllTime = 0.0f;
 public:
 	CGame();
 	~CGame();

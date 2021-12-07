@@ -56,10 +56,16 @@ void CField::Render(void)
 {
 	if (isInv) invCnt++;
 
-	//落下ぷよ描写
-	for (int i = 0; i < 2; i++) {
-		if (drop[i][1] > 0) CGraphicsUtilities::RenderFillCircle(125 + 50 * drop[i][0], 50 + 50 * (drop[i][1] - 1), 25, color[drop[i][2] - 1]);
+	//操作ぷよ描写
+	for (int i = 0; i < 2; i++) 
+	{
+		if (puyoCon[i][1] > 0) CGraphicsUtilities::RenderFillCircle(125 + 50 * puyoCon[i][0], 50 + 50 * (puyoCon[i][1] - 1), 25, color[puyoCon[i][2] - 1]);
 	}
+
+	/*float cir = 0.0f * M_PI / 180;
+	CGraphicsUtilities::RenderCircle(200, 200, 1, MOF_XRGB(100, 100, 100));
+	GraphicsUtilities::RenderCircle((cos(cir) * 50) + 200, (sin(cir) * 50) + 200, 1, MOF_XRGB(0, 100, 100));*/
+
 	//場面ぷよ描写
 	for (int y = 0; y < 13; y++) {
 		for (int x = 0; x < 6; x++) {
@@ -102,43 +108,47 @@ void CField::Release(void)
 	}
 }
 
-void CField::Right(void) {
-	if (drop[0][0] != 5 && drop[1][0] != 5 &&
+bool CField::Right(void) {
+	if (puyoCon[0][0] != 5 && puyoCon[1][0] != 5 &&
 		//field[drop[0][0] + 1][drop[0][1]] == 0 && (drop[1][1] == -1 || field[drop[1][0] + 1][drop[1][1]] == 0))
-		mainField[drop[0][0] + 1][drop[0][1]].GetIsHide() && mainField[drop[1][0] + 1][drop[1][1]].GetIsHide())
+		mainField[puyoCon[0][0] + 1][puyoCon[0][1]].GetIsHide() && mainField[puyoCon[1][0] + 1][puyoCon[1][1]].GetIsHide())
 	{
-		drop[0][0]++;
-		drop[1][0]++;
+		puyoCon[0][0]++;
+		puyoCon[1][0]++;
 		//gSound[0].Play();
+		return true;
 	}
+	return false;
 }
 
-void CField::Left(void) {
-	if (drop[0][0] != 0 && drop[1][0] != 0 &&
+bool CField::Left(void) {
+	if (puyoCon[0][0] != 0 && puyoCon[1][0] != 0 &&
 		//field[drop[0][0] - 1][drop[0][1]] == 0 && (drop[1][1] == -1 || field[drop[1][0] - 1][drop[1][1]] == 0))
-		mainField[drop[0][0] - 1][drop[0][1]].GetIsHide() && mainField[drop[1][0] - 1][drop[1][1]].GetIsHide())
+		mainField[puyoCon[0][0] - 1][puyoCon[0][1]].GetIsHide() && mainField[puyoCon[1][0] - 1][puyoCon[1][1]].GetIsHide())
 	{
-		drop[0][0]--;
-		drop[1][0]--;
-		gSound[0].Play();
+		puyoCon[0][0]--;
+		puyoCon[1][0]--;
+		//gSound[0].Play();
+		return true;
 	}
+	return false;
 }
 
 void CField::Down(void) {
-	if (drop[0][1] != 12 && drop[1][1] != 12 &&
+	if (puyoCon[0][1] != 12 && puyoCon[1][1] != 12 &&
 		//field[drop[0][0]][drop[0][1] + 1] == 0 && field[drop[1][0]][drop[1][1] + 1] == 0)
-		mainField[drop[0][0]][drop[0][1] + 1].GetIsHide() && mainField[drop[1][0]][drop[1][1] + 1].GetIsHide())
+		mainField[puyoCon[0][0]][puyoCon[0][1] + 1].GetIsHide() && mainField[puyoCon[1][0]][puyoCon[1][1] + 1].GetIsHide())
 	{
-		drop[0][1]++;
-		drop[1][1]++;
+		puyoCon[0][1]++;
+		puyoCon[1][1]++;
 	}
 	else
 	{
 		isDropOnce = true;
-		Set(drop[0][0], drop[0][1], drop[0][2] - 1);
-		Set(drop[1][0], drop[1][1], drop[1][2] - 1);
-		drop[0][1] = -1;
-		drop[1][1] = -1;
+		Set(puyoCon[0][0], puyoCon[0][1], puyoCon[0][2] - 1);
+		Set(puyoCon[1][0], puyoCon[1][1], puyoCon[1][2] - 1);
+		puyoCon[0][1] = -1;
+		puyoCon[1][1] = -1;
 
 		//gSound[2].Play();
 
@@ -146,94 +156,103 @@ void CField::Down(void) {
 	}
 }
 
-void CField::RRotate(void) {
-	if (drop[0][0] == drop[1][0])
+bool CField::RRotate(void) {
+	if (puyoCon[0][0] == puyoCon[1][0])
 	{
-		if (drop[0][1] > drop[1][1])
+		if (puyoCon[0][1] > puyoCon[1][1])
 		{
-			if (drop[1][0] + 1 < 6 && drop[1][1] + 1 < 13 &&
+			if (puyoCon[1][0] + 1 < 6 && puyoCon[1][1] + 1 < 13 &&
 				//field[drop[1][0] + 1][drop[1][1] + 1] == 0)
-				mainField[drop[1][0] + 1][drop[1][1] + 1].GetIsHide())
+				mainField[puyoCon[1][0] + 1][puyoCon[1][1] + 1].GetIsHide())
 			{
-				drop[1][0]++;
-				drop[1][1]++;
-				gSound[1].Play();
+				puyoCon[1][0]++;
+				puyoCon[1][1]++;
+				//gSound[1].Play();
+				return true;
 			}
-
 		}
-		else if (drop[1][0] - 1 >= 0 &&
+		else if (puyoCon[1][0] - 1 >= 0 &&
 			//field[drop[1][0] - 1][drop[1][1] - 1] == 0)
-			mainField[drop[1][0]][drop[1][1] - 1].GetIsHide())
+			mainField[puyoCon[1][0]][puyoCon[1][1] - 1].GetIsHide())
 		{
-			drop[1][0]--;
-			drop[1][1]--;
+			puyoCon[1][0]--;
+			puyoCon[1][1]--;
 			//gSound[1].Play();
+			return true;
 		}
 	}
-	else if (drop[0][0] > drop[1][0])
+	else if (puyoCon[0][0] > puyoCon[1][0])
 	{
-		if (drop[1][0] + 1 < 6 &&
+		if (puyoCon[1][0] + 1 < 6 &&
 			//(drop[1][1] - 1 == -1 || field[drop[1][0] + 1][drop[1][1] - 1] == 0))
-			mainField[drop[1][0] + 1][drop[1][1] - 1].GetIsHide())
+			mainField[puyoCon[1][0] + 1][puyoCon[1][1] - 1].GetIsHide())
 		{
-			drop[1][0]++;
-			drop[1][1]--;
+			puyoCon[1][0]++;
+			puyoCon[1][1]--;
 			//gSound[1].Play();
+			return true;
 		}
-
 	}
-	else if (drop[1][0] - 1 >= 0 && drop[1][1] + 1 < 13 &&
+	else if (puyoCon[1][0] - 1 >= 0 && puyoCon[1][1] + 1 < 13 &&
 		//field[drop[1][0] - 1][drop[1][1] + 1] == 0)
-		mainField[drop[1][0] - 1][drop[1][1] + 1].GetIsHide())
+		mainField[puyoCon[1][0] - 1][puyoCon[1][1] + 1].GetIsHide())
 	{
-		drop[1][0]--;
-		drop[1][1]++;
+		puyoCon[1][0]--;
+		puyoCon[1][1]++;
 		//gSound[1].Play();
+		return true;
 	}
+
+	return false;
 }
 
-void CField::LRotate(void) {
-	if (drop[0][0] == drop[1][0])
+bool CField::LRotate(void) {
+	if (puyoCon[0][0] == puyoCon[1][0])
 	{
-		if (drop[0][1] > drop[1][1])
+		if (puyoCon[0][1] > puyoCon[1][1])
 		{
-			if (drop[1][0] - 1 >= 0 && drop[1][1] + 1 < 13 &&
+			if (puyoCon[1][0] - 1 >= 0 && puyoCon[1][1] + 1 < 13 &&
 				//field[drop[1][0] - 1][drop[1][1] + 1] == 0)
-				mainField[drop[1][0] - 1][drop[1][1] + 1].GetIsHide())
+				mainField[puyoCon[1][0] - 1][puyoCon[1][1] + 1].GetIsHide())
 			{
-				drop[1][0]--;
-				drop[1][1]++;
+				puyoCon[1][0]--;
+				puyoCon[1][1]++;
 				//gSound[1].Play();
+				return true;
 			}
 		}
-		else if (drop[1][0] + 1 < 6 &&
+		else if (puyoCon[1][0] + 1 < 6 &&
 			//field[drop[1][0] + 1][drop[1][1] - 1] == 0)
-			mainField[drop[1][0] + 1][drop[1][1] - 1].GetIsHide())
+			mainField[puyoCon[1][0] + 1][puyoCon[1][1] - 1].GetIsHide())
 		{
-			drop[1][0]++;
-			drop[1][1]--;
+			puyoCon[1][0]++;
+			puyoCon[1][1]--;
 			//gSound[1].Play();
+			return true;
 		}
 	}
-	else if (drop[0][0] > drop[1][0])
+	else if (puyoCon[0][0] > puyoCon[1][0])
 	{
-		if (drop[1][0] + 1 < 6 && drop[1][1] + 1 < 13 &&
+		if (puyoCon[1][0] + 1 < 6 && puyoCon[1][1] + 1 < 13 &&
 			//field[drop[1][0] + 1][drop[1][1] + 1] == 0)
-			mainField[drop[1][0] + 1][drop[1][1] + 1].GetIsHide())
+			mainField[puyoCon[1][0] + 1][puyoCon[1][1] + 1].GetIsHide())
 		{
-			drop[1][0]++;
-			drop[1][1]++;
+			puyoCon[1][0]++;
+			puyoCon[1][1]++;
 			//gSound[1].Play();
+			return true;
 		}
 	}
-	else if (drop[1][0] - 1 >= 0 &&
+	else if (puyoCon[1][0] - 1 >= 0 &&
 		//(drop[1][1] - 1 == -1 || field[drop[1][0] - 1][drop[1][1] - 1] == 0))
-		mainField[drop[1][0] - 1][drop[1][1] - 1].GetIsHide())
+		mainField[puyoCon[1][0] - 1][puyoCon[1][1] - 1].GetIsHide())
 	{
-		drop[1][0]--;
-		drop[1][1]--;
+		puyoCon[1][0]--;
+		puyoCon[1][1]--;
 		//gSound[1].Play();
+		return true;
 	}
+	return false;
 }
 
 void CField::Stock(void)
@@ -486,9 +505,9 @@ void CField::AddPuyo(void)
 	if (!CheckGameOver()) {
 		for (int i = 0; i < 2; i++)
 		{
-			drop[i][0] = 2;
-			drop[i][1] = 1 + i * - 1;
-			drop[i][2] = next[0][i];
+			puyoCon[i][0] = 2;
+			puyoCon[i][1] = 1 + i * - 1;
+			puyoCon[i][2] = next[0][i];
 
 			next[0][i] = next[1][i];
 			next[1][i] = random.Random(1, 6);
@@ -496,7 +515,7 @@ void CField::AddPuyo(void)
 
 		combo = 0;
 		//deltaTime = 0;
-		SpeedCheck();
+		ScoreCheck();
 
 		nowState = eDrop;
 	}
@@ -504,7 +523,7 @@ void CField::AddPuyo(void)
 }
 
 //スコアが一定数値以上なら落下速度、おじゃまぷよ生成周期、生成数を加速させる
-void CField::SpeedCheck(void)
+void CField::ScoreCheck(void)
 {
 	if (floor(score / accelNum) != 0 && score <= (accelNum * 10)) {
 		dropTime = 2.0f - (floor(score / accelNum) * 0.2f);
@@ -588,3 +607,22 @@ void CField::Banish()
 
 	nowState = eFall;
 }
+
+std::array< std::array<int,13>, 6> CField::GetField()
+{ 
+	std::array< std::array<int, 13>, 6> f;
+
+	for (int x = 0; x < 6; x++)
+	{
+		for (int y = 0; y < 13; y++)
+		{
+			if (mainField[x][y].GetIsHide())
+				f[x][y] = -1;
+			else
+				f[x][y] = mainField[x][y].GetColor();
+		}
+	}
+
+	return f;
+}
+

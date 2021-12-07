@@ -34,28 +34,70 @@ void CGame::Update(void) {
 		{
 			case gField.eDrop:
 
-				if (g_pInput->IsKeyPush(MOFKEY_RIGHTARROW)) {
-					gField.Right();
-				}
-				else if (g_pInput->IsKeyPush(MOFKEY_LEFTARROW)) {
-					gField.Left();
-				}
+				if (false) 
+				{
+					if (g_pInput->IsKeyPush(MOFKEY_RIGHTARROW)) {
+						gField.Right();
+					}
+					else if (g_pInput->IsKeyPush(MOFKEY_LEFTARROW)) {
+						gField.Left();
+					}
 
-				if (g_pInput->IsKeyPush(MOFKEY_X)) {
-					gField.RRotate();
-				}
-				else if (g_pInput->IsKeyPush(MOFKEY_Z)) {
-					gField.LRotate();
-				}
+					if (g_pInput->IsKeyPush(MOFKEY_X)) {
+						gField.RRotate();
+					}
+					else if (g_pInput->IsKeyPush(MOFKEY_Z)) {
+						gField.LRotate();
+					}
 
-				if (g_pInput->IsKeyHold(MOFKEY_DOWNARROW)) {
-					if (!gField.GetDropOnce()) {
-						dropDTime += gField.GetDropTime() * 0.15f;
+					if (g_pInput->IsKeyPush(MOFKEY_DOWNARROW))
+					{
+						gField.Down();
+						dropDTime = 0.0f;
+					}
+
+					if (g_pInput->IsKeyHold(MOFKEY_DOWNARROW)) {
+						if (!gField.GetDropOnce()) {
+							dropDTime += gField.GetDropTime() * 0.15f;
+						}
 					}
 				}
+				else 
+				{
+					if (aiControllTime <= 0) 
+					{
+						if (gField.GetField()[3][3] != -1)
+						{
+							if (gField.Right())
+							{
+								aiControllTime = 0.5f;
+							}
+							else 
+							{
+								dropDTime += gField.GetDropTime() * 0.15f;
+								aiControllTime = 0.1f;
+							}
+						}
+						else 
+						{
+							if (gField.Left())
+							{
+								aiControllTime = 0.5f;
+							}
+							else
+							{
+								dropDTime += gField.GetDropTime() * 0.15f;
+								aiControllTime = 0.1f;
+							}
+						}
+					}
+
+					aiControllTime -= CUtilities::GetFrameSecond();
+				}
+
 				dropDTime += CUtilities::GetFrameSecond();
 
-				if (dropDTime >= gField.GetDropTime() || g_pInput->IsKeyPush(MOFKEY_DOWNARROW)) {
+				if (dropDTime >= gField.GetDropTime()) {
 					gField.Down();
 					dropDTime = 0.0f;
 				}
@@ -123,6 +165,12 @@ void CGame::Render(void) {
 
 	gField.Render();
 	
+
+	float cir = 0.0f * M_PI / 180;
+	CGraphicsUtilities::RenderCircle(200, 200, 1,MOF_XRGB(100,100,100));
+	CGraphicsUtilities::RenderCircle((cos(cir) * 50) + 200, (sin(cir) * 50) + 200, 1, MOF_XRGB(0, 100, 100));
+
+
 	g_pGraphics->RenderEnd();
 }
 

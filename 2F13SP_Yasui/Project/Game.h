@@ -18,9 +18,8 @@ private:
 	bool			game_playBGMFlg;
 	CEnemy*			m_EnemyArray;
 	CItem*			m_ItemArray;
-	CEnemyShot*		m_EnemyShotArray;
-	float				game_Time;
-	float				game_TimeWait;
+	float			game_Time;
+	float			game_TimeWait;
 	bool			game_ScoreFlg;
 	bool			game_ScoreDesplayFlg;
 	float			game_tempPlayerPositionX;
@@ -33,6 +32,13 @@ private:
 	CSoundBuffer	game_BossClearSE;
 	bool			game_ab;
 	bool			game_MarioFireSEFlg;
+	CTexture*		game_StageBackTexure;
+
+	const char* stage_BackTexPath[2] = { "BackGround.png",
+										  "BackGround2.png",
+										};
+
+
 
 	std::array<const char*, 2 >stagePathArray;
 

@@ -19,25 +19,25 @@
 class CEnemy
 {
 private:
-	int							enemy_Type;
-	CVector2					enemy_Position;
-	CVector2					enemy_Move;
-	bool						enemy_Reverse;
-	bool						enemy_Show;
-	CTexture*					enemy_pTexture;
-	CSpriteMotionController		enemy_Motion;
-	CRectangle					enemy_RectTexture;
-	bool						enemy_Dead;
-	int							enemy_DisappearTime;
-	bool						enemy_DeadJump;
-	bool						enemy_BlockJump;
-	bool						enemy_srcDeadJump;
-	int							enemy_MarioHP;
-	int							enemy_MarioNowAttackPettern;
-	bool						enemy_MarioDamageFlg;
-	int							enemy_MarioDamageWait;
-	bool						enemy_MarioChangeFlg;
-	bool						enemy_MarioDead;
+	int								enemy_Type;
+	CVector2						enemy_Position;
+	CVector2						enemy_Move;
+	bool							enemy_Reverse;
+	bool							enemy_Show;
+	CTexture*						enemy_pTexture;
+	CSpriteMotionController			enemy_Motion;
+	CRectangle						enemy_RectTexture;
+	bool							enemy_Dead;
+	int								enemy_DisappearTime;
+	bool							enemy_DeadJump;
+	bool							enemy_BlockJump;
+	bool							enemy_srcDeadJump;
+	int								enemy_MarioHP;
+	int								enemy_MarioNowAttackPettern;
+	bool							enemy_MarioDamageFlg;
+	int								enemy_MarioDamageWait;
+	bool							enemy_MarioChangeFlg;
+	bool							enemy_MarioDead;
 
 	float							tmp_playerPositionX;
 	float							tmp_playerMoveX;

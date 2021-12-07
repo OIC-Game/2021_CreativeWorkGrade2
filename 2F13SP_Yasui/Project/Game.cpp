@@ -132,6 +132,7 @@ bool CGame::Load(void)
 	//アイテムメモリ確保
 	m_ItemArray = new CItem[g_Stage.GetItemCount()];
 
+
 	return true;
 }
 

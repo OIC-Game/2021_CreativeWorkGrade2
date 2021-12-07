@@ -379,6 +379,11 @@ void CEnemy::Update(float wx)
 	}
 	case ENEMY_FISH:
 	{
+		if (enemy_Move.y >= 10)
+		{
+			enemy_Move.y = -10;
+		}
+		enemy_Position.y += enemy_Move.y;
 		if (enemy_Motion.GetMotionNo() != FISHMOTION_MOVE)
 		{
 			enemy_Motion.ChangeMotion(FISHMOTION_MOVE);

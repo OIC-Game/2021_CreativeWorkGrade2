@@ -44,7 +44,8 @@
 
 
 /*ステージ*/
-#define		 STAGE_CHIPMOVE 10
+#define		STAGE_CHIPMOVE 10
+#define		STAGE_COUNT 2
 /*マップチップ*/
 //ブロック
 #define		CHIP_BLOCK 19

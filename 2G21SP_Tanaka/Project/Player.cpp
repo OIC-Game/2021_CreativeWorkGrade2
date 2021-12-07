@@ -490,38 +490,52 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 	CRectangle erec = ene.GetRect();
 
 	CRectangle Lefterec = ene.Left();
-	
-	
-	if (er.CollisionRect(erec))
+
+	CRectangle Righterec = ene.Right();
+
+	if (!ene.GetMove())
 	{
-		m_MoveY = -6.0f;
-		m_enemySound.Play();
-		ene.Damege();
-		EnemyScore();
-		return true;
-	}
-	if (prec.CollisionRect(erec))
-	{
-		if (m_Stat >= 1)
+		if (er.CollisionRect(Lefterec))
 		{
-			m_DamageWait = 60;
-			m_downSound.Play();
-			m_Stat = m_Stat - 1;
-			return true;
+			ene.KameMove();
 		}
-		else if (m_Stat <= 0)
+		else if (er.CollisionRect(Righterec))
 		{
-			m_bEnd = true;
-			m_bEndTime = 5;
-			m_BGM.Stop();
-			m_endSound.Play();
-			return true;
+			ene.KameMove();
 		}
 	}
-	if (er.CollisionRect(Lefterec))
+	else
 	{
-		ene.KameMove(m_bReverse);
+		if (er.CollisionRect(erec))
+		{
+			m_MoveY = -6.0f;
+			m_enemySound.Play();
+			ene.Damege();
+			EnemyScore();
+			return true;
+		}
+
+		if (prec.CollisionRect(erec))
+		{
+			if (m_Stat >= 1)
+			{
+				m_DamageWait = 60;
+				m_downSound.Play();
+				m_Stat = m_Stat - 1;
+				return true;
+			}
+			else if (m_Stat <= 0)
+			{
+				m_bEnd = true;
+				m_bEndTime = 5;
+				m_BGM.Stop();
+				m_endSound.Play();
+				return true;
+			}
+		}
 	}
+	
+	
 	return false;
 }
 

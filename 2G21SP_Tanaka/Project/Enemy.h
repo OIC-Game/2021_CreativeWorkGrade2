@@ -25,8 +25,8 @@ private:
 	bool						m_bShow;
 	bool						m_bMove;
 	bool						m_bReverse;
+	int							m_Kame;
 	bool						m_bKame;
-	bool						m_bDamege;
 	bool						m_bDead;
 	int							m_DamageWait;
 	CRectangle					m_SrcRect;
@@ -57,22 +57,22 @@ public:
 	void CollisionStage(float ox, float oy);
 	void SetTexture(CTexture* pt) { m_pTexture = pt; }
 	bool GetShow(void) { return m_bShow; }
-	//bool GetDamege(void) { return m_bDamege; }
+	bool GetMove(void) { return m_bMove; }
 	int GetType(void) { return m_Type; }
 	bool GetDead(void) { return m_bDead; }
 	CRectangle GetRect() {
-		return CRectangle(m_PosX + ENEMY_RECTDECREASE, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - ENEMY_RECTDECREASE, m_PosY + m_SrcRect.GetHeight());
+		return CRectangle(m_PosX + ENEMY_RECTDECREASE, m_PosY, m_PosX + m_SrcRect.GetWidth() - ENEMY_RECTDECREASE, m_PosY + m_SrcRect.GetHeight());
 	}
 
 	CRectangle Left() {
-		return CRectangle(m_PosX, m_PosY, m_PosX + m_SrcRect.GetWidth() - 20, m_PosY + m_SrcRect.GetHeight());
+		return CRectangle(m_PosX, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - 20, m_PosY + m_SrcRect.GetHeight());
 	}
 
 	CRectangle Right() {
-		return CRectangle(m_PosX + 20, m_PosY, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
+		return CRectangle(m_PosX + 20, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
 	}
-
 	void Damege(void);
-	void KameMove(bool reverse);
+	void KameMove(void);
+	void KameStop(void);
 };
 

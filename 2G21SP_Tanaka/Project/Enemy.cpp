@@ -26,7 +26,7 @@ void CEnemy::Initialize(float px, float py, int type){
 	m_bShow = true;
 	m_bMove = false;
 	m_bKame = false;
-	m_bDamege = true;
+	m_Kame = 0;
 	m_bDead = false;
 	m_DamageWait = 10;
 	switch (GetType())
@@ -215,16 +215,18 @@ void CEnemy::Damege(void){
 			m_Motion.ChangeMotion(MOTION_DEATH);
 			m_bKame = true;
 			m_bMove = false;
-			m_bDamege = false;
 			return;
 			break;
 	}
 }
 
-void CEnemy::KameMove(bool reverse){
+void CEnemy::KameMove(void){
 	m_bMove = true;
-	m_bDamege = true;
-	m_bReverse = reverse;
+	m_MoveKameX *= -1;
+}
 
+void CEnemy::KameStop(void){
+	m_bMove = false;
+	
 }
 

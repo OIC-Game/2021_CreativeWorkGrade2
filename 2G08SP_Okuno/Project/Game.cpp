@@ -106,7 +106,7 @@ bool CGame::Initialize(std::string fname, int stageIdx)
 	m_ClearBgmFlg = false;
 	m_FailedBgmFlg = false;
 	m_nStageIdx = stageIdx;
-	m_Time = 100;
+	m_Time = gameOverTime;
 	return true;
 }
 
@@ -141,7 +141,7 @@ void CGame::Update()
 		if (m_SceneChangeTime <= 0) {
 			m_SceneChangeTime = 3.0f;
 			m_FailedBgmFlg = false;
-			m_Time = 100;
+			m_Time = gameOverTime;
 			m_nScene = G_SCENE_GAME;
 
 			m_Stage.Initialize();
@@ -212,6 +212,7 @@ void CGame::Update()
 
 void CGame::Render()
 {
+	CRectangle tRect;
 	m_renderTime = timeGetTime();
 	if (m_nScene == G_SCENE_GAMEOVER) {
 		CGraphicsUtilities::RenderString(10, 10, m_Stage.GetStageName());
@@ -232,10 +233,12 @@ void CGame::Render()
 		m_Stage.RenderLayerOver();//ï`âÊèáÇ™ÉvÉåÉCÉÑÅ[ÇÊÇËè„ÇÃï`âÊ
 
 		CGraphicsUtilities::RenderString(10, 10, "ÉQÅ[ÉÄ");
-		CGraphicsUtilities::RenderString(300, 10, "LIFEÅ~%d TIME %3.0f", m_Player.GetLife(), m_Time);
+
+		CGraphicsUtilities::CalculateStringRect(0, 0, "LIFEÅ~000 TIME 000", tRect);
+
+		CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() - tRect.Right - 150, 10, "LIFEÅ~%3d TIME %3.0f", m_Player.GetLife(), m_Time);
 
 		if (m_Time <= 0) {
-			CRectangle tRect;
 			CGraphicsUtilities::CalculateStringRect(0, 0, "TIME UP", tRect);
 			CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() / 2 - tRect.Right / 2, g_pGraphics->GetTargetHeight() / 2 - tRect.Bottom / 2, "TIME UP");
 		}

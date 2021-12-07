@@ -84,10 +84,11 @@ CPipe::PipeData CPipe::GetOutPipe()
 
 void CPipe::RenderDebug(int id, float wx, float wy)
 {
+	float scale = g_pGraphics->GetTargetWidth() / ViewWidth;
 	if (m_InId == id) {
-		CGraphicsUtilities::RenderRect(m_In - CVector2(wx, wy), MOF_COLOR_RED);
+		CGraphicsUtilities::RenderRect((m_In - CVector2(wx, wy)) * scale, MOF_COLOR_RED);
 	}
 	if (m_OutId == id) {
-		CGraphicsUtilities::RenderRect(m_Out - CVector2(wx, wy), MOF_COLOR_YELLOW);
+		CGraphicsUtilities::RenderRect((m_Out - CVector2(wx, wy)) * scale, MOF_COLOR_YELLOW);
 	}
 }

@@ -2,6 +2,8 @@
 
 #include "Mof.h"
 
+constexpr float ViewWidth = 800;
+
 enum b_Direction {
 	BlockNone = 0,
 	BlockUp = 1,
@@ -304,7 +306,7 @@ public:
 	}
 
 	CRectangle GetGameScreenRect(float wx, float wy) {
-		return CRectangle(wx - 50, wy, wx + 50 + g_pGraphics->GetTargetWidth(), wy + g_pGraphics->GetTargetHeight());
+		return CRectangle(wx - 50, wy, wx + 50 + ViewWidth, wy + ViewWidth);
 	}
 
 };

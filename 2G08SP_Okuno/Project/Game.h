@@ -8,6 +8,7 @@
 #include	"Item.h"
 
 constexpr int pllifeDefault = 5;
+constexpr float gameOverTime = 200;
 
 class CGame
 {

@@ -58,15 +58,15 @@ void CBlock::Render(float wx, float wy)
 	if (m_Type < 0) {
 		return;
 	}
-
 	float sw = g_pGraphics->GetTargetWidth();
 	float sh = g_pGraphics->GetTargetHeight();
+	float scale = sw / ViewWidth;
 	if (m_Pos.x - wx + CHIPSIZE < 0 || m_Pos.x - wx > sw ||
 		m_Pos.y - wy + CHIPSIZE < 0 || m_Pos.y - wy > sh) {
 		return;
 	}
 
-	m_Texture->Render(m_Pos.x - wx, m_Pos.y - wy, m_Rect);
+	m_Texture->RenderScale((m_Pos.x - wx) * scale, (m_Pos.y - wy) * scale, scale, m_Rect);
 }
 
 //ÉuÉçÉbÉNÇí@Ç≠

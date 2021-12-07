@@ -58,13 +58,14 @@ void CSkillObj::Render(float wx, float wy)
 	if (!m_bShowNow) return;
 
 	CRectangle cr = m_Motion.GetSrcRect();
+	float scale = g_pGraphics->GetTargetWidth() / ViewWidth;
 	//”½“]ƒtƒ‰ƒO‚ª—LŒø‚ÌŽž‚Í‰æ‘œ‚ð”½“]‚·‚é
 	if (m_bReverse) {
 		float tmp = cr.Left;
 		cr.Left = cr.Right;
 		cr.Right = tmp;
 	}
-	m_Texture->Render(m_Pos.x - wx, m_Pos.y - wy, cr);
+	m_Texture->RenderScale((m_Pos.x - wx) * scale, (m_Pos.y - wy) * scale, scale, cr);
 }
 
 void CSkillObj::CollisionStage(CCollisionData coll)

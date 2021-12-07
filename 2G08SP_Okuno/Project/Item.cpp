@@ -46,12 +46,13 @@ void CItem::Render(float wx, float wy)
 		return;
 	}
 	CRectangle rect = m_Rect;
+	float scale = g_pGraphics->GetTargetWidth() / ViewWidth;
 	float sub = 0;
 	if (m_animShow && m_animShowTime < BShowAnimTime) {
 		sub = rect.GetHeight() - rect.GetHeight() * (m_animShowTime / BShowAnimTime);
 		rect.Bottom -= sub;
 	}
-	m_Texture->Render(m_Pos.x - wx, m_Pos.y - wy + sub, rect);
+	m_Texture->RenderScale((m_Pos.x - wx) * scale, (m_Pos.y - wy + sub) * scale, scale, rect);
 }
 
 void CItem::Update(float wx, float wy)
@@ -61,7 +62,7 @@ void CItem::Update(float wx, float wy)
 	}
 	if (m_ShowState == STATE_DISSHOW) {
 		CRectangle rect = GetRect();
-		if (rect.Right >= wx && rect.Left <= wx + g_pGraphics->GetTargetWidth()) {
+		if (rect.Right >= wx && rect.Left <= wx + ViewWidth) {
 			m_ShowState = STATE_SHOW;
 		}
 		else {
@@ -70,7 +71,7 @@ void CItem::Update(float wx, float wy)
 	}
 	else if (m_ShowState == STATE_SHOW) {
 		CRectangle rect = GetRect();
-		if (rect.Right < wx || rect.Left > wx + g_pGraphics->GetTargetWidth()) {
+		if (rect.Right < wx || rect.Left > wx + ViewWidth) {
 			m_ShowState = STATE_DISSHOW;
 			return;
 		}

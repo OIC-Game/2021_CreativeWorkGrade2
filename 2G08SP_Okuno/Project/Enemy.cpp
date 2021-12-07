@@ -59,7 +59,7 @@ void CEnemy::Update(float wx, float wy, CRectangle prec)
 	}
 	if (m_ShowState == STATE_DISSHOW) {
 		CRectangle rect = GetRect();
-		if (rect.Right >= wx && rect.Left <= wx + g_pGraphics->GetTargetWidth()) {
+		if (rect.Right >= wx && rect.Left <= wx + ViewWidth) {
 			m_ShowState = STATE_SHOW;
 		}
 		else {
@@ -68,7 +68,7 @@ void CEnemy::Update(float wx, float wy, CRectangle prec)
 	}
 	else if (m_ShowState == STATE_SHOW) {
 		CRectangle rect = GetRect();
-		if (rect.Right < wx || rect.Left > wx + g_pGraphics->GetTargetWidth()) {
+		if (rect.Right < wx || rect.Left > wx + ViewWidth) {
 			m_ShowState = STATE_DISSHOW;
 			return;
 		}
@@ -111,13 +111,14 @@ void CEnemy::Render(float wx, float wy)
 	}
 
 	CRectangle cr = m_Motion.GetSrcRect();
+	float scale = g_pGraphics->GetTargetWidth() / ViewWidth;
 	//”½“]ƒtƒ‰ƒO‚ª—LŒø‚ÌŽž‚Í‰æ‘œ‚ð”½“]‚·‚é
 	if (m_bReverse) {
 		float tmp = cr.Left;
 		cr.Left = cr.Right;
 		cr.Right = tmp;
 	}
-	m_Texture[m_define->idx - 1].Render(m_Pos.x - wx, m_Pos.y - wy, cr);
+	m_Texture[m_define->idx - 1].RenderScale((m_Pos.x - wx) * scale, (m_Pos.y - wy) * scale, scale, cr);
 }
 
 void CEnemy::Release()

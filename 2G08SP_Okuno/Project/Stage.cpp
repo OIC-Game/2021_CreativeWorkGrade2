@@ -187,9 +187,10 @@ void CStage::Initialize(bool bGoal, int gType, int gx, int gy, CSoundBuffer* ski
 void CStage::Update(CPlayer& pl)
 {
 	CRectangle prec = pl.GetRect(false);
-	float sw = g_pGraphics->GetTargetWidth();
+	float sw = ViewWidth;
 	float hsw = sw * 0.4f;
 	float stgw = CHIPSIZE * m_XSize;
+	float scale = g_pGraphics->GetTargetWidth() / ViewWidth;
 	if (sw < stgw) {
 		if (m_ScrollX > stgw - sw) {
 			m_ScrollX = stgw - sw;
@@ -211,7 +212,7 @@ void CStage::Update(CPlayer& pl)
 	else {
 		m_ScrollX = (stgw - sw) / 2;
 	}
-	float sh = g_pGraphics->GetTargetHeight();
+	float sh = g_pGraphics->GetTargetHeight() / scale;
 	float hsh = 100;
 	float stgh = CHIPSIZE * m_YSize;
 	if (sh < stgh) {
@@ -298,11 +299,12 @@ void CStage::Update(CPlayer& pl)
 
 void CStage::Render()
 {
-	int scw = g_pGraphics->GetTargetWidth();
-	int sch = g_pGraphics->GetTargetHeight();
-	float s = 1.0f;
-	int bw = m_BgTexture.GetWidth();
-	int bh = m_BgTexture.GetHeight();
+	int scw = ViewWidth;
+	float scale = g_pGraphics->GetTargetWidth() / ViewWidth;
+	int sch = g_pGraphics->GetTargetHeight() / scale;
+	float s = scale;
+	int bw = m_BgTexture.GetWidth() * s;
+	int bh = m_BgTexture.GetHeight() * s;
 	float stgw = CHIPSIZE * m_XSize;
 	float stgh = CHIPSIZE * m_YSize;
 	if (bh < MOF_MAX(stgh, sch)) {
@@ -314,7 +316,7 @@ void CStage::Render()
 	int y = -m_ScrollY;
 	if (y > 0) y = 0;
 	for (float x = ((int)-m_ScrollX % bw) - bw; x < scw; x += bw) {
-		m_BgTexture.RenderScale(x, y, s);
+		m_BgTexture.RenderScale(x, y * scale, s);
 	}
 	//}
 

@@ -6,6 +6,7 @@ private:
 	CTexture		m_backTexture;
 	bool			m_startFlg;
 	CSoundBuffer	m_titleBGM;
+	bool			m_vsAiFlg;
 
 	CFade			m_fade;
 public:
@@ -16,4 +17,8 @@ public:
 	void Update(void);
 	void Render(void);
 	void Release(void);
+	bool GetVsAiFlg()
+	{
+		return m_vsAiFlg;
+	}
 };

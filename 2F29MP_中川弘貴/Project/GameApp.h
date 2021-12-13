@@ -9,6 +9,9 @@
 
 #pragma once
 
+#define SW 1024
+#define SH 768
+
 //INCLUDE
 #include	"Mof.h"
 #include	"time.h"

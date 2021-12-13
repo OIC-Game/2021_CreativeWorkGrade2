@@ -74,23 +74,31 @@ private:
 
 	//ぷよ格納用配列
 	int			m_field[FH][FW];
+	int			m_fieldAI[FH][FW];
 	//操作している、次に降ってくるぷよの色
 	int			m_type[2][2];
+	int			m_typeAI[2][2];
 
 
 	//タイマー
 
 	//自動落下まで待つ変数
 	int			m_dropTimeCnt;
+	int			m_dropTimeCntAI;
 	int			m_rotateTimeCnt;
+	int			m_rotateTimeCntAI;
 	//また後で名前変える　　間を生み出すためタイム変数
 	int			m_waitTimeCnt;
+	int			m_waitTimeCntAI;
 	//readyカウント
 	int			m_readyTimeCnt;
 	//ぷよを長押しによって移動させる際に動くを抑制するためのタイム
 	int			m_downHoldTimeCnt;
+	int			m_downHoldTimeCntAI;
 	int			m_leftHoldTimeCnt;
+	int			m_leftHoldTimeCntAI;
 	int			m_rightHoldTimeCnt;
+	int			m_rightHoldTimeCntAI;
 
 	//スコア
 	int			m_maxChainCnt;
@@ -99,32 +107,43 @@ private:
 
 	//回転回数
 	int			m_rotateCnt;
+	int			m_rotateCntAI;
 
 	//連鎖
 
 	//ぷよが消滅した
 	bool		m_chainFlg;
+	bool		m_chainFlgAI;
 	//空でも壁でもなくぷよである
 	bool		m_puyoCheckFlg[FH][FW];
+	bool		m_puyoCheckFlgAI[FH][FW];
 	//消滅させるぷよ
 	bool		m_destroyFlg[FH][FW];
+	bool		m_destroyFlgAI[FH][FW];
 	//同じ色が何個繋がっているか
 	int			m_bondCnt;
+	int			m_bondCntAI;
 	//連鎖数
 	int			m_chainCnt;
+	int			m_chainCntAI;
 
 	bool		m_endFlg;
 	
 	//操作するぷよ座標
 	Vector2		m_pos;
+	Vector2		m_posAI;
 	//回転による座標の変化
 	Vector2		m_spin;
+	Vector2		m_spinAI;
 	//フィールド配列に格納するための座標
 	FieldPos	m_sFldPos;
+	FieldPos	m_sFldPosAI;
 	//ぷよの向き
 	Rotation	m_eRotation;
+	Rotation	m_eRotationAI;
 	//流れを制御
 	Flow		m_eFlow;
+	Flow		m_eFlowAI;
 	//乱数
 	CRandom		m_random;
 
@@ -158,9 +177,9 @@ public:
 	CGame();
 	~CGame();
 	bool Load(void);
-	void Initialize(void);
-	void ChainCheck(int y, int x);
-	void Update(void);
+	void Initialize(bool vsAiFlg);
+	void ChainCheck(int y, int x,int field[FH][FW]);
+	void Update(bool vsAiFlg);
 	void ReadyUpdate();
 	void PauseUpdate();
 	void DropUpdate();
@@ -170,6 +189,52 @@ public:
 	void GameOverUpdate();
 	void Movement();
 	void Rotate();
-	void Render(void);
+	void Render(bool vsAiFlg);
 	void Release(void);
+	void FieldInit(int field[FH][FW])
+	{
+		for (int y = 0; y < FH; y++)
+		{
+			for (int x = 0; x < FW; x++)
+			{
+				if (x == 0 || x == FW - 1)
+					field[y][x] = Wall;
+				else if (y == FH - 1)
+					field[y][x] = Wall;
+				else
+					field[y][x] = Empty;
+			}
+		}
+	}
+	void FieldRender(int field[FH][FW], int initPosX)
+	{
+		//フィールドの描画
+		for (int y = 0; y < FH; y++)
+		{
+			for (int x = 0; x < FW; x++)
+			{
+				if (field[y][x] == Green)
+				{
+					m_GreenPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+				}
+				if (field[y][x] == Yellow)
+				{
+					m_YellowPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+				}
+				if (field[y][x] == Blue)
+				{
+					m_BluePuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+				}
+				if (field[y][x] == Red)
+				{
+					m_RedPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+				}
+				if (field[y][x] == Wall)
+				{
+					CGraphicsUtilities::RenderFillRect(initPosX + x * BL, BL * 2 + y * BL, initPosX + x * BL + BL, y * BL + BL * 3, MOF_COLOR_BLACK);
+				}
+
+			}
+		}
+	}
 };

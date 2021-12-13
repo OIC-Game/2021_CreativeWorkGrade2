@@ -31,10 +31,9 @@ MofBool CGameApp::Update(void) {
 			gTitleScene.Update();
 			break;
 		case SCENENO_GAME:
-			gGameScene.Update();
+			gGameScene.Update(gTitleScene.GetVsAiFlg());
 			break;
 	}
-
 	//シーン変更があった場合変更先シーンの初期化
 	if (gChangeScene != gScene)
 	{
@@ -44,7 +43,7 @@ MofBool CGameApp::Update(void) {
 				gTitleScene.Initialize();
 				break;
 			case SCENENO_GAME:
-				gGameScene.Initialize();
+				gGameScene.Initialize(gTitleScene.GetVsAiFlg());
 				break;
 		}
 		gScene = gChangeScene;
@@ -65,7 +64,7 @@ MofBool CGameApp::Render(void) {
 		gTitleScene.Render();
 		break;
 	case SCENENO_GAME:
-		gGameScene.Render();
+		gGameScene.Render(gTitleScene.GetVsAiFlg());
 		break;
 	}
 

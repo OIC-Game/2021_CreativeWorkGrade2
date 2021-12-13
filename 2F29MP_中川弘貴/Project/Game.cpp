@@ -107,30 +107,26 @@ bool CGame::Load(void)
 	return true;
 }
 
+
 /*
   初期化
 */
-void CGame::Initialize(void)
+void CGame::Initialize(bool vsAiFlg)
 {
 	//テクスチャの読み込み
 	Load();
 
 	//フィールドの初期配置
-	for (int y = 0; y < FH; y++)
+	FieldInit(m_field);
+	if (vsAiFlg)
 	{
-		for (int x = 0; x < FW; x++)
-		{
-			if (x == 0 || x == FW - 1)
-				m_field[y][x] = Wall;
-			else if (y == FH - 1)
-				m_field[y][x] = Wall;
-			else
-				m_field[y][x] = Empty;
-		}
+		FieldInit(m_fieldAI);
 	}
 
 	m_random.SetSeed(time(NULL));
+
 	//ぷよの色をランダムで決める
+	//todo: 降るぷよの色が右と左で違うのを防ぐために、タイプを格納し続ける配列を作る
 	for (int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 2; j++)
@@ -174,28 +170,28 @@ void CGame::Initialize(void)
 	fade.FadeIn();
 }
 
-void CGame::ChainCheck(int y, int x)
+void CGame::ChainCheck(int y, int x,int field[FH][FW])
 {
-	if (m_field[y][x] != Empty && m_field[y][x] != Wall &&
+	if (field[y][x] != Empty && field[y][x] != Wall &&
 		!m_puyoCheckFlg[y][x])
 	{
 		m_puyoCheckFlg[y][x] = true;
 		m_bondCnt++;
-		if (m_field[y][x] == m_field[y - 1][x])
+		if (field[y][x] == m_field[y - 1][x])
 		{
-			ChainCheck(y - 1, x);
+			ChainCheck(y - 1, x, field);
 		}
-		if (m_field[y][x] == m_field[y][x + 1])
+		if (field[y][x] == m_field[y][x + 1])
 		{
-			ChainCheck(y, x + 1);
+			ChainCheck(y, x + 1, field);
 		}
-		if (m_field[y][x] == m_field[y + 1][x])
+		if (field[y][x] == m_field[y + 1][x])
 		{
-			ChainCheck(y + 1, x);
+			ChainCheck(y + 1, x, field);
 		}
-		if (m_field[y][x] == m_field[y][x - 1])
+		if (field[y][x] == m_field[y][x - 1])
 		{
-			ChainCheck(y, x - 1);
+			ChainCheck(y, x - 1, field);
 		}
 	}
 }
@@ -203,7 +199,7 @@ void CGame::ChainCheck(int y, int x)
 /*
   更新
 */
-void CGame::Update(void)
+void CGame::Update(bool vsAiFlg)
 {
 	//フェードの処理
 	fade.Update();
@@ -387,7 +383,7 @@ void CGame::ChainUpdate()
 		{
 			for (int x = 0; x < FW; x++)
 			{
-				ChainCheck(y, x);
+				ChainCheck(y, x,m_field);
 				if (m_bondCnt >= 4)
 				{
 					for (int i = 0; i < FH; i++)
@@ -791,45 +787,38 @@ void CGame::Rotate()
 /*
   描画
 */
-void CGame::Render(void)
+void CGame::Render(bool vsAiFlg)
 {
 	//背景
-	m_BackTexture.Render(0,0);
+	if (!vsAiFlg)
+	{
+		m_BackTexture.Render(0, 0);
+	}
 
 	//パズル部分の背景
-	for (int y = 0; y < FH - 1; y++)
+	/*for (int y = 0; y < FH - 1; y++)
 	{
 		for (int x = 1; x < FW - 1; x++)
 		{
 			CGraphicsUtilities::RenderFillRect(BL + x * BL, BL * 2 + y * BL, x * BL + BL * 2, y * BL + BL * 3, MOF_COLOR_WHITE);
 		}
+	}*/
+	CGraphicsUtilities::RenderFillRect(100, 100, 400, 700, MOF_COLOR_WHITE);
+	if (vsAiFlg)
+	{
+		CGraphicsUtilities::RenderFillRect(SW - 400, 100, SW - 100, 700, MOF_COLOR_WHITE);
 	}
 
 	//ゲームオーバーの×
 	m_CrossMarkTexture.Render(BL * 4, BL * 2);
+	if (vsAiFlg)
+	{
+		m_CrossMarkTexture.Render(SW - 300, BL * 2);
+	}
 
 	//フィールドの描画
-	for (int y = 0; y < FH; y++)
-	{
-		for (int x = 0; x < FW; x++)
-		{
-			if (m_field[y][x] == Green)
-				m_GreenPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
-
-			if (m_field[y][x] == Yellow)
-				m_YellowPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
-
-			if (m_field[y][x] == Blue)
-				m_BluePuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
-
-			if (m_field[y][x] == Red)
-				m_RedPuyoTexture.Render(BL + x * BL, BL * 2 + y * BL);
-
-			if (m_field[y][x] == Wall)
-				CGraphicsUtilities::RenderFillRect(BL + x * BL, BL * 2 + y * BL, x * BL + BL * 2, y * BL + BL * 3, MOF_COLOR_BLACK);
-
-		}
-	}
+	FieldRender(m_field, BL);
+	FieldRender(m_fieldAI, SW - 450);
 
 	//待機中のぷよ
 	CGraphicsUtilities::RenderString(490, 100, "NEXT");
@@ -906,20 +895,24 @@ void CGame::Render(void)
 	}
 
 	//連鎖表示
-	if (m_chainCnt >= 1)
+	if (m_chainCnt >= 1 && !vsAiFlg)
 	{
 		CGraphicsUtilities::RenderFillRect(210,350,280,380, MOF_COLOR_WHITE);
 		CGraphicsUtilities::RenderString(210, 350, MOF_COLOR_BLACK, "%d連鎖", m_chainCnt);
 	}
 
 	//スコア
-	CGraphicsUtilities::RenderString(800, 138, MOF_COLOR_BLACK, "%d",m_score);
+	if(!vsAiFlg)
+		CGraphicsUtilities::RenderString(800, 138, MOF_COLOR_BLACK, "%d",m_score);
 
 	//最大連鎖数
-	CGraphicsUtilities::RenderString(900, 210, MOF_COLOR_BLACK, "%d", m_maxChainCnt);
+	if(!vsAiFlg)
+		CGraphicsUtilities::RenderString(900, 210, MOF_COLOR_BLACK, "%d", m_maxChainCnt);
 
 	//開幕にブロックが見えないように、画面上部を隠す
 	CGraphicsUtilities::RenderFillRect(BL, 50, BL * 9, BL * 2, MOF_COLOR_BLACK);
+	if(vsAiFlg)
+		CGraphicsUtilities::RenderFillRect((SW - 500) + BL, 50, (SW - 500) + BL * 9, BL * 2, MOF_COLOR_BLACK);
 
 	//escでポーズ
 	CGraphicsUtilities::RenderString(885, 12, MOF_COLOR_BLACK, "Pause[Esc]");

@@ -78,6 +78,7 @@ void CTitle::Update(void)
 
 	if (g_pInput->IsKeyPush(MOFKEY_RETURN))
 	{
+		m_vsAiFlg = true;
 		m_startFlg = true;
 		//フェードアウト
 		m_fade.FadeOut();

@@ -10,7 +10,7 @@ CStageParent::CStageParent() :
 	m_CheckPointCount(0),
 	m_CheckPointArray(),
 	m_ThroughPipe(),
-	m_PipeFlg(false),
+	m_PipeFlg(PIPE_FLAG_UNKNOWN),
 	m_GoalFlg(false)
 	//m_DebugFlg(false)
 {
@@ -145,7 +145,7 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 
 	float ox = 0;
 
-	if (!m_PipeFlg) {
+	if (m_PipeFlg == PIPE_FLAG_UNKNOWN || m_PipeFlg == PIPE_FLAG_OUT_END) {
 		//CRectangle pr = pl.GetRect();
 		bool jump = pl.IsJumpingUp();
 		CCollisionData coll = m_StageArray[m_StageCursor].Collision(&pl, NULL, prec_b, prec_a, pl.GetMove());
@@ -164,51 +164,65 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 		return;
 	}
 
-	if (m_PipeFlg) {
-		/*bool psFlg = m_StageCursor == m_ThroughPipe.GetOutPipe().Id && m_ThroughPipe.GetInPipe().Id != m_ThroughPipe.GetOutPipe().Id;
-		if (psFlg) {
-			if (pl.PipeOutFn(m_ThroughPipe.GetOutPipe())) {
-				m_PipeFlg = false;
+	if (m_PipeFlg != PIPE_FLAG_UNKNOWN && m_PipeFlg != PIPE_FLAG_OUT_END) {
+		int flg = m_PipeFlg;
+		if (m_ThroughPipe.GetInPipe().Type == 0) flg = pl.PipeInFn(m_ThroughPipe.GetInPipe());
+		else if (m_ThroughPipe.GetInPipe().Type == 1) {
+			m_PipeAnimTime += CUtilities::GetFrameSecond();
+			if (m_StageArray[m_StageCursor].DoorAnimation(pl.GetRect(false), m_PipeAnimTime, m_PipeFlg == PIPE_FLAG_IN_NOW)) {
+				if (m_PipeFlg == PIPE_FLAG_IN_NOW) {
+					flg = PIPE_FLAG_IN_END;
+				}
+				else {
+					flg = PIPE_FLAG_OUT_END;
+					m_PipeFlg = PIPE_FLAG_OUT_END;
+					pl.PipeOutFn_Door(m_ThroughPipe.GetOutPipe());
+					m_StageArray[m_StageCursor].EndDoorAnimation(pl.GetRect(false));
+				}
 			}
 		}
-		else {*/
-		int flg = pl.PipeInFn(m_ThroughPipe.GetInPipe());
-			if (flg == PIPE_FLAG_IN_END) {
-				CPipe::PipeData p = m_ThroughPipe.GetOutPipe();
-				m_StageCursor = p.Id; //現在のステージを移動先のステージに
+		if (flg == PIPE_FLAG_IN_END) {
+			CPipe::PipeData p = m_ThroughPipe.GetOutPipe();
+			m_StageCursor = p.Id; //現在のステージを移動先のステージに
 
-				/*マリオの大きさと土管の向きに合わせて移動先の位置を変える*/
-				CVector2 v(p.Rect.Left, p.Rect.Top);
-				if (p.Type == 0) {
-					if ((p.Dir & BlockRight) == BlockRight) {
-						v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
-					}
-					else if ((p.Dir & BlockDown) == BlockDown) {
-						v.y = p.Rect.Top;
-					}
-					else if ((p.Dir & BlockLeft) == BlockLeft) {
-						v.x = p.Rect.Right - pl.GetRect(false).GetWidth();
-						v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
-					}
-					else {
-						v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
-					}
-				}
-				else if (p.Type == 1) {
+			/*マリオの大きさと土管の向きに合わせて移動先の位置を変える*/
+			CVector2 v(p.Rect.Left, p.Rect.Top);
+			if (p.Type == 0) {
+				if ((p.Dir & BlockRight) == BlockRight) {
 					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
 				}
-
-				//CVector2 v(200, 300); //一つのステージで作る時は位置を変える
-
-				pl.ChangeStage(v); //プレイヤーにステージが切り替わったことを伝える
-				pl.SetStageHeight(GetStageHeight()); //ステージの高さを更新する
-			}
-			else if (flg == PIPE_FLAG_OUT_NOW) {
-				if (pl.PipeOutFn(m_ThroughPipe.GetOutPipe()) == PIPE_FLAG_OUT_END) {
-					m_PipeFlg = false;
+				else if ((p.Dir & BlockDown) == BlockDown) {
+					v.y = p.Rect.Top;
+				}
+				else if ((p.Dir & BlockLeft) == BlockLeft) {
+					v.x = p.Rect.Right - pl.GetRect(false).GetWidth();
+					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
+				}
+				else {
+					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
 				}
 			}
-		//}
+			else if (p.Type == 1) {
+				v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
+			}
+
+			//CVector2 v(200, 300); //一つのステージで作る時は位置を変える
+
+			pl.ChangeStage(v); //プレイヤーにステージが切り替わったことを伝える
+			pl.SetStageHeight(GetStageHeight()); //ステージの高さを更新する
+			m_StageArray[m_StageCursor].StageFlash();
+			m_PipeFlg = PIPE_FLAG_OUT_NOW;
+
+			if (p.Type == 1) {
+				m_PipeAnimTime = 0;
+				m_StageArray[m_StageCursor].DoorAnimation(pl.GetRect(false), m_PipeAnimTime, false);
+			}
+		}
+		else if (flg == PIPE_FLAG_OUT_NOW && m_ThroughPipe.GetOutPipe().Type == 0) {
+			if (pl.PipeOutFn(m_ThroughPipe.GetOutPipe()) == PIPE_FLAG_OUT_END) {
+				m_PipeFlg = PIPE_FLAG_OUT_END;
+			}
+		}
 		return;
 	}
 
@@ -218,7 +232,11 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 			CPipe::PipeData p = m_PipeArray[i].CanToPassThrough(plPipe); //プレイヤーの状態を引数として、ステージ移動の情報を取得する
 			if (p.Root) { //移動できるかどうか
 				m_ThroughPipe = m_PipeArray[i];
-				m_PipeFlg = true;
+				m_PipeFlg = PIPE_FLAG_IN_NOW;
+				m_PipeAnimTime = 0;
+				if (m_ThroughPipe.GetInPipe().Type == 1) {
+					pl.PipeInFn_Door(m_ThroughPipe.GetInPipe());
+				}
 				return;
 			}
 		}

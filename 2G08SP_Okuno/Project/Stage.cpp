@@ -184,6 +184,22 @@ void CStage::Initialize(bool bGoal, int gType, int gx, int gy, CSoundBuffer* ski
 	}
 }
 
+void CStage::StageFlash()
+{
+	for (int i = 0; i < GetEnemyCount(); i++) {
+		if (!m_EnemyArray[i].GetShow()) {
+			continue;
+		}
+		m_EnemyArray[i].SetDisplay(STATE_SHOW);
+	}
+	for (int i = 0; i < GetItemCount(); i++) {
+		if (!m_ItemArray[i].GetShow()) {
+			continue;
+		}
+		m_ItemArray[i].SetDisplay(STATE_SHOW);
+	}
+}
+
 void CStage::Update(CPlayer& pl)
 {
 	CRectangle prec = pl.GetRect(false);
@@ -253,10 +269,12 @@ void CStage::Update(CPlayer& pl)
 		}
 		CRectangle erec_b = m_EnemyArray[i].GetRect();
 		m_EnemyArray[i].Update(GetScrollX(), GetScrollY(), pl.GetRect(true));
+		if (m_EnemyArray[i].GetDisplay()) {
+			pl.CollisionEnemy(m_EnemyArray[i]);
+		}
 		if (!m_EnemyArray[i].GetDisplay()) {
 			continue;
 		}
-		pl.CollisionEnemy(m_EnemyArray[i]);
 		CRectangle erec_a = m_EnemyArray[i].GetRect();
 
 		m_EnemyArray[i].CollisionStage(Collision(NULL, &m_EnemyArray[i], erec_b, erec_a, m_EnemyArray[i].GetMove()));
@@ -269,10 +287,12 @@ void CStage::Update(CPlayer& pl)
 		}
 		CRectangle irec_b = m_ItemArray[i].GetRect();
 		m_ItemArray[i].Update(GetScrollX(), GetScrollY());
+		if (m_ItemArray[i].GetDisplay()) {
+			pl.CollisionItem(m_ItemArray[i]);
+		}
 		if (!m_ItemArray[i].GetDisplay()) {
 			continue;
 		}
-		pl.CollisionItem(m_ItemArray[i]);
 		CRectangle irec_a = m_ItemArray[i].GetRect();
 
 		m_ItemArray[i].CollisionStage(Collision(NULL, NULL, irec_b, irec_a, m_ItemArray[i].GetMove()));
@@ -644,5 +664,55 @@ void CStage::CheckPointThrough(CRectangle rect)
 
 		CBlockDefine* bd = CGameDefine::GetGameDefine()->GetBlockByIdx(type + 1);
 		m_BlockArray[i].Load(&m_ChipTexture, CVector2(cr.Left, cr.Top) , tr, m_BlockArray[i].GetItem(), type, bd->broken, bd);
+	}
+}
+
+bool CStage::DoorAnimation(CRectangle rect, float animTime, bool isIn)
+{
+	int tcx = m_ChipTexture.GetWidth() / CHIPSIZE;
+	long keyCount = floor(animTime / 0.2f);
+	if (isIn) {
+		if (keyCount >= DOOR_FN) return true;
+	}
+	else {
+		keyCount = DOOR_FN - keyCount - 1;
+		if (keyCount < 0) return true;
+	}
+
+	for (int i = 0; i < m_BlockCount; i++) {
+		int type = m_BlockArray[i].GetType();
+		if (type < 0 || type < DOOR_F1 || (type >= (DOOR_F1 + DOOR_FN) && type < DOOR_F2) || type >= (DOOR_F2 + DOOR_FN)) continue;
+		CRectangle cr = m_BlockArray[i].GetRect();
+		if (rect.Left > cr.Right && cr.Right > rect.Right + CHIPSIZE && rect.Top > cr.Bottom && cr.Bottom > rect.Bottom + CHIPSIZE) continue;
+
+		//現在のアニメーションのチップに置き換える
+		int fChip = DOOR_F1;
+		if (type >= DOOR_F2 && type < (DOOR_F2 + DOOR_FN)) fChip = DOOR_F2;
+		type = fChip + keyCount;
+		CRectangle tr = CRectangle(type % tcx, type / tcx, type % tcx + 1, type / tcx + 1) * CHIPSIZE;
+
+		CBlockDefine* bd = CGameDefine::GetGameDefine()->GetBlockByIdx(type + 1);
+		m_BlockArray[i].Load(&m_ChipTexture, CVector2(cr.Left, cr.Top), tr, m_BlockArray[i].GetItem(), type, bd->broken, bd);
+	}
+	return false;
+}
+
+void CStage::EndDoorAnimation(CRectangle rect) 
+{
+	int tcx = m_ChipTexture.GetWidth() / CHIPSIZE;
+	for (int i = 0; i < m_BlockCount; i++) {
+		int type = m_BlockArray[i].GetType();
+		if (type < 0 || type < DOOR_F1 || (type >= (DOOR_F1 + DOOR_FN) && type < DOOR_F2) || type >= (DOOR_F2 + DOOR_FN)) continue;
+		CRectangle cr = m_BlockArray[i].GetRect();
+		if (rect.Left > cr.Right && cr.Right > rect.Right + CHIPSIZE && rect.Top > cr.Bottom && cr.Bottom > rect.Bottom + CHIPSIZE) continue;
+
+		//初期状態のチップに戻す
+		int fChip = DOOR_F1;
+		if (type >= DOOR_F2 && type < (DOOR_F2 + DOOR_FN)) fChip = DOOR_F2;
+		type = fChip;
+		CRectangle tr = CRectangle(type % tcx, type / tcx, type % tcx + 1, type / tcx + 1) * CHIPSIZE;
+
+		CBlockDefine* bd = CGameDefine::GetGameDefine()->GetBlockByIdx(type + 1);
+		m_BlockArray[i].Load(&m_ChipTexture, CVector2(cr.Left, cr.Top), tr, m_BlockArray[i].GetItem(), type, bd->broken, bd);
 	}
 }

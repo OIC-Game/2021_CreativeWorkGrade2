@@ -42,6 +42,7 @@ public:
 	bool Load(char* fname, int sx, int sy);
 
 	void Initialize(bool bGoal, int gType, int gx, int gy, CSoundBuffer* skillSound);
+	void StageFlash(); //ステージ内の敵などのステータスを表示状態にする
 
 	void Update(CPlayer& pl);
 
@@ -63,6 +64,9 @@ public:
 	CCollisionData Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRectangle ra, CVector2 move);
 
 	void CheckPointThrough(CRectangle rect);
+
+	bool DoorAnimation(CRectangle rect, float animTime, bool isIn);
+	void EndDoorAnimation(CRectangle rect);
 
 	Vector2 GetStartPos() { return Vector2(CHIPSIZE * m_StartX, CHIPSIZE * m_StartY); }
 

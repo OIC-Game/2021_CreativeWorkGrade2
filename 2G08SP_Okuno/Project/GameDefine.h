@@ -83,6 +83,13 @@ enum t_CHECKPOINT_CHIPS {
 	CHECKPOINT_AN = 2,
 };
 
+enum t_DOOR_CHIPS {
+	DOOR_F1 = 82,
+	DOOR_F2 = 92,
+
+	DOOR_FN = 5,
+};
+
 class CItemDefine {
 public:
 	int idx;

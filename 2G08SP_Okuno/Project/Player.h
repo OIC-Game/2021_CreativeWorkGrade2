@@ -136,9 +136,9 @@ public:
 	bool GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPlay);
 
 	int PipeInFn(CPipe::PipeData pipe);
-	int PipeInFn_Door(CPipe::PipeData pipe);
+	void PipeInFn_Door(CPipe::PipeData pipe);
 	int PipeOutFn(CPipe::PipeData pipe);
-	int PipeOutFn_Door(CPipe::PipeData pipe);
+	void PipeOutFn_Door(CPipe::PipeData pipe);
 
 	bool DeadFn();
 

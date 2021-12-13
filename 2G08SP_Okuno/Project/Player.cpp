@@ -200,7 +200,7 @@ void CPlayer::Update(float wx, float wy)
 			}
 		}
 
-		if (m_TypeIdx == CGameDefine::GetGameDefine()->GetMarioIdx(MARIO_FIRE) && 
+		if (m_TypeIdx == CGameDefine::GetGameDefine()->GetMarioIdx(MARIO_FIRE) &&
 			(g_pInput->IsKeyPush(MOFKEY_LCONTROL) || g_pInput->IsMouseKeyPush(1))) {
 			CVector2 f_pos = CVector2(m_Pos.x, m_Pos.y + GetRect(false).GetHeight() / 2);
 			CVector2 f_move = CVector2(-8, 4);
@@ -333,11 +333,11 @@ void CPlayer::CollisionStage(CCollisionData coll)
 
 	//右移動かつ右方向への埋まり
 	if (coll.ox < 0 && m_Move.x > 0) {
-		m_Move.x  = 0;
+		m_Move.x = 0;
 	}
 	//左移動かつ左方向への埋まり
 	else if (coll.ox > 0 && m_Move.x < 0) {
-		m_Move.x  = 0;
+		m_Move.x = 0;
 	}
 
 	//接地状態（地面に足がついている）ではなくステータスが接地状態の場合
@@ -356,7 +356,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 	if (!ene.GetShow() || !ene.GetDisplay()) {
 		return;
 	}
-	
+
 	CRectangle rb = GetBRect(true);
 	CRectangle ra = GetRect(true);
 	CRectangle erec = ene.GetRect();
@@ -412,7 +412,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 		bool tFlg = (ene.GetChangeFlg() & CHANGE_TOUCH) == CHANGE_TOUCH;
 
 		if (ene.CheckDamageFlg(DAMAGE_ONLY_PLAYER) &&
-			(ene.GetDamageDirection() & BlockUp) == BlockUp && 
+			(ene.GetDamageDirection() & BlockUp) == BlockUp &&
 			(ene.GetChangeFlg() & CHANGE_TRAMPLED) != CHANGE_TRAMPLED) {
 			if (m_DmgTime > 0) return;
 
@@ -552,7 +552,11 @@ bool CPlayer::GoalFn(float ox, int gType, float glb, float stw, bool clearBgmPla
 int CPlayer::PipeInFn(CPipe::PipeData pipe)
 {
 	if (pipe.Type == 1) {
-		return PipeInFn_Door(pipe);
+		if (m_bPipeIn) {
+			return PIPE_FLAG_OUT_NOW;
+		}
+		m_bPipeIn = true;
+		return PIPE_FLAG_IN_END;
 	}
 	if (!m_bPipe) {
 		m_bPipe = true;
@@ -609,29 +613,25 @@ int CPlayer::PipeInFn(CPipe::PipeData pipe)
 	return PIPE_FLAG_IN_END;
 }
 
-int CPlayer::PipeInFn_Door(CPipe::PipeData pipe)
+void CPlayer::PipeInFn_Door(CPipe::PipeData pipe)
 {
-	if (!m_bPipe) {
-		m_bPipe = true;
-		m_bPipeIn = false;
-		m_Move.x = 0;
-		m_Move.y = 0;
-		m_Pos.x = pipe.Rect.Left;
-		m_Pos.y = pipe.Rect.Bottom - GetRect(false).GetHeight();
-		return PIPE_FLAG_IN_NOW;
-	}
-	else if (m_bPipeIn) {
-		return PIPE_FLAG_OUT_NOW;
-	}
+	m_bPipe = true;
 	m_bPipeIn = true;
-	return PIPE_FLAG_IN_END;
+	m_Move.x = 0;
+	m_Move.y = 0;
+	m_Pos.x = pipe.Rect.Left;
+	m_Pos.y = pipe.Rect.Bottom - GetRect(false).GetHeight();
 }
 
 int CPlayer::PipeOutFn(CPipe::PipeData pipe)
 {
 	if (!m_bPipe) return PIPE_FLAG_OUT_END;
 	if (pipe.Type == 1) {
-		return PipeOutFn_Door(pipe);
+		if (!m_bPipe) {
+			return PIPE_FLAG_OUT_END;
+		}
+		m_bPipe = false;
+		return PIPE_FLAG_OUT_END;
 	}
 	if ((pipe.Dir & BlockRight) == BlockRight) {
 		if (m_Pos.x + GetRect(false).GetWidth() > pipe.Rect.Left) {
@@ -661,10 +661,9 @@ int CPlayer::PipeOutFn(CPipe::PipeData pipe)
 	return PIPE_FLAG_OUT_END;
 }
 
-int CPlayer::PipeOutFn_Door(CPipe::PipeData pipe)
+void CPlayer::PipeOutFn_Door(CPipe::PipeData pipe)
 {
 	m_bPipe = false;
-	return PIPE_FLAG_OUT_END;
 }
 
 bool CPlayer::DeadFn()

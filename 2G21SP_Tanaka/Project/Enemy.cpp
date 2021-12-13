@@ -22,9 +22,10 @@ void CEnemy::Initialize(float px, float py, int type){
 	m_PosY = py;
 	m_MoveX = -1.0f;
 	m_MoveY = 0.0f;
-	m_MoveKameX = -6.0f;
+	m_MoveKameX = 0.0f;
 	m_bShow = true;
 	m_bMove = false;
+	m_bReverse = false;
 	m_bKame = false;
 	m_Kame = 0;
 	m_bDead = false;
@@ -118,7 +119,6 @@ void CEnemy::Update(float wx, float wy){
 		else
 		{
 			m_PosX += m_MoveX;
-
 		}
 		m_PosY += m_MoveY;
 	}
@@ -179,28 +179,52 @@ void CEnemy::CollisionStage(float ox, float oy){
 	{
 		m_MoveY = 0;
 	}
-	//左移動中の左埋まり、右移動中の右埋まりの場合は移動を初期化する。
-	if (ox < 0 && m_MoveX > 0)
+	if (m_bKame)
 	{
-		m_MoveX *= -1;
-		m_bReverse = true;
+		//左移動中の左埋まり、右移動中の右埋まりの場合は移動を初期化する。
+		if (ox < 0 && m_MoveKameX > 0)
+		{
+			m_MoveKameX *= -1;
+			m_bReverse = false;
+		}
+		else if (ox > 0 && m_MoveKameX < 0)
+		{
+			m_MoveKameX *= -1;
+			m_bReverse = true;
+		}
 	}
-	else if (ox > 0 && m_MoveX < 0)
+	else
 	{
-		m_MoveX *= -1;
-		m_bReverse = false;
+		//左移動中の左埋まり、右移動中の右埋まりの場合は移動を初期化する。
+		if (ox < 0 && m_MoveX > 0)
+		{
+			m_MoveX *= -1;
+			m_bReverse = false;
+		}
+		else if (ox > 0 && m_MoveX < 0)
+		{
+			m_MoveX *= -1;
+			m_bReverse = true;
+		}
+
 	}
-	//左移動中の左埋まり、右移動中の右埋まりの場合は移動を初期化する。
-	else if (ox < 0 && m_MoveKameX > 0)
+}
+
+void CEnemy::CollisionEnemy(void){
+	if (!m_bMove)
 	{
-		m_MoveKameX *= -1;
-		m_bReverse = true;
+		return;
 	}
-	else if (ox > 0 && m_MoveKameX < 0)
+	if (m_bDead)
 	{
-		m_MoveKameX *= -1;
-		m_bReverse = false;
+		return;
 	}
+	CRectangle erec = GetRect();
+
+	CRectangle left = Left();
+
+	CRectangle right = Right();
+	
 }
 
 void CEnemy::Damege(void){
@@ -220,13 +244,34 @@ void CEnemy::Damege(void){
 	}
 }
 
-void CEnemy::KameMove(void){
+void CEnemy::EnemyDamege(void){
+	switch (GetType())
+	{
+	case ENEMY_01:
+		m_Motion.ChangeMotion(MOTION_DEATH);
+		m_bDead = true;
+		return;
+		break;
+	case ENEMY_02:
+		m_Motion.ChangeMotion(MOTION_DEATH);
+		m_bKame = true;
+		m_bDead = true;
+		return;
+		break;
+	}
+}
+
+void CEnemy::KameLeftMove(void){
 	m_bMove = true;
-	m_MoveKameX *= -1;
+	m_MoveKameX = 6.0f;
+}
+
+void CEnemy::KameRightMove(void){
+	m_bMove = true;
+	m_MoveKameX = -6.0f;
 }
 
 void CEnemy::KameStop(void){
 	m_bMove = false;
-	
 }
 

@@ -55,6 +55,7 @@ public:
 	void RenderDebug(float wx, float wy);
 	void Release();
 	void CollisionStage(float ox, float oy);
+	void CollisionEnemy(void);
 	void SetTexture(CTexture* pt) { m_pTexture = pt; }
 	bool GetShow(void) { return m_bShow; }
 	bool GetMove(void) { return m_bMove; }
@@ -72,7 +73,9 @@ public:
 		return CRectangle(m_PosX + 20, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
 	}
 	void Damege(void);
-	void KameMove(void);
+	void EnemyDamege(void);
+	void KameLeftMove(void);
+	void KameRightMove(void);
 	void KameStop(void);
 };
 

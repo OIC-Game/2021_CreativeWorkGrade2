@@ -497,11 +497,11 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 	{
 		if (er.CollisionRect(Lefterec))
 		{
-			ene.KameMove();
+			ene.KameLeftMove();
 		}
 		else if (er.CollisionRect(Righterec))
 		{
-			ene.KameMove();
+			ene.KameRightMove();
 		}
 	}
 	else

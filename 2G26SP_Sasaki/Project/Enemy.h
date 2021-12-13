@@ -48,4 +48,6 @@ public:
 	}
 	//n”Ô–Ú‚Ì’e‚ğæ“¾i’e‚ÌQÆ‚ğ•Ô‚·j
 	CEnemyShot& GetShot(int n) { return m_ShotArray[n]; }
+
+	void NomalEnemyMove();
 };

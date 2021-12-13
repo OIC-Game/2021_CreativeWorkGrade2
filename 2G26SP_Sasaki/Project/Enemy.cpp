@@ -78,8 +78,9 @@ void CEnemy::Update(void){
 		return;	//‘ŠúƒŠƒ^[ƒ“
 	}
 
-	//‰æ–Ê‰º‚ÉŒü‚©‚Á‚ÄˆÚ“®
-	m_PosY += m_SpeedY;
+	if (m_EnemyType == 0)
+		NomalEnemyMove();
+
 	//‰æ–ÊŠO‚ÅÁ‹Ž
 	if(m_PosY >= g_pGraphics->GetTargetHeight())
 	{
@@ -157,4 +158,10 @@ void CEnemy::Damage(int dmg)
 	{
 		m_bShow = false;
 	}
+}
+
+	//‰æ–Ê‰º‚ÉŒü‚©‚Á‚ÄˆÚ“®
+void CEnemy::NomalEnemyMove()
+{
+	m_PosY += m_SpeedY;
 }

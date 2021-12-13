@@ -88,13 +88,13 @@ void CStage::Update(CEnemy* ene,int ecnt)
 			{
 				//ìGèoåª
 				ene[i].SetTexture(&m_EnemyTextureWhite,&m_EnemyShotTextureWhite);
-				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color);
+				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type);
 			}
 			if (m_pEnemyStart[m_EnemyNo].Color == 1)
 			{
 				//ìGèoåª
 				ene[i].SetTexture(&m_EnemyTextureBlack, &m_EnemyShotTextureBlack);
-				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color);
+				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type);
 			}
 			break;
 		}

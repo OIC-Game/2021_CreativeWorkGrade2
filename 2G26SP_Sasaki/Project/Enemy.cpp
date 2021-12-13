@@ -284,10 +284,10 @@ void CEnemy::ShotSelect(int i)
 	if (m_EnemyType == 3)
 		DownBullet(i);
 	if (m_EnemyType == 4)
-	{
-	}
+		DownBullet(i);
 	if (m_EnemyType == 5)
 	{
+		DownBullet(i);
 	}
 	
 }

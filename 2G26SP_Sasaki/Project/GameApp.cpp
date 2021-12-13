@@ -20,7 +20,7 @@ CPlayer     g_Player;
 //ステージ
 CStage     g_Stage;
 
-#define ENEMY_COUNT 20
+#define ENEMY_COUNT 40
 //CTexture m_EnemyTexture;
 CEnemy   g_EnemyArray[ENEMY_COUNT];
 
@@ -63,6 +63,7 @@ MofBool CGameApp::Initialize(void){
 	{
 		g_EnemyArray[i].Initialize();
 	}
+	g_Stage.MoveScroll(3200);
 
 	return TRUE;
 }

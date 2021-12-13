@@ -64,5 +64,4 @@ public:
 	{
 		return CRectangle(m_PosX, m_PosY, m_PosX + m_Texture.GetWidth(), m_PosY + m_Texture.GetHeight());
 	}
-
 };

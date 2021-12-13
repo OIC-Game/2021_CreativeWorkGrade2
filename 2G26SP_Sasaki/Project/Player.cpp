@@ -216,11 +216,11 @@ bool CPlayer::Collision(CEnemy& ene)
 	int enecolor    = ene.GetEnemyColor();
 	if(m_PlayerColor != enecolor)
 	{ 
-		if (prec.CollisionRect(erec))
-		{
-			m_bDead = true;
-			return true;
-		}
+		//if (prec.CollisionRect(erec))
+		//{
+		//	m_bDead = true;
+		//	return true;
+		//}
 	}
 
 	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
@@ -255,12 +255,12 @@ bool CPlayer::Collision(CEnemy& ene)
 		CRectangle srec = ene.GetShot(i).GetRect();
 		if (m_PlayerColor != enecolor)
 		{
-			if (srec.CollisionRect(prec))
-			{
-				m_bDead = true;
-				ene.GetShot(i).SetShow(false);
-				return true;
-			}
+			//if (srec.CollisionRect(prec))
+			//{
+			//	m_bDead = true;
+			//	ene.GetShot(i).SetShow(false);
+			//	return true;
+			//}
 		}
 	}
 	return false;

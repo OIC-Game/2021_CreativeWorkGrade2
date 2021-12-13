@@ -16,7 +16,7 @@ public:
 	~CEnemyShot();
 	void Initialize(void);
 	void Fire(float px,float py,float sx,float sy);
-	void Update(void);
+	void Update();
 	void Render(void);
 	void RenderDebug(void);
 	void SetTexture(CTexture* pt){ m_pTexture = pt; }

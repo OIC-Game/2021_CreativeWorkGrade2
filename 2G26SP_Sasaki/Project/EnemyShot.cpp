@@ -54,15 +54,17 @@ void CEnemyShot::Fire(float px,float py,float sx,float sy){
  * 更新
  *
  */
-void CEnemyShot::Update(void){
+void CEnemyShot::Update(){
 	//非表示
 	if(!m_bShow)
 	{
 		return;
 	}
+
 	//速度を利用した移動
 	m_PosX += m_SpdX;
 	m_PosY += m_SpdY;
+
 	//画面外で消去
 	if(m_PosX + m_pTexture->GetWidth() < 0 || m_PosX > g_pGraphics->GetTargetWidth() ||
 		m_PosY + m_pTexture->GetHeight() < 0 || m_PosY > g_pGraphics->GetTargetHeight())

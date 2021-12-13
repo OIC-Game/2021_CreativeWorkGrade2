@@ -3,7 +3,9 @@
 #include	"Mof.h"
 #include    "EnemyShot.h"
 
-#define      ENEMYSHOT_COUNT   50
+#define		ENEMY_MOVESPEED		1
+
+#define      ENEMYSHOT_COUNT   100
 //敵１体分の情報を管理するクラス
 class CEnemy {
 private:
@@ -19,6 +21,9 @@ private:
 	int                     m_ShotWaitSet;
 	int						m_EnemyColor;
 	int						m_EnemyType;
+
+	int						Secondcount;
+	int						second;
 
 public:
 	CEnemy();
@@ -49,5 +54,29 @@ public:
 	//n番目の弾を取得（弾の参照を返す）
 	CEnemyShot& GetShot(int n) { return m_ShotArray[n]; }
 
+	//真下
 	void NomalEnemyMove();
+	//止まって動く
+	void StopAndStartMove();
+	//斜め右移動
+	void SlantMove(bool left);
+	//回転
+	void HardEnemyMove(bool left);
+	//ボス黒
+	void BossMoveBlack();
+	//ボス白
+	void BossMoveWhite();
+
+	void ShotSelect(int i);
+
+	//真下
+	void DownBullet(int i);
+	//斜め右下
+	void SlantRightBullet(int i);
+	//斜め左下
+	void SlantLeftBullet(int i);
+	//右
+	void RightBullet(int i);
+	//左
+	void LeftBullet(int i);
 };

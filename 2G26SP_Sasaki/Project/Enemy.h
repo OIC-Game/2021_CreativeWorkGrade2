@@ -5,7 +5,9 @@
 
 #define		ENEMY_MOVESPEED		1
 
-#define      ENEMYSHOT_COUNT   100
+//
+#define		ENEMYSHOT_LINE		10
+#define     ENEMYSHOT_COUNT		50
 //敵１体分の情報を管理するクラス
 class CEnemy {
 private:
@@ -16,7 +18,7 @@ private:
 	float					m_SpeedY;	//ｙ方向の移動量
 	bool					m_bShow;	//表示（出現）している場合はtrue
 	int                     m_HP;       //敵のHP
-	CEnemyShot              m_ShotArray[ENEMYSHOT_COUNT];
+	CEnemyShot              m_ShotArray[ENEMYSHOT_LINE][ENEMYSHOT_COUNT];
 	int                     m_ShotWait;
 	int                     m_ShotWaitSet;
 	int						m_EnemyColor;
@@ -49,10 +51,17 @@ public:
 	void SetTexture(CTexture* pt, CTexture* st)
 	{
 		m_pTexture = pt;
-		for (int i = 0; i < ENEMYSHOT_COUNT; i++) { m_ShotArray[i].SetTexture(st); }
+		for (int i = 0; i < ENEMYSHOT_LINE; i++)
+		{
+			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+			{
+				m_ShotArray[i][j].SetTexture(st);
+			}
+		}
 	}
+
 	//n番目の弾を取得（弾の参照を返す）
-	CEnemyShot& GetShot(int n) { return m_ShotArray[n]; }
+	CEnemyShot& GetShot(int n,int m) { return m_ShotArray[n][m]; }
 
 	//真下
 	void NomalEnemyMove();
@@ -67,16 +76,16 @@ public:
 	//ボス白
 	void BossMoveWhite();
 
-	void ShotSelect(int i);
+	void ShotSelect(int j);
 
 	//真下
-	void DownBullet(int i);
+	void DownBullet(int j);
 	//斜め右下
-	void SlantRightBullet(int i);
+	void SlantRightBullet(int j);
 	//斜め左下
-	void SlantLeftBullet(int i);
+	void SlantLeftBullet(int j);
 	//右
-	void RightBullet(int i);
+	void RightBullet(int j);
 	//左
-	void LeftBullet(int i);
+	void LeftBullet(int j);
 };

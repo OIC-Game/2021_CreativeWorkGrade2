@@ -246,21 +246,24 @@ bool CPlayer::Collision(CEnemy& ene)
 		}
 		//}
 	}
-	for (int i = 0; i < ENEMYSHOT_COUNT; i++)
+	for (int i = 0; i < ENEMYSHOT_LINE; i++)
 	{
-		if (!ene.GetShot(i).GetShow())
+		for (int j = 0; j < ENEMYSHOT_COUNT; j++)
 		{
-			continue;
-		}
-		CRectangle srec = ene.GetShot(i).GetRect();
-		if (m_PlayerColor != enecolor)
-		{
-			//if (srec.CollisionRect(prec))
-			//{
-			//	m_bDead = true;
-			//	ene.GetShot(i).SetShow(false);
-			//	return true;
-			//}
+			if (!ene.GetShot(i, j).GetShow())
+			{
+				continue;
+			}
+			CRectangle srec = ene.GetShot(i,j).GetRect();
+			if (m_PlayerColor != enecolor)
+			{
+				//if (srec.CollisionRect(prec))
+				//{
+				//	m_bDead = true;
+				//	ene.GetShot(i).SetShow(false);
+				//	return true;
+				//}
+			}
 		}
 	}
 	return false;

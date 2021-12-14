@@ -63,7 +63,10 @@ MofBool CGameApp::Initialize(void){
 	{
 		g_EnemyArray[i].Initialize();
 	}
-	g_Stage.MoveScroll(3200);
+
+	//デバック用
+	//ステージのスクロール値
+	//g_Stage.MoveScroll(3200);
 
 	return TRUE;
 }

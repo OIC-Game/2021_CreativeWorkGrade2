@@ -18,7 +18,7 @@ bool CGame::Load(void){
 	switch (gStage)
 	{
 		case STAGENO_01:
-		m_Stage.Load("Stage03.txt");
+		m_Stage.Load("Stage01.txt");
 		break;
 		case STAGENO_02:
 		m_Stage.Load("Stage02.txt");
@@ -42,7 +42,7 @@ void CGame::Initialize(void){
 	switch (gStage)
 	{
 		case STAGENO_01:
-			m_Stage.Initialize("Stage03.txt", m_EnemyArray, m_ItemArray);
+			m_Stage.Initialize("Stage01.txt", m_EnemyArray, m_ItemArray);
 			break;
 		case STAGENO_02:
 			m_Stage.Initialize("Stage02.txt", m_EnemyArray, m_ItemArray);
@@ -74,6 +74,34 @@ void CGame::Update(void){
 			continue;
 		}
 		m_EnemyArray[i].Update(m_Stage.GetScrollX(), m_Stage.GetScrollY());
+		for (int s = 0; s < m_Stage.GetEnemyCount(); s++)
+		{
+			CRectangle ene = m_EnemyArray[i].GetRect();
+			CRectangle left = m_EnemyArray[s].Left();
+			CRectangle right = m_EnemyArray[s].Right();
+			if (m_EnemyArray[s].GetKame()&&m_EnemyArray[s].GetMove())
+			{
+				if (ene.CollisionRect(left))
+				{
+					m_EnemyArray[i].EnemyDamege();
+				}
+				else if (ene.CollisionRect(right))
+				{
+					m_EnemyArray[i].EnemyDamege();
+				}
+			}
+			else
+			{
+				if (ene.CollisionRect(left))
+				{
+					m_EnemyArray[i].CollisionEnemy();
+				}
+				else if (ene.CollisionRect(right))
+				{
+					m_EnemyArray[i].CollisionEnemy();
+				}
+			}
+		}
 		float ox = 0, oy = 0;
 		int popItemNo = 0;
 		if (m_Stage.Collision(m_EnemyArray[i].GetRect(), m_Player, ox, oy,popItemNo))

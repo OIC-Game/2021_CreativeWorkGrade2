@@ -210,21 +210,9 @@ void CEnemy::CollisionStage(float ox, float oy){
 	}
 }
 
-void CEnemy::CollisionEnemy(void){
-	if (!m_bMove)
-	{
-		return;
-	}
-	if (m_bDead)
-	{
-		return;
-	}
-	CRectangle erec = GetRect();
-
-	CRectangle left = Left();
-
-	CRectangle right = Right();
-	
+void CEnemy::CollisionEnemy(){
+	m_bReverse = !m_bReverse;
+	m_MoveX *= -1;
 }
 
 void CEnemy::Damege(void){
@@ -254,7 +242,6 @@ void CEnemy::EnemyDamege(void){
 		break;
 	case ENEMY_02:
 		m_Motion.ChangeMotion(MOTION_DEATH);
-		m_bKame = true;
 		m_bDead = true;
 		return;
 		break;

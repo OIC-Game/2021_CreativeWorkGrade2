@@ -11,6 +11,7 @@ bool CUI::Load(void){
 	{
 		return false;
 	}
+	return true;
 }
 
 void CUI::Initialize(void){

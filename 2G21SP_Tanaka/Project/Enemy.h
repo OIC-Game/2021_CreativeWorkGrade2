@@ -61,16 +61,17 @@ public:
 	bool GetMove(void) { return m_bMove; }
 	int GetType(void) { return m_Type; }
 	bool GetDead(void) { return m_bDead; }
+	bool GetKame(void) { return m_bKame; }
 	CRectangle GetRect() {
 		return CRectangle(m_PosX + ENEMY_RECTDECREASE, m_PosY, m_PosX + m_SrcRect.GetWidth() - ENEMY_RECTDECREASE, m_PosY + m_SrcRect.GetHeight());
 	}
 
 	CRectangle Left() {
-		return CRectangle(m_PosX, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - 20, m_PosY + m_SrcRect.GetHeight());
+		return CRectangle(m_PosX, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - 40, m_PosY + m_SrcRect.GetHeight());
 	}
 
 	CRectangle Right() {
-		return CRectangle(m_PosX + 20, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
+		return CRectangle(m_PosX + 40, m_PosY + ENEMY_RECTDECREASE, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
 	}
 	void Damege(void);
 	void EnemyDamege(void);

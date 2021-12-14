@@ -41,7 +41,7 @@ bool CStageBase::Load(char* file)
 
 void CStageBase::Initialize()
 {
-	m_Stage.Initialize();
+	//m_Stage.Initialize();
 }
 
 void CStageBase::Update()

@@ -15,6 +15,7 @@ CPlayer::CPlayer() :
 	m_JumpStatus(0),
 	m_bReverse(false),
 	m_JumpSp(0),
+	m_bInWater(false),
 	m_Texture(),
 	m_SkillTexture()
 {
@@ -50,6 +51,7 @@ void CPlayer::Initialize(Vector2 pos, int life)
 	m_DeadWait = 0;
 	m_bDeadEnd = 0;
 	m_bGoal = false;
+	m_bInWater = false;
 	m_DmgTime = 0;
 	m_Life = life;
 	m_BRect = GetRect(false);
@@ -85,6 +87,34 @@ void CPlayer::JumpStart(float SSpeed) {
 	}
 }
 
+void CPlayer::SwimStart()
+{
+	SwimStart(0);
+}
+
+void CPlayer::SwimStart(float SSpeed)
+{
+	//ステータスをジャンプ中に設定
+	m_JumpStatus = Swimming;
+
+	//ジャンプによる上下方向の加速度を設定
+	m_JumpSp = SwimUSp;
+
+	//初速度のインデックス
+	int ix = 0;
+
+	if (SSpeed < 0) {
+		m_Move.y = SSpeed;
+	}
+	else {
+		m_Move.y = SwimSSpeed;
+	}
+
+	if (!m_bDead) {
+		//m_SoundArray[SOUND_JUMP].Play();
+	}
+}
+
 void CPlayer::JumpingFn(bool btnPull)
 {
 	//上下方向の速度が下方向、もしくはジャンプボタンが離された場合
@@ -99,6 +129,26 @@ void CPlayer::JumpingFn(bool btnPull)
 	//落下上限速度で制限する
 	if (m_Move.y >= JumpMaxSpeed) {
 		m_Move.y = JumpMaxSpeed;
+	}
+}
+
+void CPlayer::SwimmingFn(bool btnPull)
+{
+	//上下方向の速度が下方向、もしくはジャンプボタンが離された場合
+	if (btnPull) {
+		m_Move.y = 0;
+	}
+	if (m_Move.y >= 0 || btnPull) {
+		//上下方向の加速度を落下時の加速度に変える
+		m_JumpSp = SwimFSp;
+	}
+
+	//上下方向の速度に加速度分加算する
+	m_Move.y += m_JumpSp;
+
+	//落下上限速度で制限する
+	if (m_Move.y >= SwimMaxSpeed) {
+		m_Move.y = SwimMaxSpeed;
 	}
 }
 
@@ -123,6 +173,7 @@ void CPlayer::Damage(bool death)
 
 void CPlayer::Update(float wx, float wy)
 {
+	m_SwimFlg = false;
 	m_BRect = GetRect(false);
 
 	m_Motion.AddTimer(CUtilities::GetFrameSecond());
@@ -141,27 +192,27 @@ void CPlayer::Update(float wx, float wy)
 			//ダッシュ判定（左CTRL又は右クリック）
 			if (g_pInput->IsKeyHold(MOFKEY_LCONTROL) || g_pInput->IsMouseKeyHold(1)) {
 				//横方向の速度に加速度分加算する
-				if (m_Move.x > -MoveMaxSpeed) {
-					m_Move.x -= MoveSpeed;
+				if (m_Move.x > GetMaxMoveSpeed(true)) {
+					m_Move.x += GetMoveSpeed(true);
 				}
 				else {
-					m_Move.x -= RunSpeed;
+					m_Move.x += GetRunSpeed(true);
 				}
 				//左（マイナス）のダッシュ上限速度で制限する
-				if (m_Move.x < -RunMaxSpeed) {
-					m_Move.x = -RunMaxSpeed;
+				if (m_Move.x < GetMaxRunSpeed(true)) {
+					m_Move.x = GetMaxRunSpeed(true);
 				}
 			}
 			else {
-				if (m_Move.x > -MoveMaxSpeed) {
+				if (m_Move.x > GetMaxMoveSpeed(true)) {
 					//横方向の速度に加速度分加算する
-					m_Move.x -= MoveSpeed;
+					m_Move.x += GetMoveSpeed(true);
 				}
 				//左（マイナス）の上限速度で制限する（上限速度まで減速する）
-				if (m_Move.x < -MoveMaxSpeed) {
-					m_Move.x += MoveSpeed;
-					if (m_Move.x > -MoveMaxSpeed) {
-						m_Move.x = -MoveMaxSpeed;
+				if (m_Move.x < GetMaxMoveSpeed(true)) {
+					m_Move.x -= GetMoveSpeed(true);
+					if (m_Move.x > GetMaxMoveSpeed(true)) {
+						m_Move.x = GetMaxMoveSpeed(true);
 					}
 				}
 			}
@@ -174,27 +225,27 @@ void CPlayer::Update(float wx, float wy)
 			//ダッシュ判定（左CTRL又は右クリック）
 			if (g_pInput->IsKeyHold(MOFKEY_LCONTROL) || g_pInput->IsMouseKeyHold(1)) {
 				//横方向の速度に加速度分加算する
-				if (m_Move.x < MoveMaxSpeed) {
-					m_Move.x += MoveSpeed;
+				if (m_Move.x < GetMaxMoveSpeed(false)) {
+					m_Move.x += GetMoveSpeed(false);
 				}
 				else {
-					m_Move.x += RunSpeed;
+					m_Move.x += GetRunSpeed(false);
 				}
 				//右（プラス）のダッシュ上限速度で制限する
-				if (m_Move.x > RunMaxSpeed) {
-					m_Move.x = RunMaxSpeed;
+				if (m_Move.x > GetMaxRunSpeed(false)) {
+					m_Move.x = GetMaxRunSpeed(false);
 				}
 			}
 			else {
-				if (m_Move.x < MoveMaxSpeed) {
+				if (m_Move.x < GetMaxMoveSpeed(false)) {
 					//横方向の速度に加速度分加算する
-					m_Move.x += MoveSpeed;
+					m_Move.x += GetMoveSpeed(false);
 				}
 				//右（プラス）の上限速度で制限する（上限速度まで減速する）
-				if (m_Move.x > MoveMaxSpeed) {
-					m_Move.x -= MoveSpeed;
-					if (m_Move.x < MoveMaxSpeed) {
-						m_Move.x = MoveMaxSpeed;
+				if (m_Move.x > GetMaxMoveSpeed(false)) {
+					m_Move.x -= GetMoveSpeed(false);
+					if (m_Move.x < GetMaxMoveSpeed(false)) {
+						m_Move.x = GetMaxMoveSpeed(false);
 					}
 				}
 			}
@@ -219,7 +270,10 @@ void CPlayer::Update(float wx, float wy)
 		//このフレームでジャンプボタンが押された場合
 		if (g_pInput->IsKeyPush(MOFKEY_SPACE) || g_pInput->IsMouseKeyPush(0)) {
 			//ステータスが接地状態（地面に足がついている）なら
-			if (m_JumpStatus == OnGround) {
+			if (m_bInWater) {
+				SwimStart();
+			}
+			else if (m_JumpStatus == OnGround) {
 				//ジャンプ処理を開始する
 				JumpStart();
 			}
@@ -230,6 +284,16 @@ void CPlayer::Update(float wx, float wy)
 		bool btnPull = g_pInput->IsKeyPull(MOFKEY_SPACE) || g_pInput->IsMouseKeyPull(0);
 		//ジャンプ処理を実行する
 		JumpingFn(btnPull && !m_bGoal);
+
+		if (m_Move.y < 0 && m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_JUMP) {
+			m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_JUMP);
+		}
+	}
+	else if (m_JumpStatus == Swimming) {
+		bool btnPull = g_pInput->IsKeyPull(MOFKEY_SPACE) || g_pInput->IsMouseKeyPull(0);
+		//
+		m_SwimFlg = true;
+		SwimmingFn(btnPull && !m_bGoal);
 
 		if (m_Move.y < 0 && m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_JUMP) {
 			m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_JUMP);
@@ -250,13 +314,13 @@ void CPlayer::Update(float wx, float wy)
 	if (!bMove && !m_bGoal && !m_bPipe && m_JumpStatus != Manualing) {
 		//次第に減速する
 		if (m_Move.x > 0) {
-			m_Move.x -= MoveSpeed;
+			m_Move.x -= GetMoveSpeed(false);
 			if (m_Move.x <= 0) {
 				m_Move.x = 0;
 			}
 		}
 		else if (m_Move.x < 0) {
-			m_Move.x += MoveSpeed;
+			m_Move.x -= GetMoveSpeed(true);
 			if (m_Move.x >= 0) {
 				m_Move.x = 0;
 			}
@@ -310,6 +374,11 @@ void CPlayer::Render(float wx, float wy)
 	m_Texture->RenderScale((m_Pos.x - wx) * scale, (m_Pos.y - wy) * scale, scale, cr);
 }
 
+void CPlayer::RenderDebug()
+{
+	CGraphicsUtilities::RenderString(20, 30, "jumpSp:%2.2f mx:%2.2f my:%2.2f state:%1d water:%d swim:%d", m_JumpSp, m_Move.x, m_Move.y, m_JumpStatus, m_bInWater, m_SwimFlg);
+}
+
 void CPlayer::CollisionStage(CCollisionData coll)
 {
 	//プレイヤーの位置を修正する
@@ -321,7 +390,7 @@ void CPlayer::CollisionStage(CCollisionData coll)
 		//上下方向の速度を無くす
 		m_Move.y = 0;
 		//ステータスがジャンプ状態の場合、接地状態にする
-		if (m_JumpStatus == Jumping) {
+		if (m_JumpStatus == Jumping || m_JumpStatus == Swimming) {
 			m_JumpStatus = OnGround;
 		}
 	}
@@ -340,10 +409,25 @@ void CPlayer::CollisionStage(CCollisionData coll)
 		m_Move.x = 0;
 	}
 
+	if (m_bInWater && !coll.inWater) {
+		m_JumpStatus = Jumping;
+		if (m_Move.y < 0) {
+			JumpStart(m_Move.y * 2.2f);
+		}
+	}
+	else if (!m_bInWater && coll.inWater && m_JumpStatus == Jumping) {
+		m_JumpStatus = Swimming;
+	}
+	m_bInWater = coll.inWater;
 	//接地状態（地面に足がついている）ではなくステータスが接地状態の場合
 	if (!coll.og && m_JumpStatus == OnGround) {
-		//ステータスをジャンプ状態にする
-		m_JumpStatus = Jumping;
+		if (!m_bInWater) {
+			//ステータスをジャンプ状態にする
+			m_JumpStatus = Jumping;
+		}
+		else {
+			m_JumpStatus = Swimming;
+		}
 	}
 
 	if (coll.damage && !coll.og) {
@@ -708,7 +792,7 @@ CPipe::PipeData CPlayer::GetPipeData(int id)
 	bool keyRight = g_pInput->IsKeyHold(MOFKEY_D) || g_pInput->IsKeyHold(MOFKEY_RIGHT);
 	bool keyDown = g_pInput->IsKeyHold(MOFKEY_S) || g_pInput->IsKeyHold(MOFKEY_DOWN);
 	bool keyLeft = g_pInput->IsKeyHold(MOFKEY_A) || g_pInput->IsKeyHold(MOFKEY_LEFT);
-	if (keyUp && (m_JumpStatus == OnGround || (m_JumpStatus == Jumping && m_Move.y < 0))) {
+	if (keyUp && (m_JumpStatus == OnGround || ((m_JumpStatus == Jumping || m_JumpStatus == Swimming) && m_Move.y < 0))) {
 		p.Root = true;
 		p.Id = id;
 		p.Dir = BlockUp;

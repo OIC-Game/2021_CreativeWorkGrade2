@@ -31,6 +31,7 @@ private:
 	int			m_BlockCount;		//
 	int			m_StartX;			//プレイヤーの初期位置
 	int			m_StartY;			//プレイヤーの初期位置
+	int			m_StageType;
 
 	float		m_ScrollX;			//横方向のスクロール位置
 	float		m_ScrollY;			//縦方向のスクロール位置

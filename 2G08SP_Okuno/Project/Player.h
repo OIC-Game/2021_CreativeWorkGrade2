@@ -23,8 +23,14 @@ private:
 	const float		RunMaxSpeed = 6.0f;							//ダッシュ時の上限速度
 	const float		JumpSSpeed[3] = { -10.3f, -10.66f , -11.0f };	//ジャンプの初速度の配列
 	const float		JumpUSp = 0.4f;								//ジャンプの上昇時の加速度（減速度）
-	const float		JumpFSp = 0.7f;							//ジャンプの落下時の加速度（減速度）
+	const float		JumpFSp = 0.7f;								//ジャンプの落下時の加速度（減速度）
 	const float		JumpMaxSpeed = 8.0f;						//落下の上限速度
+	const float		SwimSSpeed = -3.5f;
+	const float		SwimUSp = 0.2f;
+	const float		SwimFSp = 0.02f;
+	const float		SwimMaxSpeed = 0.7f;
+	const float		SwimMove = 0.5f;
+
 
 	enum t_ANIM_TYPE {
 		ANIM_STAND,
@@ -76,6 +82,7 @@ private:
 	bool			m_bReverse;
 	int				m_JumpStatus;
 	float			m_JumpSp;
+	bool			m_bInWater;
 	float			m_sth;			//ステージの縦幅
 	int				m_TypeIdx;		//マリオの状態のインデックス
 	bool			m_bDead;		//死亡フラグ
@@ -87,6 +94,8 @@ private:
 	float			m_DmgTime;		//ダメージを受けた場合の無敵時間
 	int				m_Life;			//マリオのライフ
 
+	bool			m_SwimFlg = false; //デバッグ用
+
 	/// <summary>
 	/// ジャンプ処理開始時の初期化設定
 	/// </summary>
@@ -94,11 +103,16 @@ private:
 	void JumpStart(float SSpeed);
 	void JumpStart();
 
+	void SwimStart(float SSpeed);
+	void SwimStart();
+
 	/// <summary>
 	/// ジャンプ中の処理
 	/// </summary>
 	/// <param name="btnPull">そのフレームでジャンプボタンが離されたかどうか</param>
 	void JumpingFn(bool btnPull);
+
+	void SwimmingFn(bool btnPull);
 
 public:
 	CPlayer();
@@ -111,6 +125,7 @@ public:
 	void Update(float wx, float wy);
 
 	void Render(float wx, float wy);
+	void RenderDebug();
 
 	void CollisionStage(CCollisionData coll);
 
@@ -185,6 +200,50 @@ public:
 	int GetLife() { return m_Life; };
 
 	int GetSoundCount() { return SOUND_COUNT; };
+
+	float GetMaxMoveSpeed(bool reverse) {
+		float re = MoveMaxSpeed;
+		if (m_bInWater) {
+			re *= SwimMove;
+		}
+		if (reverse) {
+			re *= -1;
+		}
+		return re;
+	}
+
+	float GetMoveSpeed(bool reverse) {
+		float re = MoveSpeed;
+		if (m_bInWater) {
+			re *= SwimMove;
+		}
+		if (reverse) {
+			re *= -1;
+		}
+		return re;
+	}
+
+	float GetMaxRunSpeed(bool reverse) {
+		float re = RunMaxSpeed;
+		if (m_bInWater) {
+			re *= SwimMove;
+		}
+		if (reverse) {
+			re *= -1;
+		}
+		return re;
+	}
+
+	float GetRunSpeed(bool reverse) {
+		float re = RunSpeed;
+		if (m_bInWater) {
+			re *= SwimMove;
+		}
+		if (reverse) {
+			re *= -1;
+		}
+		return re;
+	}
 
 	std::string* GetSoundFiles() {
 		return m_SoundFiles;

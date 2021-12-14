@@ -17,6 +17,7 @@ enum b_Direction {
 enum e_JumpState {
 	OnGround,
 	Jumping,
+	Swimming,
 	Manualing
 };
 
@@ -88,6 +89,11 @@ enum t_DOOR_CHIPS {
 	DOOR_F2 = 92,
 
 	DOOR_FN = 5,
+};
+
+enum t_WATER_CHIPS {
+	WATER_1 = 81,
+	WATER_2 = 91,
 };
 
 class CItemDefine {

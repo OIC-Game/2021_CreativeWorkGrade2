@@ -249,9 +249,10 @@ void CGame::Render()
 void CGame::RenderDebug()
 {
 	if (m_nScene == G_SCENE_GAME) {
-		m_Stage.RenderDebug();
+		//m_Stage.RenderDebug();
+		m_Player.RenderDebug();
 	}
-	CGraphicsUtilities::RenderString(400, 10, "upd :%3d render :%3d fps:%2d", m_updTime, m_renderTime, CUtilities::GetFPS());
+	//CGraphicsUtilities::RenderString(400, 10, "upd :%3d render :%3d fps:%2d", m_updTime, m_renderTime, CUtilities::GetFPS());
 }
 
 void CGame::Release()

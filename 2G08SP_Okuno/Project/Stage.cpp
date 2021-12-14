@@ -22,7 +22,8 @@ CStage::CStage() :
 	m_ItemCount(0),
 	m_ItemArray(),
 	m_BlockArray(),
-	m_BlockCount(0)
+	m_BlockCount(0),
+	m_StageType(0)
 {
 }
 
@@ -111,6 +112,12 @@ bool CStage::Load(char* fname, int sx, int sy)
 				m_ItemCount++;
 			}
 		}
+	}
+	pstr = strtok(NULL, ",");
+
+	m_StageType = 0;
+	if (pstr != NULL) {
+		m_StageType = atoi(pstr);
 	}
 
 	m_StartX = sx;
@@ -450,6 +457,9 @@ void CStage::Release()
 CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRectangle ra, CVector2 move)
 {
 	CCollisionData coll = CCollisionData();
+	if (m_StageType == 1) {
+		coll.inWater = true;
+	}
 
 	float sw = g_pGraphics->GetTargetWidth();
 	float sh = g_pGraphics->GetTargetHeight();
@@ -460,6 +470,12 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 		if (m_BlockArray[i].GetType() < 0) continue;
 		CRectangle cr = m_BlockArray[i].GetRect();
 		if (cr.Right - m_ScrollX < -CHIPSIZE || cr.Left - m_ScrollX > sw + CHIPSIZE) continue;
+
+		if (m_BlockArray[i].GetType() == WATER_1 || m_BlockArray[i].GetType() == WATER_2) {
+			if (cr.CollisionRect(ra)) {
+				coll.inWater = true;
+			}
+		}
 
 		if (move.y >= 0) {
 			CRectangle b_trec = cr;

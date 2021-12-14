@@ -6,6 +6,7 @@ public:
 	float		ox; //横方向の埋まり具合
 	float		oy; //縦方向の埋まり具合
 	bool		og; //接地状態かどうか
+	bool		inWater; 
 	bool		unfallleftflg; //非落下移動用フラグ
 	bool		unfallrightflg; //非落下移動用フラグ
 
@@ -14,6 +15,7 @@ public:
 		ox(0),
 		oy(0),
 		og(false),
+		inWater(false),
 		unfallleftflg(false),
 		unfallrightflg(false)
 	{

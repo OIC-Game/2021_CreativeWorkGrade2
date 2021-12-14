@@ -111,11 +111,7 @@ void CEnemy::Update(void) {
 	m_Motion.AddTimer(CUtilities::GetFrameSecond());
 	m_SrcRect = m_Motion.GetSrcRect();
 
-	//ダメージのインターバルを減らす
-	if (m_DamageWait > 0)
-	{
-		m_DamageWait--;
-	}
+	
 
 }
 
@@ -204,6 +200,11 @@ bool CEnemy::CollisionPlayer()
 		return true;
 	}
 	return false;
+
+	/*if (m_DamageWait<60)
+	{
+
+	}*/
 }
 
 
@@ -211,6 +212,7 @@ void CEnemy::Damage()
 {
 	m_Motion.ChangeMotion(MOTION_DAMAGE);
 
-		m_bShow = false;
+
+	m_bShow = false;
 			
 }

@@ -8,7 +8,7 @@
 
 
 //ИЏУЃСђУx
-#define		PLAYER_SPEED			0.3f
+#define		PLAYER_SPEED			0.5f
 
 //ИЏУЃН≈СеСђУx
 #define		PLAYER_MAXSPEED			5.0f

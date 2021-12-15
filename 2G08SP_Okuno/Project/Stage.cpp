@@ -31,7 +31,7 @@ CStage::~CStage()
 {
 }
 
-bool CStage::Load(char* fname, int sx, int sy)
+bool CStage::Load(char* fname, int sx, int sy, int sType)
 {
 	FILE* f = fopen(fname, "rt");
 	if (f == NULL) {
@@ -113,15 +113,10 @@ bool CStage::Load(char* fname, int sx, int sy)
 			}
 		}
 	}
-	pstr = strtok(NULL, ",");
-
-	m_StageType = 0;
-	if (pstr != NULL) {
-		m_StageType = atoi(pstr);
-	}
 
 	m_StartX = sx;
 	m_StartY = sy;
+	m_StageType = sType;
 
 	fclose(f);
 	free(buffer);

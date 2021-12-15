@@ -52,9 +52,10 @@ bool CStageParent::Load(std::string fname, CSoundBuffer* skillSound)
 		pstr = strtok(wk, ",");
 		int sx = atoi(strtok(NULL, ","));
 		int sy = atoi(strtok(NULL, ","));
+		int sType = atoi(strtok(NULL, ","));
 
 		wk = strtok(NULL, "");
-		if (!m_StageArray[i].Load(pstr, sx, sy)) {
+		if (!m_StageArray[i].Load(pstr, sx, sy, sType)) {
 			return false;
 		}
 	}

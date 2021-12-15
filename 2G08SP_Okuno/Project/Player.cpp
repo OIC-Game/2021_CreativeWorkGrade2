@@ -113,6 +113,8 @@ void CPlayer::SwimStart(float SSpeed)
 	if (!m_bDead) {
 		//m_SoundArray[SOUND_JUMP].Play();
 	}
+
+	m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_SWIM);
 }
 
 void CPlayer::JumpingFn(bool btnPull)
@@ -295,8 +297,8 @@ void CPlayer::Update(float wx, float wy)
 		m_SwimFlg = true;
 		SwimmingFn(btnPull && !m_bGoal);
 
-		if (m_Move.y < 0 && m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_JUMP) {
-			m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_JUMP);
+		if (m_Move.y < 0 && m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_SWIM) {
+			m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_SWIM);
 		}
 	}
 	else if (m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_ACTION || m_Motion.IsEndMotion()) {
@@ -415,7 +417,7 @@ void CPlayer::CollisionStage(CCollisionData coll)
 			JumpStart(m_Move.y * 2.2f);
 		}
 	}
-	else if (!m_bInWater && coll.inWater && m_JumpStatus == Jumping) {
+	else if (coll.inWater && m_JumpStatus == Jumping) {
 		m_JumpStatus = Swimming;
 	}
 	m_bInWater = coll.inWater;

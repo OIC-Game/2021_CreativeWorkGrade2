@@ -40,7 +40,7 @@ public:
 	CStage();
 	~CStage();
 
-	bool Load(char* fname, int sx, int sy);
+	bool Load(char* fname, int sx, int sy, int sType);
 
 	void Initialize(bool bGoal, int gType, int gx, int gy, CSoundBuffer* skillSound);
 	void StageFlash(); //ステージ内の敵などのステータスを表示状態にする

@@ -1,4 +1,3 @@
-#include	"GameApp.h"
 #include	"Title.h"
 
 //変更するシーン(外部参照)
@@ -37,8 +36,7 @@ bool CTitle::Load(void)
 	}
 	//ループ設定
 	m_titleBGM.SetLoop(TRUE);
-	//BGMの再生
-	m_titleBGM.Play();
+
 
 	return true;
 }
@@ -48,7 +46,8 @@ bool CTitle::Load(void)
 */
 void CTitle::Initialize(void)
 {
-	Load();
+	//BGMの再生
+	m_titleBGM.Play();
 
 	//音量の調整
 	m_titleBGM.SetVolume(0.06f);
@@ -78,11 +77,20 @@ void CTitle::Update(void)
 
 	if (g_pInput->IsKeyPush(MOFKEY_RETURN))
 	{
+		m_vsAiFlg = false;
+		m_startFlg = true;
+		//フェードアウト
+		m_fade.FadeOut();
+	}
+
+	if (g_pInput->IsKeyPush(MOFKEY_SPACE))
+	{
 		m_vsAiFlg = true;
 		m_startFlg = true;
 		//フェードアウト
 		m_fade.FadeOut();
 	}
+
 
 	
 }

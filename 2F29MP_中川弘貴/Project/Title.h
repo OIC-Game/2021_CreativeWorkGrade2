@@ -1,5 +1,5 @@
 #pragma once
-#include "Fade.h"
+#include	"GameApp.h"
 
 class CTitle {
 private:

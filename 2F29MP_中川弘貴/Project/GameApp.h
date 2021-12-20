@@ -14,6 +14,7 @@
 
 //INCLUDE
 #include	"Mof.h"
+#include	"Fade.h"
 #include	"time.h"
 
 //‘¶İ‚·‚éƒV[ƒ“‚Ì—ñ‹“

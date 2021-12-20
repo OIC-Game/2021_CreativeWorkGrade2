@@ -15,6 +15,9 @@ MofBool CGameApp::Initialize(void) {
 	//リソース配置ディレクトリの設定
 	CUtilities::SetCurrentDirectory("Resource");
 
+	gGameScene.Load();
+	gTitleScene.Load();
+
 	//最初に実行されるシーンの初期化
 	gTitleScene.Initialize();
 	//gGameScene.Initialize();

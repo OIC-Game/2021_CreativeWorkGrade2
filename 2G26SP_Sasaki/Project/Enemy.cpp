@@ -219,10 +219,7 @@ void CEnemy::Damage(int dmg)
 
 void CEnemy::NomalEnemyMove()
 {
-	if (m_PosY < 100)
-		m_SpeedY = ENEMY_MOVESPEED;
-	else
-		m_SpeedY = 0;
+	m_SpeedY = ENEMY_MOVESPEED;
 }
 
 void CEnemy::StopAndStartMove()
@@ -293,12 +290,6 @@ void CEnemy::ShotSelect(int j)
 	if (m_EnemyType == 0)
 	{
 		DownBullet(j);
-		SlantLeftBullet(j);
-		SlantLeftBullet2(j);
-		SlantRightBullet(j);
-		SlantRightBullet2(j);
-		RightBullet(j);
-		LeftBullet(j);
 	}
 
 	if (m_EnemyType == 1)

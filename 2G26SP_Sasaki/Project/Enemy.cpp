@@ -61,7 +61,7 @@ void CEnemy::Start(float px,float py ,int encol,int type){
 	m_ShotWaitSet = 60;
 	m_ShotWait = m_ShotWaitSet;
 	Secondcount = 0;
-	second = m_ShotWaitSet;
+	second = 60;
 	for (int i = 0; i < ENEMYSHOT_LINE; i++)
 	{
 		for (int j = 0; j < ENEMYSHOT_COUNT; j++)
@@ -116,7 +116,7 @@ void CEnemy::Update(void){
 	if (second <= 0)
 	{
 		Secondcount++;
-		second = m_ShotWaitSet;
+		second = 60;
 	}
 	else
 	{

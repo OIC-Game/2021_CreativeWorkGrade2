@@ -66,7 +66,7 @@ MofBool CGameApp::Initialize(void){
 
 	//デバック用
 	//ステージのスクロール値
-	//g_Stage.MoveScroll(3200);
+	g_Stage.MoveScroll(1600);
 
 	return TRUE;
 }

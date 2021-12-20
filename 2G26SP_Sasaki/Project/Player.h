@@ -4,6 +4,11 @@
 #include "Enemy.h"
 #include "PlayerShot.h"
 
+//プレイヤーの当たり判定の幅
+#define		PLAYER_WIDTHRECT -8
+
+#define		PLAYER_HEIGHTRECT -6
+
 //移動速度
 #define      PLAYER_SPEED 3
 
@@ -62,6 +67,6 @@ public:
 
 	CRectangle GetRect()
 	{
-		return CRectangle(m_PosX, m_PosY, m_PosX + m_Texture.GetWidth(), m_PosY + m_Texture.GetHeight());
+		return CRectangle(m_PosX + PLAYER_WIDTHRECT, m_PosY + PLAYER_HEIGHTRECT, m_PosX + m_Texture.GetWidth() + PLAYER_WIDTHRECT, m_PosY + m_Texture.GetHeight() + PLAYER_HEIGHTRECT);
 	}
 };

@@ -9,6 +9,7 @@ extern int						player_Life;
 
 extern int						score;
 extern int						stage_number = 0;
+extern bool						bossWarpFlg;
 
 /**
  * コンストラクタ
@@ -44,6 +45,7 @@ void CTitle::Initialize(void) {
 
 	player_Life = PLAYER_INITIALLIFE;
 	score = 0;
+	bossWarpFlg = false;
 
 }
 

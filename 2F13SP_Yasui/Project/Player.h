@@ -5,7 +5,13 @@
 #include	"Enemy.h"
 #include	"Item.h"
 
-
+enum PLAYER_STAGESTATE
+{
+	STAGESTATE_GROUND,
+	STAGESTATE_WATER,
+	STAGESTATE_SKY,
+};
+extern  bool	bossWarpFlg;
 
 class CPlayer
 {
@@ -51,6 +57,7 @@ private:
 	bool			player_BossClearFlg;
 	bool			player_BossClearTransitionFlg;
 	bool			player_DokanWarpFlg;
+	int				player_NowStageState;
 
 	//ÉÇÅ[ÉVÉáÉìéÌóﬁ
 	enum tag_MOTION
@@ -66,19 +73,23 @@ private:
 		MOTION_COUNT,
 	};
 
+
+
 	void CreateAnimation();
 
 public:
 	CPlayer();
 	~CPlayer();
 	bool Load(void);
-	void Initialize(void);
+	void Initialize(Vector2 initPos,int stageState);
 	void Update(void);
 	void Render(float wx, float wy);
 	void RenderDebug(float wx, float wy);
 	void Release(void);
 	void PlayerMove(void);
+	void PlayerWaterMove(void);
 	void PlayerJump(void);
+	void PlayerWaterJump(void);
 	CRectangle GetRectTexture(void);
 	CRectangle GetRectPlayer() { 
 		return CRectangle(player_Position.x + 5, player_Position.y, player_Position.x + player_RectTexture.GetWidth() -5, player_Position.y + player_RectTexture.GetHeight());
@@ -109,7 +120,7 @@ public:
 	float Getplayer_PositionX() { return player_Position.x; };
 	float Getplayer_PositionY() { return player_Position.y; };
 	bool GetWarpFlg() { return player_WarpFlg; }
-	void SetWarpFlg(bool Warp) { player_WarpFlg = Warp; }
+	void SetWarpFlg(bool Warp) { player_WarpFlg = Warp; bossWarpFlg = Warp; }
 	float GetPlayer_MoveX() { return player_Move; }
 	bool GetTmpWorpFlg() { return player_tmpWarpFlg; }
 	bool GetMarioDead() { return player_MarioDead; }
@@ -117,7 +128,8 @@ public:
 	void SetBossClearTrantionFlg(bool clear) { player_BossClearTransitionFlg = clear; }
 	bool GetBossClearTrantionFlg() { return player_BossClearTransitionFlg; }
 	bool GetBossClearFlg() { return player_BossClearFlg; }
-	bool GetDokanWorpFlg() { return player_DokanWarpFlg; }
+	bool GetDokanWarpFlg() { return player_DokanWarpFlg; }
+	void SetDokanWarpFlg(bool isWarp) { player_DokanWarpFlg = isWarp; }
 	void SetPlayerPos(CVector2 position) { player_Position = position; }
 };
 

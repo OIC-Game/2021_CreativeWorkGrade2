@@ -2,6 +2,7 @@
 
 extern int	score;
 
+extern int stage_number;
 
 
 CEnemy::CEnemy() :
@@ -40,9 +41,12 @@ CEnemy::CEnemy() :
 	fireWait(0),
 	otherAttack(0),
 	dashCount(0),
-	enemy_MarioDead(false),
-	enemy_FireSE()
+	enemy_MarioDead(false)
 {
+	for (int i = 0; i < MARIOSOUND_COUNT; i++)
+	{
+		enemy_pSound[i] = NULL;
+	}
 }
 
 CEnemy::~CEnemy()
@@ -100,216 +104,15 @@ void CEnemy::Initialize(float px, float py, int type)
 	debug_MarioAttackPettern = 0;
 	debugModeFlg = false;
 	dashCount = 0;
+	lastFire = false;
+	hipDropCount = 0;
+	enemy_sinMove = 0.0f;
 
-	switch (enemy_Type)
-	{
-	case ENEMY_MUSH:
-	{
-		enemy_Move.x = -1.0f;
-		break;
-	}
-	case ENEMY_SKELETON:
-	{
-		enemy_Move.x = -0.5f;
-		break;
-	}
-	case ENEMY_MARIO:
-	{
-		enemy_Move.x = -3.0f;
-		enemy_MarioHP = ENEMY_MARIOHP;
-
-		break;
-	}
-	case ENEMY_FISH:
-	{
-		enemy_Move.x = 0;
-		enemy_Move.y = 0;
-
-		break;
-	}
-	}
+	//敵のスピードや当たり判定サイズ設定＆アニメーション設定
+	EnemyInitialize();
 
 
-
-	//アニメーションを作成
-	switch (enemy_Type)
-	{
-	case ENEMY_MUSH:
-	{
-		SpriteAnimationCreate anime[] = {
-			{
-				"移動",
-				0,0,
-				32,32,
-				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0}}
-			},
-			{
-				"死亡",
-				0,32,
-				32,32,
-				FALSE,{{5,0,0}}
-			},
-		};
-		enemy_Motion.Create(anime, MUSHMOTION_COUNT);
-		break;
-	}
-	case ENEMY_SKELETON:
-	{
-		SpriteAnimationCreate anime[] = {
-			{
-				"待機",
-				0,0,
-				32,64,
-				TRUE,{{5,0,0}}
-			},
-			{
-				"移動",
-				0,0,
-				32,64,
-				TRUE,{{6,0,0},{4,1,0},{2,2,0},{4,3,0},{6,4,0},{3,5,0}}
-			},
-			{
-				"死亡",
-				32,128,
-				32,64,
-				FALSE,{{5,0,0}}
-			},
-			{
-				"復活",
-				0,128,
-				32,64,
-				FALSE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0},{5,6,0}}
-			},
-			{
-				"攻撃",
-				0,64,
-				32,64,
-				FALSE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0}}
-			},
-		};
-		enemy_Motion.Create(anime, SKELETONMOTION_COUNT);
-		break;
-	}
-	case ENEMY_MARIO:
-	{
-		SpriteAnimationCreate anime[] = {
-
-			{
-				"通常移動",
-				72,0,
-				36,68,
-				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0}}
-			},
-			{
-				"通常待機",
-				0,0,
-				36,68,
-				TRUE,{{5,0,0}}
-			},
-			{
-				"通常ジャンプ開始",
-				252,0,
-				36,68,
-				FALSE,{{5,0,0}}
-			},
-			{
-				"通常ジャンプ着地",
-				252,0,
-				36,68,
-				FALSE,{{4,0,0},{4,1,0},{4,2,0},{4,3,0},{4,4,0},{4,5,0},{4,6,0},{4,7,0}}
-			},
-			{
-				"通常ヒップドロップ",
-				504,0,
-				36,68,
-				FALSE,{{5,1,0},{4,0,0}}
-			},
-			{
-				"通常ブレーキ",
-				216,0,
-				36,68,
-				FALSE,{{30,0,0}}
-			},
-			{
-				"通常ダメージ",
-				36,0,
-				36,68,
-				FALSE,{{5,0,0}}
-			},
-			{
-				"進化移動",
-				72,68,
-				36,68,
-				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0}}
-			},
-			{
-				"進化待機",
-				0,68,
-				36,68,
-				TRUE,{{5,0,0}}
-			},
-			{
-				"進化ジャンプ開始",
-				252,68,
-				36,68,
-				FALSE,{{5,0,0}}
-			},
-			{
-				"進化ジャンプ着地",
-				288,68,
-				36,68,
-				FALSE,{{4,0,0},{4,1,0},{4,2,0},{4,3,0},{2,4,0},{2,5,0},{1,6,0},{1,7,0}}
-			},
-			{
-				"進化ヒップドロップ",
-				504,68,
-				36,68,
-				FALSE,{{5,1,0},{4,0,0}}
-			},
-			{
-				"進化ブレーキ",
-				216,68,
-				36,68,
-				FALSE,{{30,0,0}}
-			},
-			{
-				"進化攻撃",
-				576,68,
-				36,68,
-				FALSE,{{8,0,0},{4,1,0}}
-			},
-			{
-				"進化ダメージ",
-				36,68,
-				36,68,
-				FALSE,{{5,0,0}}
-			},
-			{
-				"進化死亡",
-				648,68,
-				36,68,
-				FALSE,{{5,0,0}}
-			},
-
-
-		};
-		enemy_Motion.Create(anime, MARIOMOTION_COUNT);
-		break;
-	}
-	case ENEMY_FISH:
-	{
-		SpriteAnimationCreate anime[] = {
-			{
-				"移動",
-				0,0,
-				32,32,
-				TRUE,{{5,0,0},{5,1,0}}
-			},
-		};
-		enemy_Motion.Create(anime, 1);
-		break;
-	}
-	}
+	
 	if (enemy_Type == ENEMY_SKELETON || enemy_Type == ENEMY_MARIO)
 	{
 		for (int i = 0; i < ENEMYSHOT_COUNT; i++)
@@ -328,10 +131,14 @@ void CEnemy::Initialize(float px, float py, int type)
 
 }
 
-void CEnemy::Update(float wx)
+void CEnemy::Update(float wx,float wy)
 {
 	//画面外で動かない
-	if (wx > enemy_Position.x + 16 || wx + g_pGraphics->GetTargetWidth() < enemy_Position.x)
+	if (wx  > enemy_Position.x + enemy_pTexture->GetWidth() || wx + g_pGraphics->GetTargetWidth() < enemy_Position.x)
+	{
+		return;
+	}
+	if ((wy > enemy_Position.y + enemy_pTexture->GetHeight() || wy + g_pGraphics->GetTargetHeight() < enemy_Position.y) && enemy_Type != ENEMY_MARIO)
 	{
 		return;
 	}
@@ -356,10 +163,13 @@ void CEnemy::Update(float wx)
 	}
 
 	//重力処理
-	enemy_Move.y += ENEMY_GRAVITY;
-	if (enemy_Move.y >= 20.0f)
+	if (stage_number != STAGE_2_1)
 	{
-		enemy_Move.y = 20.0f;
+		enemy_Move.y += ENEMY_GRAVITY;
+		if (enemy_Move.y >= 20.0f)
+		{
+			enemy_Move.y = 20.0f;
+		}
 	}
 	//攻撃処理
 	switch (enemy_Type)
@@ -377,20 +187,67 @@ void CEnemy::Update(float wx)
 			MarioAttack();
 		break;
 	}
-	case ENEMY_FISH:
+	case ENEMY_HUGEMUSH:
 	{
-		if (enemy_Move.y >= 10)
+		
+		if (enemy_Motion.GetMotionNo() == HUGEMOTION_DAMAGEMOVE)
 		{
-			enemy_Move.y = -10;
+			if (CUtilities::Random(0, 10) > 5)
+			{
+				enemy_Move.x += CUtilities::Random(0, 5) * 0.1f;
+			}
+			else
+			{
+				enemy_Move.x -= (int)CUtilities::Random(0, 5) * 0.1f;
+			}
+			if (enemy_Move.x < -5)
+			{
+				enemy_Move.x = -5;
+			}
+			else if (enemy_Move.x > 5)
+			{
+				enemy_Move.x = 5;
+			}
+			
 		}
-		enemy_Position.y += enemy_Move.y;
-		if (enemy_Motion.GetMotionNo() != FISHMOTION_MOVE)
+		if (enemy_Move.x > 0 && enemy_Reverse)
 		{
-			enemy_Motion.ChangeMotion(FISHMOTION_MOVE);
+			enemy_Reverse = false;
 		}
-		return;
+		else if (enemy_Move.x < 0 && !enemy_Reverse)
+		{
+			enemy_Reverse = true;
+		}
+		
 		break;
 	}
+	case ENEMY_MAGURO:
+	{
+		enemy_sinMove += CUtilities::GetFrameSecond() * 5;
+		enemy_Move.y = sin(enemy_sinMove) * 2.0f;
+		break;
+	}
+	case ENEMY_IKA:
+	{
+		enemy_sinMove += CUtilities::GetFrameSecond() * 5;
+		if (sin(enemy_sinMove) > 0)
+		{
+			enemy_Move.y = sin(enemy_sinMove) * 2.5f;
+		}
+		else
+		{
+			enemy_Move.y = sin(enemy_sinMove) * 5.0f;
+		}
+		break;
+	}
+	case ENEMY_KAZIKI:
+	{
+		enemy_sinMove += CUtilities::GetFrameSecond() * 2;
+		enemy_Move.y = sin(enemy_sinMove) ;
+		break;
+	}
+	default:
+		break;
 	}
 
 
@@ -404,7 +261,10 @@ void CEnemy::Update(float wx)
 	}
 	else
 	{
-
+		if (stage_number == STAGE_2_1)
+		{
+			enemy_Position.y += 4;
+		}
 
 		//敵が叩いたブロックと同じ位置にいた時
 		if (enemy_DeadJump)
@@ -462,6 +322,10 @@ void CEnemy::Render(float wx, float wy)
 	{
 		return;
 	}
+	if (wx > enemy_Position.x + enemy_pTexture->GetWidth() || wx + g_pGraphics->GetTargetWidth() < enemy_Position.x)
+	{
+		return;
+	}
 
 	if (enemy_Type == ENEMY_MARIO && enemy_MarioDamageWait % 4 >= 2)
 	{
@@ -503,6 +367,10 @@ void CEnemy::RenderDebug(float wx, float wy)
 {
 	//非表示
 	if (!enemy_Show)
+	{
+		return;
+	}
+	if (wx > enemy_Position.x + enemy_pTexture->GetWidth() || wx + g_pGraphics->GetTargetWidth() < enemy_Position.x)
 	{
 		return;
 	}
@@ -556,12 +424,23 @@ void CEnemy::Release(void)
 {
 	enemy_Motion.Release();
 	m_ShotArray->Release();
+	if (enemy_Type == ENEMY_MARIO)
+	{
+		for (int i = 0; i < MARIOSOUND_COUNT; i++)
+		{
+			enemy_pSound[i]->Release();
+		}
+	}
 
 }
 
 void CEnemy::CollisionStage(float ox, float oy)
 {
 	if (enemy_Type == ENEMY_MARIO && enemy_MarioDead)
+	{
+		return;
+	}
+	if (enemy_Type == ENEMY_MAGURO || enemy_Type == ENEMY_IKA || enemy_Type == ENEMY_KAZIKI)
 	{
 		return;
 	}
@@ -609,13 +488,13 @@ void CEnemy::ShotCollisionStage(float ox, float oy,int n)
 		float shotSpeed = m_ShotArray[n].GetSpeedY();
 		float randomSpeed = CUtilities::RandomFloat();
 		//落下中の下埋まり、ジャンプ中の上埋まりの場合は移動を初期化する。
-		if (oy < 0)
+		if (oy < 2)
 		{
 
 			shotSpeed *= -(1.0f + randomSpeed) ;
 
 		}
-		else if (oy > 0 && shotSpeed < 0)
+		else if (oy > 2 && shotSpeed < 0)
 		{
 			shotSpeed *= -1.5;
 
@@ -655,6 +534,18 @@ void CEnemy::Dead(bool bDead)
 			enemy_Motion.ChangeMotion(MARIOMOTION_FIRE_DEAD);
 			break;
 		}
+		case ENEMY_HUGEMUSH:
+		{
+			enemy_Motion.ChangeMotion(HUGEMOTION_DEAD);
+			break;
+		}
+		case ENEMY_MAGURO:
+		case ENEMY_IKA:
+		case ENEMY_KAZIKI:
+			enemy_Motion.ChangeMotion(FISHMOTION_DEAD);
+			break;
+		default:
+			break;
 		}
 
 	}
@@ -685,7 +576,7 @@ void CEnemy::SkeletonShot(void)
 				}
 				if (!enemy_Dead)
 				{
-					enemy_ShotWait = 70;
+					enemy_ShotWait = 80;
 					enemy_Motion.ChangeMotion(SKELETONMOTION_ATTACK);
 				}
 				if (enemy_Reverse)
@@ -950,6 +841,7 @@ void CEnemy::MarioDamage(float damage)
 	if (enemy_MarioHP <= 3 && !enemy_MarioChangeFlg)
 	{
 		enemy_MarioChangeFlg = true;
+		enemy_pSound[MARIOSOUND_CHANGE]->Play();
 
 	}
 	else if (enemy_MarioHP <= 0)
@@ -967,11 +859,23 @@ void CEnemy::MarioDamage(float damage)
 void CEnemy::MarioActionConditions()
 {
 	//行動パターン条件
+	//最後のあがきファイア
+	if (enemy_MarioHP <= 1 && changeFireMode && !lastFire)
+	{
+		enemy_MarioNowAttackPettern = MARIOATTACK_FIRE;
+		return;
+	}
 	//ダッシュ
-	
 	if (tmp_DistanceBetweenPlayer > 550 && !tmp_playerJumpFlg && dashCount <= 1)
 	{
 		enemy_MarioNowAttackPettern = MARIOATTACK_DASH;
+		return;
+	}
+	//ホップジャンプ後ダッシュ
+	if (hipDropCount > 0)
+	{
+		enemy_MarioNowAttackPettern = MARIOATTACK_HOPJUMP;
+		hipDropCount = 0;
 		return;
 	}
 	//ホップジャンプ
@@ -1067,7 +971,7 @@ void CEnemy::MarioActionModeDash()
 	//ブレーキ
 	if (enemy_Position.x > 7080 && enemy_Move.x > 0 && one)
 	{
-		enemy_Move.x -= 10;
+		enemy_Move.x = 0;
 		if (enemy_Move.x <= 10)
 		{
 			enemy_Move.x = 0;
@@ -1091,7 +995,7 @@ void CEnemy::MarioActionModeDash()
 	}
 	else if (enemy_Position.x < 6220 && enemy_Move.x < 0 && one)
 	{
-		enemy_Move.x += 10;
+		enemy_Move.x = 0;
 		if (enemy_Move.x >= -10)
 		{
 			enemy_Move.x = 0;
@@ -1145,13 +1049,19 @@ void CEnemy::MarioActionModeHipDrop()
 		}
 		one = false;
 		otherAttack++;
+		if (enemy_MarioChangeFlg)
+		{
+			hipDropCount++;
+		}
 		enemy_MarioNowAttackPettern = 0;
+		
 		return;
 	}
 	if (!jumpFlg)
 	{
-		enemy_Move.y = -5;
+		enemy_Move.y = -1;
 		jumpFlg = true;
+		enemy_pSound[MARIOSOUND_JUMP]->Play();
 	}
 	else if (!one && jumpFlg)
 	{
@@ -1239,11 +1149,13 @@ void CEnemy::MarioActionModeJump()
 		{
 			enemy_Move.x = -6;
 			enemy_Move.y = -6;
+			enemy_pSound[MARIOSOUND_JUMP]->Play();
 		}
 		else if (enemy_Position.x < tmp_playerPositionX && !enemy_Reverse)
 		{
 			enemy_Move.x = 6;
 			enemy_Move.y = -6;
+			enemy_pSound[MARIOSOUND_JUMP]->Play();
 		}
 		else
 		{
@@ -1301,6 +1213,7 @@ void CEnemy::MarioActionModeHopJump()
 		loop = 0;
 		otherAttack++;
 		enemy_MarioNowAttackPettern = 0;
+		
 		return;
 	}
 	if (!jumpFlg)
@@ -1310,12 +1223,14 @@ void CEnemy::MarioActionModeHopJump()
 			enemy_Move.x = -5;
 			enemy_Move.y = -10;
 			enemy_Reverse = true;
+			enemy_pSound[MARIOSOUND_JUMP]->Play();
 		}
 		else if (enemy_Position.x < tmp_playerPositionX)
 		{
 			enemy_Move.x = 5;
 			enemy_Move.y = -10;
 			enemy_Reverse = false;
+			enemy_pSound[MARIOSOUND_JUMP]->Play();
 		}
 		else
 		{
@@ -1378,13 +1293,13 @@ void CEnemy::MarioActionModeFire()
 				if (enemy_Motion.GetMotionNo() != MARIOMOTION_FIRE_ATTACK)
 				{
 					enemy_Motion.ChangeMotion(MARIOMOTION_FIRE_ATTACK);
+					
 				}
 
 				if (enemy_Motion.IsEndMotion() && enemy_Motion.GetMotionNo() == MARIOMOTION_FIRE_ATTACK)
 				{
 					fire = true;
 					
-
 				}
 			}
 			else
@@ -1399,7 +1314,9 @@ void CEnemy::MarioActionModeFire()
 				}
 				if (enemy_ShotWait < 0)
 				{
-
+					BYTE shotCount = 0;
+					BYTE hpCount = 0;
+					BYTE shotSpeedX = 5;
 					for (int i = 0; i < ENEMYSHOT_COUNT; i++)
 					{
 						if (m_ShotArray[i].GetShow())
@@ -1411,8 +1328,39 @@ void CEnemy::MarioActionModeFire()
 							enemy_ShotWait = 80;
 						}
 						m_ShotArray[i].Fire(enemy_Position.x + 30, enemy_Position.y + 10,
-							5, 5, enemy_Reverse);
-						break;
+							shotSpeedX, 5, enemy_Reverse);
+						enemy_pSound[MARIOSOUND_FIRE]->Play();
+						shotCount++;
+						shotSpeedX += 2;
+						switch (enemy_MarioHP)
+						{
+						case 3:
+						{
+							hpCount = 0;
+							break;
+						}
+						case 2:
+						{
+							hpCount = 1;
+							break;
+						}
+						case 1:
+						{
+							hpCount = 2;
+							break;
+						}
+						default:
+							hpCount = 0;
+							break;
+						}
+						if (!lastFire && enemy_MarioHP <= 1)
+						{
+							hpCount = 4;
+						}
+						if (shotCount > hpCount)
+						{
+							break;
+						}
 					}
 					
 					
@@ -1426,12 +1374,17 @@ void CEnemy::MarioActionModeFire()
 				{
 					loop++;
 					fire = false;
+					
 					enemy_Motion.SetTime(0);
 				}
 			}
 		}
 		else if(enemy_ShotWait <= 0 && loop > 3)
 		{
+			if (!lastFire && enemy_MarioHP <= 1)
+			{
+				lastFire = true;
+			}
 			one = false;
 			fire = false;
 			otherAttack = 0;
@@ -1448,6 +1401,10 @@ void CEnemy::MarioActionModeFire()
 	}
 	else
 	{
+		if (!lastFire && enemy_MarioHP <= 1)
+		{
+			lastFire = true;
+		}
 		one = false;
 		fire = false;
 		otherAttack = 0;
@@ -1460,7 +1417,10 @@ void CEnemy::MarioActionModeFire()
 void CEnemy::MarioActionModeDamage()
 {
 	enemy_Move.x = 0;
-	enemy_Move.y = 2;
+	if (enemy_Move.y < 0)
+	{
+		enemy_Move.y = 2;
+	}
 	if (enemy_MarioChangeFlg && !changeFireMode)
 	{
 		one = true;
@@ -1487,9 +1447,19 @@ void CEnemy::MarioActionModeDamage()
 	}
 	else
 	{
-		if (enemy_Motion.GetMotionNo() != MARIOMOTION_FIRE_WAIT)
+		if (changeFireMode)
 		{
-			enemy_Motion.ChangeMotion(MARIOMOTION_FIRE_WAIT);
+			if (enemy_Motion.GetMotionNo() != MARIOMOTION_FIRE_WAIT)
+			{
+				enemy_Motion.ChangeMotion(MARIOMOTION_FIRE_WAIT);
+			}
+		}
+		else
+		{
+			if (enemy_Motion.GetMotionNo() != MARIOMOTION_WAIT)
+			{
+				enemy_Motion.ChangeMotion(MARIOMOTION_WAIT);
+			}
 		}
 	}
 	enemy_MarioDamageWait--;
@@ -1548,12 +1518,371 @@ void CEnemy::MarioActionModeMove()
 
 	if (enemy_Reverse)
 	{
-		enemy_Move.x = -5;
+		if (enemy_MarioChangeFlg)
+		{
+			enemy_Move.x = -5;
+		}
+		else
+		{
+			enemy_Move.x = -5;
+		}
+		
 	}
 	else
 	{
-		enemy_Move.x = 5;
+		if (enemy_MarioChangeFlg)
+		{
+			enemy_Move.x = 5;
+		}
+		else
+		{
+			enemy_Move.x = 5;
+		}
 	}
 }
+
+void CEnemy::Damage()
+{
+	enemy_HP--;
+	if (enemy_Type == ENEMY_HUGEMUSH)
+	{
+		if (enemy_HP <= 1)
+		{
+			enemy_Motion.ChangeMotion(HUGEMOTION_DAMAGEMOVE, false);
+		}
+	}
+	if (enemy_HP <= 0)
+	{
+		Dead(true);
+	}
+}
+
+void CEnemy::EnemyInitialize()
+{
+	switch (enemy_Type)
+	{
+	case ENEMY_MUSH:
+	{
+		enemy_Move.x = -1.0f;
+		enemy_RectOffsetSize.x = 5;
+		enemy_RectOffsetSize.y = 5;
+		break;
+	}
+	case ENEMY_SKELETON:
+	{
+		enemy_Move.x = -0.5f;
+		enemy_RectOffsetSize.x = 5;
+		enemy_RectOffsetSize.y = 5;
+		break;
+	}
+	case ENEMY_MARIO:
+	{
+		enemy_Move.x = -3.0f;
+		enemy_RectOffsetSize.x = 5;
+		enemy_RectOffsetSize.y = 5;
+		enemy_MarioHP = ENEMY_MARIOHP;
+
+		break;
+	}
+	case ENEMY_HUGEMUSH:
+	{
+		enemy_Move.x = -1.0f;
+		enemy_RectOffsetSize.x = 5;
+		enemy_RectOffsetSize.y = 5;
+		enemy_HP = 2;
+		break;
+	}
+	case ENEMY_MAGURO:
+	{
+		enemy_Move.x = -3.0f;
+		enemy_RectOffsetSize.x = 5;
+		enemy_RectOffsetSize.y = 5;
+		enemy_Reverse = false;
+		//enemy_HP = 2;
+		break;
+	}
+	case ENEMY_IKA:
+	{
+		enemy_Move.x = -1.0f;
+		enemy_RectOffsetSize.x = 5;
+		enemy_RectOffsetSize.y = 5;
+		//enemy_HP = 2;
+		break;
+	}
+	case ENEMY_KAZIKI:
+	{
+		enemy_Move.x = -7.0f;
+		enemy_RectOffsetSize.x = 5;
+		enemy_RectOffsetSize.y = 5;
+		enemy_Reverse = false;
+		//enemy_HP = 2;
+		break;
+	}
+	default:
+		break;
+	}
+
+
+	//アニメーションを作成
+	switch (enemy_Type)
+	{
+	case ENEMY_MUSH:
+	{
+		SpriteAnimationCreate anime[] = {
+			{
+				"移動",
+				0,0,
+				32,32,
+				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0}}
+			},
+			{
+				"死亡",
+				0,32,
+				32,32,
+				FALSE,{{5,0,0}}
+			},
+		};
+		enemy_Motion.Create(anime, MUSHMOTION_COUNT);
+		break;
+	}
+	case ENEMY_SKELETON:
+	{
+		SpriteAnimationCreate anime[] = {
+			{
+				"待機",
+				0,0,
+				32,64,
+				TRUE,{{5,0,0}}
+			},
+			{
+				"移動",
+				0,0,
+				32,64,
+				TRUE,{{6,0,0},{4,1,0},{2,2,0},{4,3,0},{6,4,0},{3,5,0}}
+			},
+			{
+				"死亡",
+				32,128,
+				32,64,
+				FALSE,{{5,0,0}}
+			},
+			{
+				"復活",
+				0,128,
+				32,64,
+				FALSE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0},{5,6,0}}
+			},
+			{
+				"攻撃",
+				0,64,
+				32,64,
+				FALSE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0}}
+			},
+		};
+		enemy_Motion.Create(anime, SKELETONMOTION_COUNT);
+		break;
+	}
+	case ENEMY_MARIO:
+	{
+		SpriteAnimationCreate anime[] = {
+
+			{
+				"通常移動",
+				72,0,
+				36,68,
+				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0}}
+			},
+			{
+				"通常待機",
+				0,0,
+				36,68,
+				TRUE,{{5,0,0}}
+			},
+			{
+				"通常ジャンプ開始",
+				252,0,
+				36,68,
+				FALSE,{{5,0,0}}
+			},
+			{
+				"通常ジャンプ着地",
+				252,0,
+				36,68,
+				FALSE,{{4,0,0},{4,1,0},{4,2,0},{4,3,0},{4,4,0},{4,5,0},{4,6,0},{4,7,0}}
+			},
+			{
+				"通常ヒップドロップ",
+				504,0,
+				36,68,
+				FALSE,{{5,1,0},{4,0,0}}
+			},
+			{
+				"通常ブレーキ",
+				216,0,
+				36,68,
+				FALSE,{{30,0,0}}
+			},
+			{
+				"通常ダメージ",
+				36,0,
+				36,68,
+				FALSE,{{5,0,0}}
+			},
+			{
+				"進化移動",
+				72,68,
+				36,68,
+				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0}}
+			},
+			{
+				"進化待機",
+				0,68,
+				36,68,
+				TRUE,{{5,0,0}}
+			},
+			{
+				"進化ジャンプ開始",
+				252,68,
+				36,68,
+				FALSE,{{5,0,0}}
+			},
+			{
+				"進化ジャンプ着地",
+				288,68,
+				36,68,
+				FALSE,{{4,0,0},{4,1,0},{4,2,0},{4,3,0},{2,4,0},{2,5,0},{1,6,0},{1,7,0}}
+			},
+			{
+				"進化ヒップドロップ",
+				504,68,
+				36,68,
+				FALSE,{{5,1,0},{4,0,0}}
+			},
+			{
+				"進化ブレーキ",
+				216,68,
+				36,68,
+				FALSE,{{30,0,0}}
+			},
+			{
+				"進化攻撃",
+				576,68,
+				36,68,
+				FALSE,{{8,0,0},{4,1,0}}
+			},
+			{
+				"進化ダメージ",
+				36,68,
+				36,68,
+				FALSE,{{5,0,0}}
+			},
+			{
+				"進化死亡",
+				648,68,
+				36,68,
+				FALSE,{{5,0,0}}
+			},
+
+
+		};
+		enemy_Motion.Create(anime, MARIOMOTION_COUNT);
+		break;
+	}
+	case ENEMY_HUGEMUSH:
+	{
+		SpriteAnimationCreate anime[] = {
+			{
+				"移動",
+				0,0,
+				50,72,
+				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0}}
+			},
+			{
+				"ダメージ後移動",
+				0,72,
+				50,72,
+				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0}}
+			},
+			{
+				"死亡",
+				0,144,
+				50,72,
+				FALSE,{{5,0,0}}
+			},
+		};
+		enemy_Motion.Create(anime, HUGEMOTION_COUNT);
+		break;
+	}
+	case ENEMY_MAGURO:
+	{
+		SpriteAnimationCreate anime[] = {
+			{
+				"移動",
+				0,0,
+				67,32,
+				FALSE,{{1,0,0}}
+			},
+			{
+				"死亡",
+				67,0,
+				43,32,
+				FALSE,{{1,0,0}}
+			},
+		};
+		enemy_Motion.Create(anime, FISHMOTION_COUNT);
+		break;
+	}
+	case ENEMY_IKA:
+	{
+		SpriteAnimationCreate anime[] = {
+			{
+				"移動",
+				0,0,
+				32,44,
+				FALSE,{{1,0,0}}
+			},
+			{
+				"死亡",
+				32,0,
+				43,32,
+				FALSE,{{1,0,0}}
+			},
+		};
+		enemy_Motion.Create(anime, FISHMOTION_COUNT);
+		break;
+	}
+	case ENEMY_KAZIKI:
+	{
+		SpriteAnimationCreate anime[] = {
+			{
+				"移動",
+				0,0,
+				85,32,
+				FALSE,{{1,0,0}}
+			},
+			{
+				"死亡",
+				85,0,
+				51,32,
+				FALSE,{{1,0,0}}
+			},
+		};
+		enemy_Motion.Create(anime, FISHMOTION_COUNT);
+		break;
+	}
+	default:
+		SpriteAnimationCreate anime[] = {
+			{
+				"移動",
+				0,0,
+				32,32,
+				FALSE,{{5,0,0}}
+			},
+		};
+		enemy_Motion.Create(anime, 1);
+		break;
+	}
+}
+
 
 

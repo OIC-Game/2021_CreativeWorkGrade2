@@ -45,6 +45,12 @@ private:
 	CSoundBuffer	stage_BlockAttackSE;
 	CSoundBuffer	stage_BlockDestroySE;
 
+	CSoundBuffer	stage_MarioJumpSE;
+	CSoundBuffer	stage_MarioDeadSE;
+	CSoundBuffer	stage_MarioChangeSE;
+	CSoundBuffer	stage_MarioFireSE;
+	CSoundBuffer    stage_MarioSE[MARIOSOUND_COUNT];
+
 
 
 	int				stage_NowStage;
@@ -53,6 +59,10 @@ private:
 	CTexture		stage_EnemyFireTexture;
 	CTexture		stage_EnemyKuriboTexture;
 	CTexture		stage_EnemyMushTexture;
+	CTexture		stage_FishesTexture;
+	CVector2		stage_FishesMove;
+	CVector2		stage_FishesPos;
+
 
 
 public:

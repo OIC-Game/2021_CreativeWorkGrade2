@@ -19,6 +19,8 @@ int						scoreDesplayTime = 0;
 bool					player1UpDisplayFlg = false;
 extern int				enemyDeadCount;
 int						getCoinCount = 0;
+extern bool				bossWarpFlg;
+
 
 
 CPlayer		g_Player;
@@ -47,8 +49,6 @@ game_ScoreDesplayFlg(false),
 game_tempPlayerPositionX(0),
 game_tempPlayerPositionY(0),
 game_NowStage(0),
-game_MarioJumpSE(),
-game_MarioFireSE(),
 game_playMarioSEFlg(false),
 game_MarioDeadSE(),
 game_ab(false)
@@ -72,33 +72,49 @@ bool CGame::Load(void)
 	{
 	case STAGE_1_1:
 	{
+		if (!game_BGM.Load("BGM.mp3"))
+		{
+			return false;
+		}
 		g_Stage.Load("Stage1.txt");
+		break;
+	}
+	case STAGE_2_1:
+	{
+		if (!game_BGM.Load("BGM2.mp3"))
+		{
+			return false;
+		}
+		g_Stage.Load("Stage2.txt");
 		break;
 	}
 	case STAGE_LAST:
 	{
 		g_Stage.Load("Stage_Boss.txt");
+		if (!game_LAST_BGM.Load("LAST_BGM.mp3"))
+		{
+			return false;
+		}
+		if (!game_BOSS_BGM.Load("BOSS_BGM.mp3"))
+		{
+			return false;
+		}
 		break;
 	}
 	default:
+		if (!game_BGM.Load("BGM.mp3"))
+		{
+			return false;
+		}
 		break;
 	}
 	
 
 
 	//BGMロード
-	if (!game_LAST_BGM.Load("LAST_BGM.mp3"))
-	{
-		return false;
-	}
-	if (!game_BGM.Load("BGM.mp3"))
-	{
-		return false;
-	}
-	if (!game_BOSS_BGM.Load("BOSS_BGM.mp3"))
-	{
-		return false;
-	}
+	
+	
+	
 	//ゲームオーバーSEロード
 	if (!game_GameOverSE.Load("GameOver.mp3"))
 	{
@@ -109,20 +125,11 @@ bool CGame::Load(void)
 	{
 		return false;
 	}
-	if (!game_MarioJumpSE.Load("MarioJump.mp3"))
-	{
-		return false;
-	}
 	if (!game_MarioDeadSE.Load("MarioDead.mp3"))
 	{
 		return false;
 	}
 	if (!game_BossClearSE.Load("BossClear.wav"))
-	{
-		return false;
-	}
-
-	if (!game_MarioFireSE.Load("MarioFire.mp3"))
 	{
 		return false;
 	}
@@ -144,7 +151,36 @@ bool CGame::Load(void)
 void CGame::Initialize(void) {
 	
 	//プレイヤー初期化
-	g_Player.Initialize();
+	switch (m_StageNumber)
+	{
+	case STAGE_1_1:
+	{
+		game_StageState = STAGESTATE_GROUND;
+		game_PlayerInitializePosition = Vector2(100, 700);
+		break;
+	}
+	case STAGE_2_1:
+	{
+		game_StageState = STAGESTATE_WATER;
+		game_PlayerInitializePosition = Vector2(50, 150);
+		break;
+	}
+	case STAGE_LAST:
+	{
+		game_StageState = STAGESTATE_GROUND;
+		game_PlayerInitializePosition = Vector2(100, 600);
+		break;
+	}
+	default:
+		game_StageState = STAGESTATE_GROUND;
+		game_PlayerInitializePosition = Vector2(100, 600);
+		break;
+	}
+	if (m_StageNumber != STAGE_LAST)
+	{
+		bossWarpFlg = false;
+	}
+	g_Player.Initialize(game_PlayerInitializePosition, game_StageState);
 	//ステージ初期化
 	g_Stage.Initialize(m_EnemyArray,m_ItemArray);
 	
@@ -184,8 +220,10 @@ void CGame::Initialize(void) {
 	case STAGE_LAST:
 	{
 		game_Time = GAME_TIMELIMIT_BOSS;
+		break;
 	}
 	default:
+		game_Time = GAME_TIMELIMIT;
 		break;
 	}
 	game_TimeWait = 0.0f;
@@ -194,6 +232,7 @@ void CGame::Initialize(void) {
 	game_tempPlayerPositionY = 0.0f;
 	game_playMarioSEFlg = false;
 	game_ab = false;
+
 }
 
 /**
@@ -249,30 +288,8 @@ void CGame::Update(void) {
 		}
 		if (m_EnemyArray[i].GetType() == ENEMY_MARIO)
 		{
-			if (!game_playMarioSEFlg && m_EnemyArray[i].GetMarioJumpFlg())
-			{
-				if (game_MarioJumpSE.IsPlay())
-				{
-					game_MarioJumpSE.Stop();
-				}
-				game_MarioJumpSE.Play();
-				game_playMarioSEFlg = true;
-			}
-			else if (game_playMarioSEFlg && !m_EnemyArray[i].GetMarioJumpFlg())
-			{
-				
-				game_playMarioSEFlg = false;
-			}
 
-			if (!game_MarioFireSEFlg && m_EnemyArray[i].GetMarioFireFlg())
-			{
-				game_MarioFireSE.Play();
-				game_MarioFireSEFlg = true;
-			}
-			else if (game_MarioFireSEFlg && !m_EnemyArray[i].GetMarioFireFlg())
-			{
-				game_MarioFireSEFlg = false;
-			}
+
 
 			if (!game_playSoundFlg && m_EnemyArray[i].GetMarioDeadFlg())
 			{
@@ -286,7 +303,7 @@ void CGame::Update(void) {
 			}
 
 		}
-			m_EnemyArray[i].Update(g_Stage.GetScrollX());
+			m_EnemyArray[i].Update(g_Stage.GetScrollX(), g_Stage.GetScrollY());
 			ox = 0, oy = 0;
 			enemyDead = false;
 			jumpFlg = false;
@@ -294,7 +311,10 @@ void CGame::Update(void) {
 			//敵[i]の死亡フラグがfalseの時
 			if (!m_EnemyArray[i].GetEnemyDead())
 			{
-
+				if (m_EnemyArray[i].GetType() == ENEMY_MAGURO || m_EnemyArray[i].GetType() == ENEMY_IKA || m_EnemyArray[i].GetType() == ENEMY_KAZIKI)
+				{
+					continue;
+				}
 				if (g_Stage.Collision(m_EnemyArray[i].GetRect(), ox, oy, og, enemyDead, jumpFlg, g_Player, magmaDead))
 				{
 					if (magmaDead)
@@ -354,7 +374,7 @@ void CGame::Update(void) {
 		{
 			return;
 		}
-		m_ItemArray[i].Update();
+		m_ItemArray[i].Update(g_Stage.GetScrollX(), g_Stage.GetScrollY());
 		float ox = 0, oy = 0;
 		jumpFlg = false;
 		magmaDead = false;
@@ -481,10 +501,18 @@ void CGame::Update(void) {
 		else
 		{
 			game_Time = 0.0f;
+
+			
 			if (!game_GameClearSE.IsPlay())
 			{
+				player_Life += (int)floor(score / 20000);
+				score = 0;
 				m_NextScene = SCENENO_INFOMATION;
-				stage_number = STAGE_LAST;
+				stage_number++;
+				if (stage_number >= STAGE_COUNT)
+				{
+					stage_number = STAGE_COUNT - 1;
+				}
 				m_bEnd = true;
 			}
 			
@@ -611,14 +639,22 @@ void CGame::Release(void)
 		m_ItemArray = NULL;
 	}
 	//BGM解放
-	game_BGM.Release();
-	game_BOSS_BGM.Release();
-	game_LAST_BGM.Release();
+	switch (stage_number)
+	{
+	case STAGE_LAST:
+	{
+		game_BOSS_BGM.Release();
+		game_LAST_BGM.Release();
+		break;
+	}
+	default:
+		game_BGM.Release();
+		break;
+	}
+	
 	//SE解放
 	game_GameOverSE.Release();
 	game_GameClearSE.Release();
-	game_MarioJumpSE.Release();
 	game_MarioDeadSE.Release();
 	game_BossClearSE.Release();
-	game_MarioFireSE.Release();
 }

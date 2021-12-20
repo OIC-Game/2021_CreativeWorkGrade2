@@ -7,6 +7,8 @@
 	enum tag_ITEMTYPE {
 		ITEM_MUSH,					//キノコ
 		ITEM_COIN,					//コイン
+		ITEM_FOAM_MUSH,				//泡キノコ
+		ITEM_FOAM_COIN,				//泡コイン
 
 		ITEM_TYPECOUNT,
 	};
@@ -28,7 +30,7 @@ public:
 	CItem();
 	~CItem();
 	void Initialize(float px, float py, int type);
-	void Update(void);
+	void Update(float wx,float wy);
 	void Render(float wx, float wy);
 	void RenderDebug(float wx, float wy);
 	void Release(void);

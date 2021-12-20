@@ -8,7 +8,7 @@
 
 //ÉvÉåÉCÉÑÅ[écã@
 extern int				player_Life;
-
+extern int				stage_number;
 extern bool				scoreDisplayFlg;
 extern	bool			player1UpDisplayFlg;
 
@@ -44,6 +44,27 @@ void CInfomation::Update(void)
 
 void CInfomation::Render(void)
 {
+	switch (stage_number)
+	{
+	case STAGE_1_1:
+	{
+		CGraphicsUtilities::RenderString(600, 50, "ÇPÅ[ÇP");
+		break;
+	}
+	case STAGE_2_1:
+	{
+		CGraphicsUtilities::RenderString(600, 50, "ÇQÅ[ÇP");
+		break;
+	}
+	case STAGE_LAST:
+	{
+		CGraphicsUtilities::RenderString(600, 50, "BOSS");
+		break;
+	}
+
+	default:
+		break;
+	}
 	CGraphicsUtilities::RenderString(460, 350, "LIFE Å~ %d", player_Life);
 }
 

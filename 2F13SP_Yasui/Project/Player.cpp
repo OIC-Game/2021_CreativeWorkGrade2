@@ -108,9 +108,10 @@ bool CPlayer::Load(void)
 	return true;
 }
 
-void CPlayer::Initialize(void)
+void CPlayer::Initialize(Vector2 initPos, int stageState)
 {
-	player_Position = Vector2(100, 500);
+	player_Position = initPos;
+	player_NowStageState = stageState;
 	player_Move = 0.0f;
 	player_Jump = 0.0f;
 	player_JumpFlg = false;
@@ -143,6 +144,17 @@ void CPlayer::Initialize(void)
 	player_MarioDead = false;
 	player_BossClearFlg = false;
 	player_BossClearTransitionFlg = false;
+	player_DokanWarpFlg = false;
+	if (!player_WarpFlg && bossWarpFlg)
+	{
+		player_HP = 2;
+		player_ChangeBig = true;
+		if (player_Motion.GetMotionNo() != MOTION_BIG_WAIT)
+		{
+			player_Motion.ChangeMotion(MOTION_BIG_WAIT);
+		}
+		player_WarpFlg = bossWarpFlg;
+	}
 }
 
 void CPlayer::Update(void)
@@ -161,14 +173,23 @@ void CPlayer::Update(void)
 		
 		player_BossClearFlg = true;
 	}
+	if (player_NowStageState == STAGESTATE_WATER)
+	{
+		if (player_Position.y > 980)
+		{
+			player_DeadFlg = true;
+		}
+	}
+
 	//死亡,クリアフラグがfalseの時プレイヤーを動かす
 	if (!player_DeadFlg && !player_ClearFlg && !player_BossClearFlg)
 	{
+		
 		if (player_WarpFlg && player_Position.x < 6000)
 		{
 			player_tmpWarpFlg = player_WarpFlg;
 			player_Position.x = 6400;
-			player_Position.y = 400;
+			player_Position.y = 500;
 		}
 
 		if (player_ChangeWait > 0 && !player_ChangeWaitFlg)
@@ -184,18 +205,45 @@ void CPlayer::Update(void)
 		//プレイヤーがサイズ変化していないときに処理
 		if (player_ChangeWait <= 0)
 		{
-			//プレイヤー移動
-			PlayerMove();
-
-			//プレイヤージャンプ(プレイヤーが地面に接触しているならジャンプ)
-			if (player_CheckGround)
+			switch (player_NowStageState)
 			{
-				PlayerJump();
+			case STAGESTATE_WATER:
+			{
+				//プレイヤー移動
+				PlayerWaterMove();
 
+				//プレイヤージャンプ
+				PlayerWaterJump();
+				//プレイヤーの速度に重力を与え続ける
+				player_Jump += PLAYER_WATER_GRAVITY;
+				if (player_Jump > PLAYER_WATER_MAXGRAVITY)
+				{
+					player_Jump = PLAYER_WATER_MAXGRAVITY;
+				}
+				player_Position.y += player_Jump;
+				break;
 			}
-			//プレイヤーの速度に重力を与え続ける
-			player_Jump += PLAYER_GRAVITY;
-			player_Position.y += player_Jump;
+			default:
+				
+				//プレイヤー移動
+				PlayerMove();
+
+				//プレイヤージャンプ(プレイヤーが地面に接触しているならジャンプ)
+				if (player_CheckGround)
+				{
+					PlayerJump();
+
+				}
+				//プレイヤーの速度に重力を与え続ける
+				player_Jump += PLAYER_GRAVITY;
+				if (player_Jump > PLAYER_MAXGRAVITY)
+				{
+					player_Jump = PLAYER_MAXGRAVITY;
+				}
+				player_Position.y += player_Jump;
+				break;
+			}
+			
 
 		}
 		////落下した時死亡フラグをTRUE
@@ -231,9 +279,9 @@ void CPlayer::Update(void)
 		}
 		//落ちる処理
 		player_Jump += PLAYER_GRAVITY;
-		if (player_Jump > 20.0f)
+		if (player_Jump > PLAYER_MAXGRAVITY)
 		{
-			player_Jump = 20.0f;
+			player_Jump = PLAYER_MAXGRAVITY;
 		}
 		player_Position.y += player_Jump;
 	}
@@ -510,6 +558,102 @@ void CPlayer::PlayerMove(void)
 	player_Position.x += player_Move;
 }
 
+void CPlayer::PlayerWaterMove(void)
+{
+	//プレイヤー移動
+	if (g_pInput->IsKeyHold(MOFKEY_RIGHT))
+	{
+		player_Move += PLAYER_WATER_SPEED;
+		player_MoveFlg = true;
+		player_Reverse = false;
+		//最高速度
+		if (player_Move > PLAYER_WATER_TOPSPEED)
+		{
+			player_Move = PLAYER_WATER_TOPSPEED;
+		}
+		//移動モーションに切り替え
+		if (!player_ChangeBig)
+		{
+			if (player_Motion.GetMotionNo() == MOTION_SMALL_WAIT)
+			{
+				player_Motion.ChangeMotion(MOTION_SMALL_MOVE);
+			}
+		}
+		else
+		{
+			if (player_Motion.GetMotionNo() == MOTION_BIG_WAIT)
+			{
+				player_Motion.ChangeMotion(MOTION_BIG_MOVE);
+			}
+		}
+
+	}
+	else if (g_pInput->IsKeyHold(MOFKEY_LEFT))
+	{
+		player_Move -= PLAYER_WATER_SPEED;
+		player_MoveFlg = true;
+		player_Reverse = true;
+		//最高速度
+		if (player_Move < -PLAYER_WATER_TOPSPEED)
+		{
+			player_Move = -PLAYER_WATER_TOPSPEED;
+		}
+		//移動モーションに切り替え
+		if (!player_ChangeBig)
+		{
+			if (player_Motion.GetMotionNo() == MOTION_SMALL_WAIT)
+			{
+				player_Motion.ChangeMotion(MOTION_SMALL_MOVE);
+			}
+		}
+		else
+		{
+			if (player_Motion.GetMotionNo() == MOTION_BIG_WAIT)
+			{
+				player_Motion.ChangeMotion(MOTION_BIG_MOVE);
+			}
+		}
+	}
+	else
+	{
+
+		//キー入力がない場合は速度を減衰させる
+		if (player_Move < 0)
+		{
+			player_Move += PLAYER_WATER_SPEED;
+			if (player_Move >= 0)
+			{
+				player_Move = 0;
+			}
+		}
+		else if (player_Move > 0)
+		{
+			player_Move -= PLAYER_WATER_SPEED;
+			if (player_Move <= 0)
+			{
+				player_Move = 0;
+			}
+		}
+		player_MoveFlg = false;
+		if (!player_ChangeBig)
+		{
+			if (player_Motion.GetMotionNo() == MOTION_SMALL_MOVE)
+			{
+				player_Motion.ChangeMotion(MOTION_SMALL_WAIT);
+			}
+		}
+		else
+		{
+			if (player_Motion.GetMotionNo() == MOTION_BIG_MOVE)
+			{
+				player_Motion.ChangeMotion(MOTION_BIG_WAIT);
+			}
+		}
+	}
+	//X座標の変化
+	player_Position.x += player_Move;
+}
+
 //プレイヤージャンプ
 void CPlayer::PlayerJump(void)
 {
@@ -544,6 +688,32 @@ void CPlayer::PlayerJump(void)
 			player_Jump *= 0.2f;
 		}
 	}
+}
+
+void CPlayer::PlayerWaterJump(void)
+{
+	//プレイヤージャンプ
+	if (g_pInput->IsKeyPush(MOFKEY_UP))
+	{
+		//ジャンプの開始、初速を設定してジャンプフラグを有効にする
+		player_JumpFlg = true;
+		player_Jump = -PLAYER_WATER_JUMPSPEED;
+		//ジャンプモーションに切り替え
+		if (player_JumpFlg)
+		{
+			if (!player_ChangeBig)
+			{
+				player_Motion.ChangeMotion(MOTION_SMALL_JUMP);
+			}
+			else
+			{
+				player_Motion.ChangeMotion(MOTION_BIG_JUMP);
+			}
+
+		}
+		player_StepEnemySE.Play();
+	}
+
 }
 
 //描画する範囲のテクスチャ矩形を取得
@@ -662,14 +832,6 @@ bool CPlayer::CollisionEnemy(CEnemy & ene)
 	CRectangle playerRect = GetRectPlayer();
 	CRectangle enemyRect = ene.GetRect();
 	CRectangle enemyAttackRect = ene.GetAttackRangeRect();
-	if (ene.GetType() == ENEMY_MARIO && !player_playSEFlg)
-	{
-		if (ene.GetMarioChangeFlg())
-		{
-			player_ChangeBigSE.Play();
-			player_playSEFlg = true;
-		}
-	}
 	if (ene.GetMarioDeadFlg())
 	{
 		player_MarioDead = true;
@@ -688,7 +850,7 @@ bool CPlayer::CollisionEnemy(CEnemy & ene)
 	if (playerRect.CollisionRect(enemyRect))
 	{
 		//プレイヤーのbottomが敵の上半分より高い時、踏みつけ
-		if (playerRect.Bottom <= ene.Getenemy_PositionY() + 20)
+		if (playerRect.Bottom <= ene.Getenemy_PositionY() + (ene.GetRect().GetHeight() / 1.5f) )
 		{
 			//踏みつけたときの小ジャンプ
 			player_Jump = -PLAYER_ENEMYSTEP_JUMPSPEED;
@@ -698,12 +860,30 @@ bool CPlayer::CollisionEnemy(CEnemy & ene)
 				ene.MarioDamage(1);
 				return true;
 			}
+			else if (ene.GetType() == ENEMY_HUGEMUSH)
+			{
+				player_Jump = -(PLAYER_ENEMYSTEP_JUMPSPEED + 10);
+				ene.Damage();
+				return true;
+			}
 			else
 			{
 				ene.Dead(true);
 				score += SCORE_ENEMYSTEP;
-				//連続で踏んだ時のスコア加算処理
-				AddScoreEnemyStep();
+				if (player_NowStageState == STAGESTATE_WATER)
+				{
+					player1UpDisplayFlg = false;
+					scoreDesplayTime = SCORE_DISPLAYTIME;
+					//獲得スコア表示用
+					getScore = SCORE_ENEMYSTEP;
+					//獲得スコア表示フラグ
+					scoreDisplayFlg = true;
+				}
+				else
+				{
+					//連続で踏んだ時のスコア加算処理
+					AddScoreEnemyStep();
+				}
 				return true;
 			}
 
@@ -769,8 +949,27 @@ bool CPlayer::CollisionItem(CItem& item)
 			score += SCORE_COIN;
 			scoreDisplayFlg = true;
 			break;
+		case ITEM_FOAM_MUSH:
+			ChangeBig();
+			player_ChangeBigSE.Play();
+			scoreDesplayTime = SCORE_DISPLAYTIME;
+			getScore = SCORE_GETITEM;
+			score += SCORE_GETITEM;
+			scoreDisplayFlg = true;
+			break;
+		case ITEM_FOAM_COIN:
+			player_GetCoinSE.Play();
+			getCoinCount++;
+			scoreDesplayTime = SCORE_DISPLAYTIME;
+			getScore = SCORE_COIN;
+			score += SCORE_COIN;
+			scoreDisplayFlg = true;
+			break;
+		default:
+			break;
 		}
-		return true;
+			return true;
+		
 	}
 	return false;
 }

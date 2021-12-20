@@ -1,16 +1,31 @@
 #pragma once
 
+//存在するシーンの列挙
+enum tag_SCENENO {
+	SCENENO_TITLE,
+	SCENENO_GAME,
+	SCENENO_GAMEOVER,
+	SCENENO_INFOMATION,
+};
+
 /*プレイヤー*/
 //移動速度
 #define		PLAYER_SPEED 0.3f
+#define		PLAYER_WATER_SPEED 0.2f
 //移動最高速度
 #define		PLAYER_TOPSPEED 5
+#define		PLAYER_WATER_TOPSPEED 3
 //ジャンプ速度
 #define		PLAYER_JUMPSPEED 12
+#define		PLAYER_WATER_JUMPSPEED 6
 //敵を踏みつけたときのジャンプ速度
 #define		PLAYER_ENEMYSTEP_JUMPSPEED 5
 //重力
 #define		PLAYER_GRAVITY 0.4f
+#define		PLAYER_WATER_GRAVITY 0.25f
+//最大重力
+#define		PLAYER_MAXGRAVITY 20.0f
+#define		PLAYER_WATER_MAXGRAVITY 30.0f
 //死亡時ウェイト
 #define		PLAYER_DEADWAIT 30
 //初期ライフ
@@ -45,7 +60,14 @@
 
 /*ステージ*/
 #define		STAGE_CHIPMOVE 10
-#define		STAGE_COUNT 2
+enum tag_STAGENUMBER
+{
+	STAGE_1_1,
+	STAGE_2_1,
+	STAGE_LAST,
+
+	STAGE_COUNT,
+};
 /*マップチップ*/
 //ブロック
 #define		CHIP_BLOCK 19

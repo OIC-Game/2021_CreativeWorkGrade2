@@ -1,11 +1,7 @@
 #pragma once
 #include <Mof.h>
 
-enum tag_STAGENUMBER
-{
-	STAGE_1_1,
-	STAGE_LAST,
-};
+
 
 class CSceneBase {
 protected:

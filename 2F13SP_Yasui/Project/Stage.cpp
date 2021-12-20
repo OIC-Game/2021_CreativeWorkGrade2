@@ -1,6 +1,7 @@
 #include "Stage.h"
 #include "GlobalDefine.h"
 
+extern int stage_number;
 
 CStage::CStage() :
 	stage_ChipTexture(),
@@ -146,7 +147,26 @@ bool CStage::Load(char* pName)
 	fclose(fp);
 	free(buffer);
 
-
+	if (stage_number == STAGE_LAST)
+	{
+		char* name[] = {
+			"MarioJump.mp3",
+			"MarioFire.mp3",
+			"MarioDead.mp3",
+			"ChangeBigSE.wav"
+		};
+		for (int i = 0; i < MARIOSOUND_COUNT; i++)
+		{
+			if (!stage_MarioSE[i].Load(name[i]))
+			{
+				return false;
+			}
+		}
+	}
+	else if (stage_number == STAGE_2_1)
+	{
+		stage_FishesTexture.Load("Fishes.png");
+	}
 
 	//SEロード
 	if (!stage_BlockAttackSE.Load("BlockAttack.mp3"))
@@ -201,6 +221,10 @@ void CStage::Initialize(CEnemy* pEnemy, CItem* pItem)
 			if (on == ENEMY_MARIO)
 			{
 				pEnemy[n].SetTexture(&stage_pEnemyTexture[on], &stage_EnemyFireTexture);
+				for (int i = 0; i < MARIOSOUND_COUNT; i++)
+				{
+					pEnemy[n].SetSound(&stage_MarioSE[i],i);
+				}
 			}
 			else
 			{
@@ -234,6 +258,11 @@ void CStage::Initialize(CEnemy* pEnemy, CItem* pItem)
 			stage_gapMove[y * stage_XCount + x] = 0;
 		}
 	}
+	if (stage_number == STAGE_2_1)
+	{
+		stage_FishesMove = Vector2(-2,0);
+		stage_FishesPos = Vector2(g_pGraphics->GetTargetWidth(), g_pGraphics->GetTargetHeight() / 2.5f);
+	}
 }
 
 void CStage::Update(CPlayer& pl)
@@ -249,8 +278,34 @@ void CStage::Update(CPlayer& pl)
 	float stgh = stage_ChipSize * stage_YCount;
 
 	//座標が画面端によっている(角端から200pixel)場合スクロールを行って補正する。
-	if (pl.Getplayer_PositionX() < 5270 && !pl.GetWarpFlg() && pl.Getplayer_PositionY() <= 1000)
+	if (stage_number == STAGE_LAST)
 	{
+		if (pl.Getplayer_PositionX() < 5270 && !pl.GetWarpFlg() && pl.Getplayer_PositionY() <= 1000)
+		{
+			if (prect.Left - stage_Scroll.x < 400) {
+				stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
+				if (stage_Scroll.x <= 0) {
+					stage_Scroll.x = 0;
+				}
+			}
+			else if (prect.Right - stage_Scroll.x > sw - 400) {
+				stage_Scroll.x += (prect.Right - stage_Scroll.x) - (sw - 400);
+				if (stage_Scroll.x >= stgw - sw) {
+					stage_Scroll.x = stgw - sw;
+				}
+			}
+		}
+		else if (pl.GetWarpFlg() && !stage_FixScroll)
+		{
+
+			stage_Scroll.x = 6175;
+
+			stage_FixScroll = true;
+		}
+	}
+	else
+	{
+
 		if (prect.Left - stage_Scroll.x < 400) {
 			stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
 			if (stage_Scroll.x <= 0) {
@@ -263,31 +318,63 @@ void CStage::Update(CPlayer& pl)
 				stage_Scroll.x = stgw - sw;
 			}
 		}
-		stage_Scroll.y = 0;
-	}
-	else if (pl.GetWarpFlg() && !stage_FixScroll)
-	{
-
-		stage_Scroll.x = 6175;
-
-			stage_FixScroll = true;
-	}
-	if (pl.Getplayer_PositionY() > 1000 && !pl.Getplayer_DeadFlg())
-	{
-		if (prect.Left - stage_Scroll.x < 400) {
-			stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
-			if (stage_Scroll.x <= 0) {
-				stage_Scroll.x = 0;
-			}
+		if (stage_number == STAGE_1_1)
+		{
+			stage_Scroll.y = 32;
 		}
-		else if (prect.Right - stage_Scroll.x > sw - 400 && pl.Getplayer_PositionX() < 900) {
-			stage_Scroll.x += (prect.Right - stage_Scroll.x) - (sw - 400);
-			if (stage_Scroll.x >= stgw - sw) {
-				stage_Scroll.x = stgw - sw;
+		else if (stage_number == STAGE_2_1)
+		{
+			if (prect.Top - stage_Scroll.y < 200) {
+				stage_Scroll.y -= 200 - (prect.Top - stage_Scroll.y);
+				if (stage_Scroll.y <= 0) {
+					stage_Scroll.y = 0;
+				}
+			}
+			else if (prect.Bottom - stage_Scroll.y > sh - 200) {
+				stage_Scroll.y += (prect.Bottom - stage_Scroll.y) - (sh - 200);
+				if (stage_Scroll.y >= stgh - sh) {
+					stage_Scroll.y = stgh - sh;
+				}
 			}
 		}
 
-		stage_Scroll.y = 900;
+	}
+	if (stage_number == STAGE_1_1)
+	{
+		if (pl.Getplayer_PositionY() > 1000 && pl.GetDokanWarpFlg())
+		{
+			
+			if (prect.Left - stage_Scroll.x < 400) {
+				stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
+				if (stage_Scroll.x <= 0) {
+					stage_Scroll.x = 0;
+				}
+			}
+			else if (prect.Right - stage_Scroll.x > sw - 400 && pl.Getplayer_PositionX() < 900) {
+				stage_Scroll.x += (prect.Right - stage_Scroll.x) - (sw - 400);
+				if (stage_Scroll.x >= stgw - sw) {
+					stage_Scroll.x = stgw - sw;
+				}
+			}
+			stage_Scroll.y = 932;
+
+		}
+	}
+	if (stage_number == STAGE_2_1)
+	{
+		
+		
+
+		stage_FishesPos.x += stage_FishesMove.x;
+
+
+		if (-stage_Scroll.x + stage_FishesPos.x + stage_FishesTexture.GetWidth() < 64)
+		{
+			stage_FishesPos.x = g_pGraphics->GetTargetWidth() + stage_Scroll.x;
+			stage_FishesPos.y = CUtilities::Random(0, g_pGraphics->GetTargetHeight() - stage_Scroll.y);
+			stage_FishesMove.x = -(int)CUtilities::Random(1, 7);
+		}
+
 	}
 
 	if (pl.GetMarioDead())
@@ -393,6 +480,11 @@ void CStage::Render(void)
 			stage_BackTexture.Render(x, y);
 		}
 	}
+	if (stage_number == STAGE_2_1)
+	{
+		Vector2 scroll(-stage_Scroll.x + stage_FishesPos.x, -stage_Scroll.y + stage_FishesPos.y);
+		stage_FishesTexture.Render(scroll.x, scroll.y, TEXALIGN_CENTERLEFT);
+	}
 
 	//テクスチャの横幅からマップチップの縦オフセットを求める
 	int tcx = stage_ChipTexture.GetWidth() / stage_ChipSize;
@@ -407,6 +499,14 @@ void CStage::Render(void)
 			if (cn < 0) {
 				continue;
 			}
+			if (-stage_Scroll.x + x * stage_ChipSize < -64 || -stage_Scroll.x + x * stage_ChipSize > g_pGraphics->GetTargetWidth() + 64)
+			{
+				continue;
+			}
+			if (-stage_Scroll.y + y * stage_ChipSize < -128 || -stage_Scroll.y + y * stage_ChipSize > g_pGraphics->GetTargetHeight() + 64)
+			{
+				continue;
+			}
 
 			//マップチップの矩形
 			CRectangle cr(stage_ChipSize * (cn % tcx), stage_ChipSize * (cn / tcx), stage_ChipSize * (cn % tcx + 1), stage_ChipSize * (cn / tcx + 1));
@@ -416,11 +516,12 @@ void CStage::Render(void)
 	}
 
 
+
 }
 
 void CStage::RenderDebug(void)
 {
-	CGraphicsUtilities::RenderString(600, 20, "スクロール:%f", stage_Scroll.x);
+	CGraphicsUtilities::RenderString(600, 20, "スクロール:X%fY%f", stage_Scroll.x, stage_Scroll.y);
 }
 
 void CStage::Release(void)
@@ -466,7 +567,7 @@ void CStage::Release(void)
 		delete[] stage_gapMove;
 		stage_gapMove = NULL;
 	}
-
+	stage_FishesTexture.Release();
 
 	//SE解放
 	stage_BlockAttackSE.Release();
@@ -475,6 +576,10 @@ void CStage::Release(void)
 	//敵弾テクスチャ解放
 	stage_EnemyShotTexture.Release();
 	stage_EnemyFireTexture.Release();
+	for (int i = 0; i < MARIOSOUND_COUNT; i++)
+	{
+		stage_MarioSE[i].Release();
+	}
 
 }
 
@@ -517,6 +622,11 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 			}
 			//クリアしたとき、ゴールフラッグの球と棒の当たり判定をしない
 			if (pl.Getplayer_ClearFlg() && (cn == CHIP_GOALBALL - 1 || cn == CHIP_GOALROD - 1))
+			{
+				continue;
+			}
+			//水の当たり判定をしない
+			if (cn == 49 || cn == 50 || cn == 51)
 			{
 				continue;
 			}
@@ -563,10 +673,14 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				{
 					if (g_pInput->IsKeyHold(MOFKEY_DOWN))
 					{
+						pl.SetDokanWarpFlg(true);
 						pl.SetPlayerPos(Vector2(200, 1200));
 					}
 				}
-
+				if (cn == CHIP_CLEARTRANSITION - 1)
+				{
+					pl.Setplayer_ClearTransitionFlg(true);
+				}
 				//接触しているブロックが動いているとき、敵とアイテムのフラグをTrue
 				if (stage_gap[y * stage_XCount + x] != 0)
 				{
@@ -649,10 +763,7 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				{
 					pl.Setplayer_ClearFlg(true);
 				}
-				if (cn == CHIP_CLEARTRANSITION - 1)
-				{
-					pl.Setplayer_ClearTransitionFlg(true);
-				}
+				
 				if (cn == 35)
 				{
 					pl.SetWarpFlg(true);
@@ -691,7 +802,8 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				{
 					if (g_pInput->IsKeyHold(MOFKEY_RIGHT))
 					{
-						pl.SetPlayerPos(Vector2(1778, 448));
+						pl.SetDokanWarpFlg(false);
+						pl.SetPlayerPos(Vector2(3600, 458));
 					}
 				}
 			}

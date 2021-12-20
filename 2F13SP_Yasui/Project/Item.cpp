@@ -72,6 +72,49 @@ void CItem::Initialize(float px, float py, int type) {
 			item_Motion.Create(anime, 1);
 			break;
 		}
+		case ITEM_FOAM_MUSH:
+		{
+			//アニメーションを作成
+			SpriteAnimationCreate anime[] = {
+				{
+					"泡キノコ",
+					0,0,
+					32,32,
+					TRUE,{{15,0,0},{15,1,0},{15,2,0},{15,1,0}}
+				},
+			};
+			item_Motion.Create(anime, 1);
+			break;
+		}
+		case ITEM_FOAM_COIN:
+		{
+			//アニメーションを作成
+			SpriteAnimationCreate anime[] = {
+				{
+					"泡コイン",
+					0,0,
+					32,32,
+					TRUE,{{10,0,0},{10,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0},{5,6,0},{5,7,0}}
+				},
+			};
+			item_Motion.Create(anime, 1);
+			break;
+		}
+		default :
+		{
+			//アニメーションを作成
+			SpriteAnimationCreate anime[] = {
+				{
+					"コイン",
+					0,0,
+					32,32,
+					FALSE,{{5,0,0}}
+				},
+			};
+			item_Motion.Create(anime, 1);
+			break;
+		}
+			
 	}
 
 }
@@ -80,9 +123,13 @@ void CItem::Initialize(float px, float py, int type) {
  * 更新
  *
  */
-void CItem::Update(void) {
+void CItem::Update(float wx,float wy) {
 	//取得時非表示
 	if (!item_Show)
+	{
+		return;
+	}
+	if (wx > item_Position.x + item_pTexture->GetWidth() || wx + g_pGraphics->GetTargetWidth() < item_Position.x)
 	{
 		return;
 	}
@@ -120,16 +167,40 @@ void CItem::Update(void) {
 			{
 				item_Move.y = 20.0f;
 			}
-			/*if (item_Position.y > 800)
-			{
-				item_Show = false;
-			}*/
 			//実際に座標を移動させる
 			item_Position.x += item_Move.x;
 			item_Position.y += item_Move.y;
 			break;
 		}
 		case ITEM_COIN:
+		{
+			item_Move = Vector2(0, 0);
+			break;
+		}
+		case ITEM_FOAM_MUSH:
+		{
+			item_Move.x += CUtilities::GetFrameSecond();
+
+			//ふわふわ浮かせる
+			item_Move.y = sin(item_Move.x) * 1.0f;
+
+			//実際に座標を移動させる
+			item_Position.x += -1;
+			item_Position.y += item_Move.y;
+			break;
+		}
+		case ITEM_FOAM_COIN:
+		{
+			item_Move.x += CUtilities::GetFrameSecond();
+			//ふわふわ浮かせる
+			item_Move.y = sin(item_Move.x) * 1.0f;
+			
+			//実際に座標を移動させる
+			item_Position.x += -1;
+			item_Position.y += item_Move.y;
+			break;
+		}
+		default:
 		{
 			break;
 		}
@@ -150,6 +221,10 @@ void CItem::Update(void) {
  * [in]			oy					Y埋まり量
  */
 void CItem::CollisionStage(float ox, float oy) {
+	if (item_Type == ITEM_FOAM_MUSH || item_Type == ITEM_FOAM_COIN)
+	{
+		return;
+	}
 
 		item_Position.x += ox;
 		item_Position.y += oy;
@@ -188,6 +263,10 @@ void CItem::Render(float wx, float wy) {
 	{
 		return;
 	}
+	if (wx > item_Position.x + item_pTexture->GetWidth() || wx + g_pGraphics->GetTargetWidth() < item_Position.x)
+	{
+		return;
+	}
 	if (!item_Appear && item_Type == ITEM_MUSH)
 	{
 		return;
@@ -206,6 +285,10 @@ void CItem::Render(float wx, float wy) {
 void CItem::RenderDebug(float wx, float wy) {
 	//非表示
 	if (!item_Show)
+	{
+		return;
+	}
+	if (wx > item_Position.x + item_pTexture->GetWidth() || wx + g_pGraphics->GetTargetWidth() > item_Position.x)
 	{
 		return;
 	}

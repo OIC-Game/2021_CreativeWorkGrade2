@@ -11,9 +11,22 @@
 		ENEMY_MUSH,				//キノコ
 		ENEMY_SKELETON,			//スケルトン
 		ENEMY_MARIO,			//マリオ
-		ENEMY_FISH,				//マグロ
+		ENEMY_HUGEMUSH,			//大キノコ
+		ENEMY_MAGURO,			//マグロ
+		ENEMY_IKA,				//イカ
+		ENEMY_KAZIKI,			//カジキ
 
 		ENEMY_TYPECOUNT,
+	};
+
+	enum tag_MARIOSOUNDTYPE
+	{
+		MARIOSOUND_JUMP,
+		MARIOSOUND_FIRE,
+		MARIOSOUND_DEAD,
+		MARIOSOUND_CHANGE,
+
+		MARIOSOUND_COUNT,
 	};
 
 class CEnemy
@@ -25,6 +38,7 @@ private:
 	bool							enemy_Reverse;
 	bool							enemy_Show;
 	CTexture*						enemy_pTexture;
+	CSoundBuffer*					enemy_pSound[MARIOSOUND_COUNT];
 	CSpriteMotionController			enemy_Motion;
 	CRectangle						enemy_RectTexture;
 	bool							enemy_Dead;
@@ -44,6 +58,8 @@ private:
 	float							tmp_DistanceBetweenPlayer;
 	bool							tmp_playerJumpFlg;
 	bool							tmp_playerWarpFlg;
+	int								enemy_HP;
+	CVector2						enemy_RectOffsetSize;
 
 	//マリオの行動パターンで使用
 	bool							one;
@@ -56,7 +72,10 @@ private:
 	int								otherAttack;
 	int								debug_MarioAttackPettern;
 	bool							debugModeFlg;
+	bool							lastFire;
+	int								hipDropCount;
 
+	float							enemy_sinMove;
 	
 
 	
@@ -117,9 +136,19 @@ private:
 
 		MARIOMOTION_COUNT,
 	};
+	enum tag_HUGEMUSHMOTION
+	{
+		HUGEMOTION_MOVE,
+		HUGEMOTION_DAMAGEMOVE,
+		HUGEMOTION_DEAD,
+		
+		HUGEMOTION_COUNT,
+	};
+
 	enum tag_FISHMOTION
 	{
 		FISHMOTION_MOVE,
+		FISHMOTION_DEAD,
 
 		FISHMOTION_COUNT,
 	};
@@ -129,25 +158,27 @@ private:
 	int				enemy_ShotWait;
 	bool			enemy_AttackFlg;
 	float			enemy_DistanceBetweenToPlayer;
-	CSoundBuffer	enemy_FireSE;
 
+	
+	void EnemyInitialize();
 public:
 	CEnemy();
 	~CEnemy();
 	bool Load(void);
 	void Initialize(float px, float py, int type);
-	void Update(float wx);
+	void Update(float wx,float wy);
 	void Render(float wx, float wy);
 	void RenderDebug(float wx, float wy);
 	void Release(void);
 	void SetTexture(CTexture* pt, CTexture* st) { enemy_pTexture = pt; for (int i = 0; i < ENEMYSHOT_COUNT; i++) { m_ShotArray[i].SetTexture(st); } }
+	void SetSound(CSoundBuffer* ps, int n) { enemy_pSound[n] = ps;}
 	bool GetShow(void) { return enemy_Show; };
 	bool GetEnemyDead(void) { return enemy_Dead; };
 	void CollisionStage(float ox, float oy);
 	void ShotCollisionStage(float ox, float oy,int n);
 	CRectangle GetRect() {
-		return CRectangle(enemy_Position.x + 5, enemy_Position.y + 5,
-			enemy_Position.x + enemy_RectTexture.GetWidth() - 5, enemy_Position.y + enemy_RectTexture.GetHeight());
+		return CRectangle(enemy_Position.x + enemy_RectOffsetSize.x, enemy_Position.y + enemy_RectOffsetSize.x,
+			enemy_Position.x + enemy_RectTexture.GetWidth() - enemy_RectOffsetSize.x, enemy_Position.y + enemy_RectTexture.GetHeight());
 	}
 	void Dead(bool bDead);
 	float Getenemy_PositionY() { return enemy_Position.y; }
@@ -191,7 +222,7 @@ public:
 
 	bool GetMarioFireFlg() { return fire; }
 
-
+	void Damage();
 
 
 	

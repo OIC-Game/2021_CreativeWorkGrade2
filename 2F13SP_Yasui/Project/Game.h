@@ -24,20 +24,14 @@ private:
 	bool			game_ScoreDesplayFlg;
 	float			game_tempPlayerPositionX;
 	float			game_tempPlayerPositionY;
+	CVector2		game_PlayerInitializePosition;
 	int				game_NowStage;
-	CSoundBuffer	game_MarioJumpSE;
-	CSoundBuffer	game_MarioFireSE;
 	bool			game_playMarioSEFlg;
 	CSoundBuffer	game_MarioDeadSE;
 	CSoundBuffer	game_BossClearSE;
 	bool			game_ab;
 	bool			game_MarioFireSEFlg;
-	CTexture*		game_StageBackTexure;
-
-	const char* stage_BackTexPath[2] = { "BackGround.png",
-										  "BackGround2.png",
-										};
-
+	int				game_StageState;
 
 
 	std::array<const char*, 2 >stagePathArray;

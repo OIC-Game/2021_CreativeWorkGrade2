@@ -219,7 +219,10 @@ void CEnemy::Damage(int dmg)
 
 void CEnemy::NomalEnemyMove()
 {
-	m_SpeedY = ENEMY_MOVESPEED;
+	if (m_PosY < 100)
+		m_SpeedY = ENEMY_MOVESPEED;
+	else
+		m_SpeedY = 0;
 }
 
 void CEnemy::StopAndStartMove()
@@ -290,6 +293,12 @@ void CEnemy::ShotSelect(int j)
 	if (m_EnemyType == 0)
 	{
 		DownBullet(j);
+		SlantLeftBullet(j);
+		SlantLeftBullet2(j);
+		SlantRightBullet(j);
+		SlantRightBullet2(j);
+		RightBullet(j);
+		LeftBullet(j);
 	}
 
 	if (m_EnemyType == 1)
@@ -329,9 +338,19 @@ void CEnemy::SlantRightBullet(int j)
 	m_ShotArray[2][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 2, 5);
 }
 
+void CEnemy::SlantRightBullet2(int j)
+{
+	m_ShotArray[6][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 4, 3);
+}
+
 void CEnemy::SlantLeftBullet(int j)
 {
 	m_ShotArray[3][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -2, 5);
+}
+
+void CEnemy::SlantLeftBullet2(int j)
+{
+	m_ShotArray[7][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -4, 3);
 }
 
 void CEnemy::RightBullet(int j)

@@ -80,10 +80,14 @@ public:
 
 	//^‰º
 	void DownBullet(int j);
-	//Î‚ß‰E‰º
+	//Î‚ß‰E‰º‰sŠp
 	void SlantRightBullet(int j);
-	//Î‚ß¶‰º
+	//Î‚ß‰E‰ºLŠp
+	void SlantRightBullet2(int j);
+	//Î‚ß¶‰º‰sŠp
 	void SlantLeftBullet(int j);
+	//Î‚ß¶‰ºLŠp
+	void SlantLeftBullet2(int j);
 	//‰E
 	void RightBullet(int j);
 	//¶

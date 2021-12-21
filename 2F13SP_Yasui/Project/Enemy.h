@@ -60,6 +60,7 @@ private:
 	bool							tmp_playerWarpFlg;
 	int								enemy_HP;
 	CVector2						enemy_RectOffsetSize;
+	int								enemy_StageState;
 
 	//マリオの行動パターンで使用
 	bool							one;
@@ -165,7 +166,7 @@ public:
 	CEnemy();
 	~CEnemy();
 	bool Load(void);
-	void Initialize(float px, float py, int type);
+	void Initialize(float px, float py, int type,int stageState);
 	void Update(float wx,float wy);
 	void Render(float wx, float wy);
 	void RenderDebug(float wx, float wy);

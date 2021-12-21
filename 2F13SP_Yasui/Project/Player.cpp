@@ -131,6 +131,8 @@ void CPlayer::Initialize(Vector2 initPos, int stageState)
 	player_ChangeSizeFlg = false;
 	player_DamageFlg = false;
 	player_GoalMoveFlg = false;
+	player_HideFlg = false;
+	player_MaguroFlyFlg = false;
 	if (player_Motion.GetMotionNo() != MOTION_SMALL_WAIT)
 	{
 		player_Motion.ChangeMotion(MOTION_SMALL_WAIT);
@@ -161,6 +163,11 @@ void CPlayer::Update(void)
 {
 	//プレイヤー死亡判定
 	DeadJudge();
+	if (player_MaguroFlyFlg)
+	{
+		player_HideFlg = true;
+		player_ClearTransitionFlg = true;
+	}
 
 	//画面外に出ないようにする
 	if (player_Position.x < 0)
@@ -383,6 +390,10 @@ void CPlayer::Update(void)
 
 void CPlayer::Render(float wx, float wy)
 {
+	if (player_HideFlg)
+	{
+		return;
+	}
 	//プレイヤー矩形
 	CRectangle player_drow = player_RectTexture;
 

@@ -34,14 +34,18 @@ CItem::~CItem() {
  * [in]			py					Y座標
  * [in]			type				敵タイプ
  */
-void CItem::Initialize(float px, float py, int type) {
+void CItem::Initialize(float px, float py, int type,int stageState) {
 	item_Type = type;
 	item_Position.x = px;
 	item_Position.y = py;
+	item_StageState = stageState;
 	item_Move = Vector2(-2.0f, 0.0f);
 	item_Show = true;
 	item_Appear = false;
 	item_BlockJump = false;
+	item_ReverseFlg = false;
+	item_TopReverseFlg = false;
+	item_MaguroFlyFlg = false;
 	switch (item_Type)
 	{
 		case ITEM_MUSH:
@@ -100,6 +104,24 @@ void CItem::Initialize(float px, float py, int type) {
 			item_Motion.Create(anime, 1);
 			break;
 		}
+		case ITEM_BIG_MAGURO:
+		{
+			item_Move.x = 0;
+			item_ReverseFlg = true;
+
+
+			//アニメーションを作成
+			SpriteAnimationCreate anime[] = {
+				{
+					"マグロ",
+					0,0,
+					128,60,
+					FALSE,{{5,0,0}}
+				},
+			};
+			item_Motion.Create(anime, 1);
+			break;
+		}
 		default :
 		{
 			//アニメーションを作成
@@ -114,7 +136,42 @@ void CItem::Initialize(float px, float py, int type) {
 			item_Motion.Create(anime, 1);
 			break;
 		}
+	}
+
+	switch (item_Type)
+	{
+		case ITEM_MUSH:
+		{
+
+			break;
+		}
+		case ITEM_COIN:
+		{
+			item_Move = Vector2(0, 0);
+			break;
+		}
+		case ITEM_FOAM_MUSH:
+		{
+
+			break;
+		}
+		case ITEM_FOAM_COIN:
+		{
+
+			break;
+		}
+		case ITEM_BIG_MAGURO:
+		{
+			item_Move.x = 0;
+			item_ReverseFlg = true;
 			
+
+			break;
+		}
+		default:
+		{
+			break;
+		}
 	}
 
 }
@@ -174,7 +231,7 @@ void CItem::Update(float wx,float wy) {
 		}
 		case ITEM_COIN:
 		{
-			item_Move = Vector2(0, 0);
+			
 			break;
 		}
 		case ITEM_FOAM_MUSH:
@@ -200,6 +257,18 @@ void CItem::Update(float wx,float wy) {
 			item_Position.y += item_Move.y;
 			break;
 		}
+		case ITEM_BIG_MAGURO:
+		{
+			if (item_MaguroFlyFlg)
+			{
+				item_Move.y -= 0.5f;
+			}
+
+
+			item_Position.x += item_Move.x;
+			item_Position.y += item_Move.y;
+			break;
+		}
 		default:
 		{
 			break;
@@ -221,7 +290,7 @@ void CItem::Update(float wx,float wy) {
  * [in]			oy					Y埋まり量
  */
 void CItem::CollisionStage(float ox, float oy) {
-	if (item_Type == ITEM_FOAM_MUSH || item_Type == ITEM_FOAM_COIN)
+	if (item_Type == ITEM_FOAM_MUSH || item_Type == ITEM_FOAM_COIN || item_Type == ITEM_BIG_MAGURO)
 	{
 		return;
 	}
@@ -271,8 +340,26 @@ void CItem::Render(float wx, float wy) {
 	{
 		return;
 	}
+
+	if (item_ReverseFlg)
+	{
+		float temp;
+		temp = item_SrcRect.Right;
+		item_SrcRect.Right = item_SrcRect.Left;
+		item_SrcRect.Left = temp;
+	}
+
+
 	//テクスチャの描画
-	item_pTexture->Render(item_Position.x - wx, item_Position.y - wy,item_SrcRect);
+	if (item_Type == ITEM_BIG_MAGURO && item_StageState == STAGESTATE_WATER)
+	{
+		if(item_MaguroFlyFlg)
+		item_pTexture->RenderRotate(item_Position.x - wx, item_Position.y - wy,MOF_ToRadian(-90), item_SrcRect,TEXALIGN_CENTERCENTER);
+	}
+	else
+	{
+		item_pTexture->Render(item_Position.x - wx, item_Position.y - wy,item_SrcRect);
+	}
 }
 
 /**

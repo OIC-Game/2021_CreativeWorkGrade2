@@ -5,12 +5,7 @@
 #include	"Enemy.h"
 #include	"Item.h"
 
-enum PLAYER_STAGESTATE
-{
-	STAGESTATE_GROUND,
-	STAGESTATE_WATER,
-	STAGESTATE_SKY,
-};
+
 extern  bool	bossWarpFlg;
 
 class CPlayer
@@ -58,6 +53,8 @@ private:
 	bool			player_BossClearTransitionFlg;
 	bool			player_DokanWarpFlg;
 	int				player_NowStageState;
+	bool			player_MaguroFlyFlg;
+	bool			player_HideFlg;
 
 	//ÉÇÅ[ÉVÉáÉìéÌóﬁ
 	enum tag_MOTION
@@ -131,5 +128,7 @@ public:
 	bool GetDokanWarpFlg() { return player_DokanWarpFlg; }
 	void SetDokanWarpFlg(bool isWarp) { player_DokanWarpFlg = isWarp; }
 	void SetPlayerPos(CVector2 position) { player_Position = position; }
+	void SetPlayerMaguroFly(bool isFly) { player_MaguroFlyFlg = isFly; }
+	bool GetPlayerMaguroFly() { return player_MaguroFlyFlg; }
 };
 

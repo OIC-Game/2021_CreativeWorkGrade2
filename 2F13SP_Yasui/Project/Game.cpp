@@ -162,7 +162,8 @@ void CGame::Initialize(void) {
 	case STAGE_2_1:
 	{
 		game_StageState = STAGESTATE_WATER;
-		game_PlayerInitializePosition = Vector2(50, 150);
+		//game_PlayerInitializePosition = Vector2(50, 150);
+		game_PlayerInitializePosition = Vector2(6100, 450);
 		break;
 	}
 	case STAGE_LAST:
@@ -182,7 +183,7 @@ void CGame::Initialize(void) {
 	}
 	g_Player.Initialize(game_PlayerInitializePosition, game_StageState);
 	//ステージ初期化
-	g_Stage.Initialize(m_EnemyArray,m_ItemArray);
+	g_Stage.Initialize(m_EnemyArray,m_ItemArray, game_StageState);
 	
 	game_NowStage = m_StageNumber;
 	//BGM再生
@@ -374,10 +375,18 @@ void CGame::Update(void) {
 		{
 			return;
 		}
+		if (m_ItemArray[i].GetType() == ITEM_BIG_MAGURO && g_Player.GetPlayerMaguroFly())
+		{
+			m_ItemArray[i].SetMaguroFly(g_Player.GetPlayerMaguroFly());
+		}
 		m_ItemArray[i].Update(g_Stage.GetScrollX(), g_Stage.GetScrollY());
 		float ox = 0, oy = 0;
 		jumpFlg = false;
 		magmaDead = false;
+		if (m_ItemArray[i].GetType() == ITEM_FOAM_COIN || m_ItemArray[i].GetType() == ITEM_FOAM_MUSH || m_ItemArray[i].GetType() == ITEM_BIG_MAGURO)
+		{
+			continue;
+		}
 		if (g_Stage.Collision(m_ItemArray[i].GetRect(), ox, oy,og,enemyDead,jumpFlg,g_Player,magmaDead))
 		{
 			if (magmaDead)

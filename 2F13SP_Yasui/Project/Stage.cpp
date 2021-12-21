@@ -191,7 +191,7 @@ bool CStage::Load(char* pName)
 
 }
 
-void CStage::Initialize(CEnemy* pEnemy, CItem* pItem)
+void CStage::Initialize(CEnemy* pEnemy, CItem* pItem,int stageState)
 {
 	stage_Scroll = Vector2(0, 0);
 	stage_ChipMove = 0.0f;
@@ -204,6 +204,7 @@ void CStage::Initialize(CEnemy* pEnemy, CItem* pItem)
 	stage_BlockDestroyWait = 0;
 	stage_BlockChange = false;
 	stage_FixScroll = false;
+	stage_State = stageState;
 
 	//ìGèâä˙âª
 	for (int y = 0; y < stage_YCount; y++)
@@ -230,7 +231,7 @@ void CStage::Initialize(CEnemy* pEnemy, CItem* pItem)
 			{
 				pEnemy[n].SetTexture(&stage_pEnemyTexture[on],  & stage_EnemyShotTexture);
 			}
-			pEnemy[n++].Initialize(x * stage_ChipSize, y * stage_ChipSize, on);
+			pEnemy[n++].Initialize(x * stage_ChipSize, y * stage_ChipSize, on,stage_State);
 		}
 	}
 	n = 0;
@@ -247,7 +248,7 @@ void CStage::Initialize(CEnemy* pEnemy, CItem* pItem)
 				continue;
 			}
 			pItem[n].SetTexture(&stage_pItemTexture[on]);
-			pItem[n++].Initialize(x * stage_ChipSize, y * stage_ChipSize, on);
+			pItem[n++].Initialize(x * stage_ChipSize, y * stage_ChipSize, on, stage_State);
 		}
 	}
 
@@ -324,19 +325,31 @@ void CStage::Update(CPlayer& pl)
 		}
 		else if (stage_number == STAGE_2_1)
 		{
-			if (prect.Top - stage_Scroll.y < 200) {
-				stage_Scroll.y -= 200 - (prect.Top - stage_Scroll.y);
-				if (stage_Scroll.y <= 0) {
-					stage_Scroll.y = 0;
+			if (!pl.GetPlayerMaguroFly())
+			{
+				if (prect.Top - stage_Scroll.y < 200) {
+					stage_Scroll.y -= 200 - (prect.Top - stage_Scroll.y);
+					if (stage_Scroll.y <= 0) {
+						stage_Scroll.y = 0;
+					}
+				}
+				else if (prect.Bottom - stage_Scroll.y > sh - 200) {
+					stage_Scroll.y += (prect.Bottom - stage_Scroll.y) - (sh - 200);
+					if (stage_Scroll.y >= stgh - sh) {
+						stage_Scroll.y = stgh - sh;
+					}
 				}
 			}
-			else if (prect.Bottom - stage_Scroll.y > sh - 200) {
-				stage_Scroll.y += (prect.Bottom - stage_Scroll.y) - (sh - 200);
-				if (stage_Scroll.y >= stgh - sh) {
-					stage_Scroll.y = stgh - sh;
+			else
+			{
+				if (stage_Scroll.y > 0)
+				{
+					stage_Scroll.y -= 2.5f;
 				}
 			}
 		}
+
+		
 
 	}
 	if (stage_number == STAGE_1_1)
@@ -772,6 +785,10 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				{
 					pl.SetBossClearTrantionFlg(true);
 				}
+				if (cn == 57)
+				{
+					pl.SetPlayerMaguroFly(true);
+				}
 
 			}
 			//âEÇ∆ìñÇΩÇËîªíË
@@ -805,6 +822,10 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 						pl.SetDokanWarpFlg(false);
 						pl.SetPlayerPos(Vector2(3600, 458));
 					}
+				}
+				if (cn == 57)
+				{
+					pl.SetPlayerMaguroFly(true);
 				}
 			}
 

@@ -9,6 +9,7 @@
 		ITEM_COIN,					//コイン
 		ITEM_FOAM_MUSH,				//泡キノコ
 		ITEM_FOAM_COIN,				//泡コイン
+		ITEM_BIG_MAGURO,			//巨大マグロ
 
 		ITEM_TYPECOUNT,
 	};
@@ -25,11 +26,15 @@ private:
 	CRectangle				item_SrcRect;
 	bool					item_Appear;
 	int						item_CoinCount;
+	bool					item_ReverseFlg;
+	bool					item_TopReverseFlg;
+	bool					item_MaguroFlyFlg;
+	int						item_StageState;
 
 public:
 	CItem();
 	~CItem();
-	void Initialize(float px, float py, int type);
+	void Initialize(float px, float py, int type,int stageState);
 	void Update(float wx,float wy);
 	void Render(float wx, float wy);
 	void RenderDebug(float wx, float wy);
@@ -44,5 +49,6 @@ public:
 	bool GetitemAppear(void){ return item_Appear; }
 	bool GetCoinCount(void) { return item_CoinCount; }
 	void SetCoinCount(int coinCount) { item_CoinCount += coinCount; }
+	void SetMaguroFly(bool isFly) { item_MaguroFlyFlg = isFly; }
 };
 

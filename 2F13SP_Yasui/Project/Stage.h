@@ -41,6 +41,7 @@ private:
 	int				stage_BlockDestroyWait;
 	bool			stage_BlockChange;
 	bool			stage_FixScroll;
+	int				stage_State;
 
 	CSoundBuffer	stage_BlockAttackSE;
 	CSoundBuffer	stage_BlockDestroySE;
@@ -69,7 +70,7 @@ public:
 	CStage();
 	~CStage();
 	bool Load(char* pName);
-	void Initialize(CEnemy* pEnemy, CItem* pItem);
+	void Initialize(CEnemy* pEnemy, CItem* pItem,int stageState);
 	void Update(CPlayer& pl);
 	void Render(void);
 	void RenderDebug(void);

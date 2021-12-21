@@ -25,7 +25,7 @@ enum tag_SCENENO {
 #define		PLAYER_WATER_GRAVITY 0.25f
 //最大重力
 #define		PLAYER_MAXGRAVITY 20.0f
-#define		PLAYER_WATER_MAXGRAVITY 30.0f
+#define		PLAYER_WATER_MAXGRAVITY 3.5f
 //死亡時ウェイト
 #define		PLAYER_DEADWAIT 30
 //初期ライフ
@@ -68,6 +68,13 @@ enum tag_STAGENUMBER
 
 	STAGE_COUNT,
 };
+enum tag_STAGESTATE
+{
+	STAGESTATE_GROUND,
+	STAGESTATE_WATER,
+	STAGESTATE_SKY,
+};
+
 /*マップチップ*/
 //ブロック
 #define		CHIP_BLOCK 19

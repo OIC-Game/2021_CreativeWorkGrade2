@@ -67,7 +67,7 @@ bool CEnemy::Load(void)
 
 
 */
-void CEnemy::Initialize(float px, float py, int type)
+void CEnemy::Initialize(float px, float py, int type,int stageState)
 {
 	enemy_Type = type;
 	enemy_Position.x = px;

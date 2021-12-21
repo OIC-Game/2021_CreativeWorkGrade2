@@ -1,5 +1,6 @@
 #pragma once
 #include	"Player.h"
+#include	"PlayerFire.h"
 #include	"Stage.h"
 #include	"Enemy.h"
 #include	"Item.h"
@@ -10,6 +11,8 @@ class CGame{
 private:
 	//プレイヤー
 	CPlayer				m_Player;
+
+	CPlayerFire			m_WorkFire;
 	//ステージ
 	CStage				m_Stage;
 	//敵

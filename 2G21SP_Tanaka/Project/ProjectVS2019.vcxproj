@@ -110,6 +110,7 @@
     <ClCompile Include="GameRetry.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerFire.cpp" />
     <ClCompile Include="PoPItem.cpp" />
     <ClCompile Include="PoPItemManager.cpp" />
     <ClCompile Include="Stage.cpp" />
@@ -118,6 +119,7 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PlayerFire.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameApp.h" />

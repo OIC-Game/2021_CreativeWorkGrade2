@@ -527,3 +527,83 @@ bool CStage::Collision(CRectangle r, CPlayer& pl, float& ox, float& oy,int& popI
 	}
 	return re;
 }
+
+bool CStage::CollisionPlayerFire(CRectangle r){
+	bool re = false;
+
+	//当たり判定する矩形の左上と右下のチップ位置を求める
+	int lc = r.Left / m_ChipSize;
+	int rc = r.Right / m_ChipSize;
+	int tc = r.Top / m_ChipSize;
+	int bc = r.Bottom / m_ChipSize;
+	//ステージの範囲外にはならないようにする
+	if (lc < 0)
+	{
+		lc = 0;
+	}
+	if (tc < 0)
+	{
+		tc = 0;
+	}
+	if (rc >= m_XCount)
+	{
+		rc = m_XCount - 1;
+	}
+	if (bc >= m_YCount)
+	{
+		bc = m_YCount - 1;
+	}
+	for (int y = tc; y <= bc; y++)
+	{
+		for (int x = lc; x <= rc; x++)
+		{
+			//描画するチップ番号
+			//チップ番号０は当たり判定しない
+			char cn = m_pChipData[y * m_XCount + x] - 1;
+			if (cn < 0)
+			{
+				continue;
+			}
+			//マップチップの矩形
+			CRectangle cr(x * m_ChipSize, y * m_ChipSize, x * m_ChipSize + m_ChipSize, y * m_ChipSize + m_ChipSize);
+			//下で範囲を限定した専用の矩形を作成する。
+			CRectangle brec = r;
+			brec.Top = brec.Bottom - 1;	//下の矩形は上側を下と同じ値にする
+			brec.Expansion(-1, 0);		//横の範囲を少し狭める
+			//下と当たり判定
+			if (cr.CollisionRect(brec))
+			{
+				re = true;
+			}
+			//当たり判定用のキャラクタ矩形
+			//左、右それぞれで範囲を限定した専用の矩形を作成する。
+			CRectangle lrec = r;
+			lrec.Right = lrec.Left + 1;	//左の矩形は右側を左と同じ値にする
+			lrec.Expansion(0, -1);		//縦の範囲を少し狭める
+			CRectangle rrec = r;
+			rrec.Left = rrec.Right - 1;	//右の矩形は左側を右と同じ値にする
+			rrec.Expansion(0, -1);		//縦の範囲を少し狭める
+			//左と当たり判定
+			if (cr.CollisionRect(lrec))
+			{
+				re = true;
+			}
+			//右と当たり判定
+			else if (cr.CollisionRect(rrec))
+			{
+				re = true;
+			}
+			//当たり判定用のキャラクタ矩形
+			//上で範囲を限定した専用の矩形を作成する。
+			CRectangle trec = r;
+			trec.Bottom = trec.Top + 1;	//上の矩形は下側を上と同じ値にする
+			trec.Expansion(-1, 0);		//横の範囲を少し狭める
+			//上と当たり判定
+			if (cr.CollisionRect(trec))
+			{
+				re = true;
+			}
+		}
+	}
+	return re;
+}

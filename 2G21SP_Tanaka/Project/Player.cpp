@@ -68,6 +68,17 @@ bool CPlayer::Load(void){
 	{
 		return false;
 	}
+
+	//弾のテクスチャ
+	if (!m_FireTexture.Load("UI.png"))
+	{
+		return false;
+	}
+	for (int i = 0; i < PLAYERFIRE_COUNT; i++)
+	{
+		m_FireArray[i].SetTexture(&m_FireTexture);
+	}
+
 	//アニメーションの作成
 	SpriteAnimationCreate anim[] = {
 		{
@@ -128,6 +139,10 @@ void CPlayer::Initialize(void){
 	m_bEndTime = 0;
 	m_DamageWait = 0;
 	m_Motion.ChangeMotion(MOTION_WAIT);
+	for (int i = 0; i < PLAYERFIRE_COUNT; i++)
+	{
+		m_FireArray[i].Initialize();
+	}
 	m_BGM.SetLoop(TRUE);
 	m_BGM.Play();
 }
@@ -241,6 +256,12 @@ void CPlayer::Update(float wx, float wy){
 	{
 		m_DamageWait--;
 	}
+
+	// 弾の更新
+	for (int i = 0; i < PLAYERFIRE_COUNT; i++)
+	{
+		m_FireArray[i].Update();
+	}
 }
 
 void CPlayer::UpdateKey(){
@@ -324,10 +345,30 @@ void CPlayer::UpdateKey(){
 		m_MoveY += GRAVITY * 1.5f;
 	}
 
-	if (g_pInput->IsKeyPush(MOFKEY_1))
+	// 弾の発射
+	if (m_Stat = 2)
 	{
-		m_bClear = true;
-	}
+		if (m_FireWait <= 0)
+		{
+			if (g_pInput->IsKeyHold(MOFKEY_A))
+			{
+				for (int i = 0; i < PLAYERFIRE_COUNT; i++)
+				{
+					if (m_FireArray[i].GetShow())
+					{
+						continue;
+					}
+						m_FireWait = PLAYERFIRE_WAIT;
+						m_FireArray[i].Fire(m_PosX, m_PosY, m_bReverse);
+						break;
+					}
+				}
+			}
+			else
+			{
+				m_FireWait--;
+			}
+		}
 }
 
 void CPlayer::UpdateMove(void){
@@ -374,9 +415,15 @@ void CPlayer::Render(float wx, float wy){
 	CGraphicsUtilities::RenderString(720, 30, "%0i", m_Life);
 	//現在のコンボの数を表示
 	CGraphicsUtilities::RenderString(740, 30, "%0i", m_Comb);
+	
 	if (!m_bShow)
 	{
 		return;
+	}
+	//弾の描画
+	for (int i = 0; i < PLAYERFIRE_COUNT; i++)
+	{
+		m_FireArray[i].Render(wx, wy);
 	}
 	//インターバル２フレームごとに描画をしない
 	if (m_DamageWait % 4 >= 2)
@@ -411,10 +458,16 @@ void CPlayer::RenderDebug(float wx, float wy){
 	er.Top = er.Bottom - 0.5;
 	er.Expansion(-6, 0);
 	CGraphicsUtilities::RenderRect(er.Left - wx, er.Top - wy, er.Right - wx, er.Bottom - wy, MOF_XRGB(255, 0, 0));
+	//弾のデバッグ描画
+	for (int i = 0; i < PLAYERFIRE_COUNT; i++)
+	{
+		m_FireArray[i].RenderDebug(wx, wy);
+	}
 }
 
 void CPlayer::Release(void){
 	m_Texture.Release();
+	m_FireTexture.Release();
 	m_Motion.Release();
 	m_JumpSound.Release();
 	m_coinSound.Release();
@@ -458,6 +511,10 @@ void CPlayer::CollisionStage(float ox, float oy){
 	{
 		m_MoveX = 0;
 	}
+}
+
+void CPlayer::CollisionStageFire(int i){
+	m_FireArray[i].CollisionStage();
 }
 
 void CPlayer::IsGoal(void){
@@ -535,7 +592,21 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 		}
 	}
 	
-	
+	for (int i = 0; i < PLAYERFIRE_COUNT; i++)
+	{
+		if (!m_FireArray[i].GetShow())
+		{
+			continue;
+		}
+		CRectangle srec = m_FireArray[i].GetRect();
+		if (srec.CollisionRect(erec))
+		{
+			ene.EnemyDamege();
+			PlusScore();
+			m_FireArray[i].SetShow(false);
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -572,6 +643,10 @@ bool CPlayer::CollisionItem(CItem& itm){
 		return true;
 	}
 	return false;
+}
+
+void CPlayer::PlusScore(void){
+	m_Score = m_Score + 200;
 }
 
 void CPlayer::CoinGet(void){

@@ -133,6 +133,22 @@ void CGame::Update(void){
 	{
 		m_Player.CollisionItem(m_ItemArray[i]);
 	}
+
+	//弾とステージの当たり判定
+	for (int i = 0; i < PLAYERFIRE_COUNT; i++)
+	{
+		m_WorkFire = m_Player.GetFireArray(i);
+		if (!m_WorkFire.GetShow())
+		{
+			continue;
+		}
+		float ox = 0, oy = 0;
+		if (m_Stage.CollisionPlayerFire(m_WorkFire.GetRect()))
+		{
+			m_Player.CollisionStageFire(i);
+		}
+	}
+
 	//ステージの更新
 	m_Stage.Update(m_Player);
 	//ポップアイテムの更新

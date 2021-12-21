@@ -61,6 +61,7 @@ public:
 	float GetScrollX() { return m_ScrollX; }
 	float GetScrollY() { return m_ScrollY; }
 	bool Collision(CRectangle r, CPlayer& pl, float& ox, float& oy,int& popItemNo);
+	bool CollisionPlayerFire(CRectangle r);
 	int GetEnemyCount() { return m_EnemyCount; }
 	int GetItemCount() { return m_ItemCount; }
 	void SetPoPItemManager(CPoPItemManager* pmng) { m_pPoPItemManager = pmng; }

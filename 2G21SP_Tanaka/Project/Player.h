@@ -3,24 +3,31 @@
 #include		"GameDefine.h"
 #include		"Enemy.h"
 #include		"Item.h"
+#include		"PlayerFire.h"
 
 //移動速度
-#define			PLAYER_SPEED		0.3f
+#define			PLAYER_SPEED			0.3f
 
 //ダッシュ速度
-#define			PLAYER_RUNSPEED		0.5f
+#define			PLAYER_RUNSPEED			0.5f
 
 //移動最大速度
-#define			PLAYER_MAXSPEED		4.0f
+#define			PLAYER_MAXSPEED			4.0f
 
 //ダッシュ最大速度
-#define			PLAYER_MAXRUNSPEED	7.0f
+#define			PLAYER_MAXRUNSPEED		7.0f
 
 //ジャンプ初速
-#define			PLAYER_JUMP			-11.0f
+#define			PLAYER_JUMP				-11.0f
+
+//弾の発射限界数
+#define			PLAYERFIRE_COUNT		3
+
+//弾の発射間隔
+#define			PLAYERFIRE_WAIT			50
 
 //当たり判定減衰幅
-#define		PLAYER_RECTDECREASE		12
+#define			PLAYER_RECTDECREASE		12
 
 class CPlayer{
 private:
@@ -51,6 +58,10 @@ private:
 
 	int						m_Time;
 	int						m_Score;
+
+	CTexture				m_FireTexture;
+	CPlayerFire				m_FireArray[PLAYERFIRE_COUNT];
+	int						m_FireWait;
 
 	CSoundBuffer			m_JumpSound;
 	CSoundBuffer			m_coinSound;
@@ -88,6 +99,7 @@ public:
 		);
 	}
 	void CollisionStage(float ox, float oy);
+	void CollisionStageFire(int i);
 	void IsGoal(void);
 	bool CollisionEnemy(CEnemy& ene);
 	bool CollisionItem(CItem& itm);
@@ -108,9 +120,14 @@ public:
 	}
 	bool IsDead(void) { return m_bDead; }
 	bool IsClear(void){ return m_bClear; }
+	void PlusScore(void);
 	void CoinGet(void);
 	void BlockCoinGet(void);
 	void BreakBlock(void);
 	void EnemyScore(void);
 	void Clear(void);
+
+	CPlayerFire GetFireArray(int i) {
+		return m_FireArray[i];
+	};
 };

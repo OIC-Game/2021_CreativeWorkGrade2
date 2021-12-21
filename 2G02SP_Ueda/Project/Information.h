@@ -1,8 +1,10 @@
 #pragma once
 #include "mof.h"
+#include "Stage.h"
 class CInformation
 {
 private:
+
 	CTexture m_InfoTexture;
 	CTexture m_NumTexture;
 	int m_bInfoCount;

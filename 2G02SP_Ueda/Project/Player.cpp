@@ -498,7 +498,7 @@ bool CPlayer::CollisionEnemy(CEnemy& ene)
 			m_bGiant = false;
 			m_DamageWait = 150;
 		}
-		//m_HP -= 1;
+		m_HP -= 1;
 		
 		if (m_HP <= 0)
 		{
@@ -615,7 +615,7 @@ bool CPlayer::CollisionItem(CItem& itm)
 		CRectangle brec = irec;
 		hrec.Bottom = hrec.Top + 1;
 		hrec.Expansion(-6, 0);
-		brec.Expansion(-6, 32);
+		brec.Expansion(0, 32);
 		brec.Top = brec.Bottom - 1;
 		if (hrec.CollisionRect(brec))
 		{
@@ -655,6 +655,9 @@ bool CPlayer::CollisionItem(CItem& itm)
 			}
 			break;
 		case ITEM_COIN:
+			m_bCoinCount++;
+			break;
+		case ITEM_BOXCOIN:
 			m_bCoinCount++;
 			break;
 		}

@@ -44,12 +44,12 @@ private:
 	int m_bGoalCount;
 	bool m_bCastle;
 	int m_bCastleCount;
-	int m_bPlayerSize;
+	float m_bPlayerSize;
 	bool m_bGiant;
 	bool m_bMotionGiant;
-	int m_bPlayerF;
-	int m_bPlayerS;
-	int m_bPlayerT;
+	float m_bPlayerF;
+	float m_bPlayerS;
+	float m_bPlayerT;
 	bool m_bPipeDown;
 	bool m_bPipeMove;
 	bool m_bUnder;

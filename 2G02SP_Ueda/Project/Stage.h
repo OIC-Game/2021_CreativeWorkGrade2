@@ -74,6 +74,7 @@ public:
 	CStage();
 	~CStage();
 	bool Load(char* pName, char* gpName);
+	bool LoadStage(char* pName);
 	void Initialize(CPlayer* pPlayer, CEnemy* pEnemy,CItem* pItem);
 	void Update(CPlayer& pl);
 	void Render(void);

@@ -4,6 +4,7 @@
 enum tag_ITEMTYPE {
 	ITEM_GIANT,
 	ITEM_COIN,
+	ITEM_BOXCOIN,
 
 	ITEM_TYPECOUNT,
 };
@@ -23,8 +24,9 @@ private:
 	bool					m_bMove;
 	enum tag_MOTION {
 		MOTION_SPAWN,
-		MOTION_DESPAWN,
+		MOTION_GIANTDESPAWN,
 		MOTION_COIN,
+		MOTION_COINDESPAWN,
 
 		MOTION_COUNT,
 	};

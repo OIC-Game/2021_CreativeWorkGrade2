@@ -1,7 +1,8 @@
 #include "GameDefine.h"
 #include "TimeUp.h"
 extern int						gChangeScene;
-CTimeUp::CTimeUp()
+CTimeUp::CTimeUp():
+	m_bTimeUpCount(0)
 {
 }
 

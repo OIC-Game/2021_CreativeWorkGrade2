@@ -2,7 +2,6 @@
 #include "Information.h"
 extern int						gChangeScene;
 CInformation::CInformation() :
-	m_InfoTexture(),
 	m_bInfoCount(0),
 	m_LIFE(5),
 	m_ChipSize(0),

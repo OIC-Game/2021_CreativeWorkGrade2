@@ -2,7 +2,6 @@
 #include "GameOver.h"
 extern int						gChangeScene;
 CGameOver::CGameOver():
-	m_GameOverTexture(),
 	m_bGameOverCount(0)
 {
 }

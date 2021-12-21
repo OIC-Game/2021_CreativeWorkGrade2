@@ -13,17 +13,24 @@ CGame::~CGame()
 
 bool CGame::Load(void)
 {
-    m_Player.Load();
+	m_Player.Load();
 	m_Stage.Load("Stage1.txt", "Stage1Information.txt");
     m_EnemyArray = new CEnemy[m_Stage.GetEnemyCount()];
 	m_ItemArray = new CItem[m_Stage.GetItemCount()];
     return true;
 }
 
+bool CGame::LoadStage(void)
+{
+	m_Stage.LoadStage("Stage1.txt");
+	return true;
+}
+
 void CGame::Initialize(void)
 {
     m_Player.Initialize();
     m_Stage.Initialize(&m_Player,m_EnemyArray,m_ItemArray);
+	m_Stage.LoadStage("Stage1.txt");
 }
 
 void CGame::Update(void)
@@ -133,6 +140,7 @@ void CGame::Render(void)
 {
 	m_Stage.Render();
     m_Player.Render(m_Stage.GetScrollX(), m_Stage.GetScrollY());
+	if (!m_Player.GetDead())
 	m_Stage.PipeRender();
 	for (int i = 0; i < m_Stage.GetEnemyCount(); i++)
 	{

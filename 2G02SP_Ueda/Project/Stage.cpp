@@ -41,7 +41,10 @@ m_bthun(0),
 m_btten(0),
 m_btone(0),
 m_bUnder(false),
-m_bOn(false)
+m_bOn(false),
+m_Player(),
+m_pItemData(),
+timecount(0)
 {
 }
 
@@ -182,6 +185,42 @@ bool CStage::Load(char* pName,char* gpName){
 
 	fclose(fp);
 	free(pBuffer);
+	return true;
+}
+
+bool CStage::LoadStage(char* pName)
+{
+	FILE* fp = fopen(pName, "rt");
+	if (fp == NULL)
+	{
+		return false;
+	}
+	fseek(fp, 0, SEEK_END);
+	long fSize = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	char* pBuffer = (char*)malloc(fSize + 1);
+	fSize = fread(pBuffer, 1, fSize, fp);
+	pBuffer[fSize] = '\0';
+	char* pstr;
+
+	pstr = strtok(pBuffer, ",");
+	pstr = strtok(NULL, ",");
+	pstr = strtok(NULL, ",");
+	pstr = strtok(NULL, ",");
+
+	m_ChipSize = atof(strtok(NULL, ","));
+	m_XCount = atoi(strtok(NULL, ","));
+	m_YCount = atoi(strtok(NULL, ","));
+
+	m_pChipData = (char*)malloc(m_XCount * m_YCount);
+
+	for (int y = 0; y < m_YCount; y++)
+	{
+		for (int x = 0; x < m_XCount; x++)
+		{
+			m_pChipData[y * m_XCount + x] = atoi(strtok(NULL, ","));
+		}
+	}
 	return true;
 }
 
@@ -425,14 +464,20 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy)
 					r.Right += cr.Left - rrec.Right;
 				}
 			CRectangle trec = r;
+			CRectangle tirec = r;
 			trec.Bottom = trec.Top + 1;
 				trec.Expansion(-6, 0);
+				tirec.Bottom = tirec.Top + 1;
+				tirec.Expansion(-6, 0);
 			if (cr.CollisionRect(trec))
 			{
 				re = true;
 				oy += cr.Bottom - trec.Top;
 				r.Top += cr.Bottom - trec.Top;
 				r.Bottom += cr.Bottom - trec.Top;
+			}
+			if (cr.CollisionRect(tirec))
+			{
 				if (cn == ITEMBOX)
 				{
 					m_pChipData[y * m_XCount + x] = 5;

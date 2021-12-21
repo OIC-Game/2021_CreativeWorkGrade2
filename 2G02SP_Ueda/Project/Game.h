@@ -16,6 +16,7 @@ public:
 	CGame();
 	~CGame();
 	bool Load(void);
+	bool LoadStage(void);
 	void Initialize(void);
 	void Update(void);
 	void Render(void);

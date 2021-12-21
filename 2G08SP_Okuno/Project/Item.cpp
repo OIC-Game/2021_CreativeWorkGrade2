@@ -94,11 +94,18 @@ void CItem::Update(float wx, float wy)
 	if (m_Spd.x == 0 && m_Define->move != 0) {
 		m_Spd.x = 1.2f;
 	}
+	m_Spd.x = GetMoveSpeed(m_Spd.x < 0);
 
 	if (m_JumpStatus == Jumping && m_Define->move != 0) {
 		m_Spd.y += JumpFSp;
 		if (m_Spd.y > JumpMaxSpeed) {
 			m_Spd.y = JumpMaxSpeed;
+		}
+	}
+	else if (m_JumpStatus == Swimming && m_Define->move != 0) {
+		m_Spd.y += SwimFSp;
+		if (m_Spd.y > SwimMaxSpeed) {
+			m_Spd.y = SwimMaxSpeed;
 		}
 	}
 
@@ -142,9 +149,21 @@ void CItem::CollisionStage(CCollisionData coll)
 		m_Spd.x *= -1;
 	}
 
-	if (!coll.og && m_JumpStatus == OnGround) {
-		//ステータスをジャンプ状態にする
+	if (m_bInWater && !coll.inWater) {
 		m_JumpStatus = Jumping;
+	}
+	else if (coll.inWater && m_JumpStatus == Jumping) {
+		m_JumpStatus = Swimming;
+	}
+	m_bInWater = coll.inWater;
+	if (!coll.og && m_JumpStatus == OnGround) {
+		if (!m_bInWater) {
+			//ステータスをジャンプ状態にする
+			m_JumpStatus = Jumping;
+		}
+		else {
+			m_JumpStatus = Swimming;
+		}
 	}
 }
 

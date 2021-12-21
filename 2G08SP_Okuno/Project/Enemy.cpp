@@ -47,6 +47,7 @@ void CEnemy::Initialize(Vector2 pos, bool bGoal, int stgh)
 	}
 	m_Damaged = false;
 	m_bGoal = bGoal;
+	m_bInWater = false;
 	m_bShow = true;
 	m_JumpSp = 0;
 	m_ShowState = STATE_SHOW;
@@ -94,8 +95,14 @@ void CEnemy::Update(float wx, float wy, CRectangle prec)
 			m_Move.y = JumpMaxSpeed;
 		}
 	}
+	else if (m_JumpStatus == Swimming) {
+		m_Move.y += SwimFSp;
+		if (m_Move.y > SwimMaxSpeed) {
+			m_Move.y = SwimMaxSpeed;
+		}
+	}
 
-	m_Pos.x += m_Move.x;
+	m_Pos.x += GetMoveSpeed(m_bReverse);
 	m_Pos.y += m_Move.y;
 
 	//落下時の処理
@@ -160,10 +167,22 @@ void CEnemy::CollisionStage(CCollisionData coll)
 		m_bReverse = false;
 	}
 
+	if (m_bInWater && !coll.inWater) {
+		m_JumpStatus = Jumping;
+	}
+	else if (coll.inWater && m_JumpStatus == Jumping) {
+		m_JumpStatus = Swimming;
+	}
+	m_bInWater = coll.inWater;
 	//接地状態（地面に足がついている）ではなくステータスが接地状態の場合
 	if (!coll.og && m_JumpStatus == OnGround) {
-		//ステータスをジャンプ状態にする
-		m_JumpStatus = Jumping;
+		if (!m_bInWater) {
+			//ステータスをジャンプ状態にする
+			m_JumpStatus = Jumping;
+		}
+		else {
+			m_JumpStatus = Swimming;
+		}
 	}
 }
 

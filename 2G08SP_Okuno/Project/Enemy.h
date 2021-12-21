@@ -11,6 +11,8 @@ private:
 	const float		MoveSpeed = 1.4f;							//横方向の移動の加速度
 	const float		JumpFSp = 0.7f;								//落下時の加速度（減速度）
 	const float		JumpMaxSpeed = 8.0f;						//落下の上限速度
+	const float		SwimFSp = 0.02f;
+	const float		SwimMaxSpeed = 0.8f;
 
 	enum t_ANIM_COUNT {
 		ANIM_STAND,
@@ -27,6 +29,7 @@ private:
 	CVector2		m_Pos;			//位置
 	CVector2		m_Move;			//移動速度
 	float			m_JumpSp;
+	bool			m_bInWater;
 	int				m_stgh;
 	bool			m_bShow;		//敵使用フラグ
 	bool			m_bReverse;
@@ -107,5 +110,16 @@ public:
 	bool GetJustTrampled() { return m_JustTrampled; };
 
 	bool IsGEnemy() { return m_bGoal && (m_ShowState == STATE_DISAPPEAR); };
+
+	float GetMoveSpeed(bool reverse) {
+		float re = m_define->x_ext1;
+		if (m_bInWater) {
+			re *= SwimMove;
+		}
+		if (reverse) {
+			re *= -1;
+		}
+		return re;
+	}
 };
 

@@ -472,23 +472,70 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 			}
 		}
 
+		if (cr.Left >= rb.Right) {
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockRight);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockDown);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockUp);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockLeft);
+		}
+		else if (cr.Right <= rb.Left) {
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockLeft);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockDown);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockUp);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockRight);
+		}
+		else if (cr.Top <= rb.Bottom) {
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockDown);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockUp);
+			if (m_BlockArray[i].GetType() < 0) {
+				continue;
+			}
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockRight);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockLeft);
+		}
+		else {
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockDown);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockUp);
+			if (m_BlockArray[i].GetType() < 0) {
+				continue;
+			}
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockRight);
+			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockLeft);
+		}
+	}
+
+	if (!leftFallFlg) {
+		coll.unfallleftflg = true;
+	}
+	if (!rightFallFlg) {
+		coll.unfallrightflg = true;
+	}
+
+	return coll;
+}
+
+void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle& ra, CVector2 move, CBlock* block, CRectangle blockRect, CCollisionData& coll, bool& leftFallFlg, bool& rightFallFlg, int direction) {
+
+	switch (direction)
+	{
+	case BlockDown:
 		if (move.y >= 0) {
-			CRectangle b_trec = cr;
+			CRectangle b_trec = blockRect;
 			//接地判定
 			CRectangle brec = CRectangle(min(rb.Left, ra.Left), min(rb.Bottom, ra.Bottom), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom));
 			//brec.Bottom += 1;
 			brec.Expansion(-6, 0);
 
-			if (!m_BlockArray[i].CheckDirection(BlockAll) || (cr.Right <= rb.Left && cr.Right >= ra.Left) || (cr.Left >= rb.Right && cr.Left <= ra.Right)) {
+			if (!block->CheckDirection(BlockAll) || (blockRect.Right <= rb.Left && blockRect.Right >= ra.Left) || (blockRect.Left >= rb.Right && blockRect.Left <= ra.Right)) {
 				b_trec.Bottom = b_trec.Top + 6;
 			}
 
 			if (b_trec.CollisionRect(brec)) {
-				if (m_BlockArray[i].CheckDirection(BlockDown) && !m_BlockArray[i].CheckDamageDirection(BlockDown)) {
+				if (block->CheckDirection(BlockDown) && !block->CheckDamageDirection(BlockDown)) {
 					coll.og = true;
 
 					if (pl != NULL) {
-						pl->SlideMove(m_BlockArray[i].GetMove());
+						pl->SlideMove(block->GetMove());
 					}
 
 					if (ene != NULL) {
@@ -502,10 +549,10 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 							rightFallFlg = true;
 						}
 
-						if (m_BlockArray[i].IsAttacked()) { //ブロックが壊された状態
+						if (block->IsAttacked()) { //ブロックが壊された状態
 							ene->PushedUp();
 						}
-						ene->SlideMove(m_BlockArray[i].GetMove());
+						ene->SlideMove(block->GetMove());
 					}
 				}
 			}
@@ -519,7 +566,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 					coll.crush = true;
 					break;
 				}*/
-				if (m_BlockArray[i].CheckDirection(BlockDown)) {
+				if (block->CheckDirection(BlockDown)) {
 					coll.oy += b_trec.Top - brec.Bottom;
 					ra.Top += b_trec.Top - brec.Bottom;
 					ra.Bottom += b_trec.Top - brec.Bottom;
@@ -531,25 +578,23 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 				}
 
 				if (pl != NULL) {
-					if (m_BlockArray[i].CheckDamageFlg(DAMAGE_ONLY_PLAYER) && m_BlockArray[i].CheckDamageDirection(BlockDown)) {
+					if (block->CheckDamageFlg(DAMAGE_ONLY_PLAYER) && block->CheckDamageDirection(BlockDown)) {
 						coll.damage = true;
 					}
 				}
 			}
 		}
-		if (m_BlockArray[i].GetType() < 0) {
-			continue;
-		}
-
+		break;
+	case BlockUp:
 		if (move.y <= 0) {
 
-			CRectangle b_brec = cr;
+			CRectangle b_brec = blockRect;
 			//上方向判定
 			CRectangle trec = CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Top, ra.Top));
 			trec.Expansion(-6, 0);
 			trec += CVector2(0, 1);
 
-			if (!m_BlockArray[i].CheckDirection(BlockAll) || (cr.Right <= rb.Left && cr.Right >= ra.Left) || (cr.Left >= rb.Right && cr.Left <= ra.Right)) {
+			if (!block->CheckDirection(BlockAll) || (blockRect.Right <= rb.Left && blockRect.Right >= ra.Left) || (blockRect.Left >= rb.Right && blockRect.Left <= ra.Right)) {
 				b_brec.Top = b_brec.Bottom - 6;
 			}
 
@@ -559,7 +604,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 					coll.crush = true;
 					break;
 				}*/
-				if (m_BlockArray[i].CheckDirection(BlockUp)) {
+				if (block->CheckDirection(BlockUp)) {
 					coll.oy += b_brec.Bottom - trec.Top;
 					ra.Top += b_brec.Bottom - trec.Top;
 					ra.Bottom += b_brec.Bottom - trec.Top;
@@ -571,22 +616,23 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 				}
 
 				if (pl != NULL) {
-					m_BlockArray[i].AttackBlock(pl, m_pItemTexture);
-					if (m_BlockArray[i].CheckDamageFlg(DAMAGE_ONLY_PLAYER) && m_BlockArray[i].CheckDamageDirection(BlockUp)) {
+					block->AttackBlock(pl, m_pItemTexture);
+					if (block->CheckDamageFlg(DAMAGE_ONLY_PLAYER) && block->CheckDamageDirection(BlockUp)) {
 						coll.damage = true;
 					}
 				}
 			}
 		}
-
+		break;
+	case BlockRight:
 		if (move.x >= 0) {
 
-			CRectangle b_lrec = cr;
+			CRectangle b_lrec = blockRect;
 			//右方向判定
 			CRectangle rrec = CRectangle(min(rb.Right, ra.Right), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom));
 			rrec.Expansion(0, -6);
 
-			if (!m_BlockArray[i].CheckDirection(BlockAll)) {
+			if (!block->CheckDirection(BlockAll)) {
 				b_lrec.Right = b_lrec.Left + 6;
 			}
 
@@ -595,7 +641,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 					coll.crush = true;
 					break;
 				}*/
-				if (m_BlockArray[i].CheckDirection(BlockRight)) {
+				if (block->CheckDirection(BlockRight)) {
 					coll.ox += b_lrec.Left - rrec.Right;
 					ra.Left += b_lrec.Left - rrec.Right;
 					ra.Right += b_lrec.Left - rrec.Right;
@@ -607,21 +653,22 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 				}
 
 				if (pl != NULL) {
-					if (m_BlockArray[i].CheckDamageFlg(DAMAGE_ONLY_PLAYER) && m_BlockArray[i].CheckDamageDirection(BlockRight)) {
+					if (block->CheckDamageFlg(DAMAGE_ONLY_PLAYER) && block->CheckDamageDirection(BlockRight)) {
 						coll.damage = true;
 					}
 				}
 			}
 		}
-
+		break;
+	case BlockLeft:
 		if (move.x <= 0) {
 
-			CRectangle b_rrec = cr;
+			CRectangle b_rrec = blockRect;
 			//左方向判定
 			CRectangle lrec = CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Left, ra.Left), max(rb.Bottom, ra.Bottom));
 			lrec.Expansion(0, -6);
 
-			if (!m_BlockArray[i].CheckDirection(BlockAll)) {
+			if (!block->CheckDirection(BlockAll)) {
 				b_rrec.Left = b_rrec.Right - 6;
 			}
 
@@ -630,7 +677,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 					coll.crush = true;
 					break;
 				}*/
-				if (m_BlockArray[i].CheckDirection(BlockLeft)) {
+				if (block->CheckDirection(BlockLeft)) {
 					coll.ox += b_rrec.Right - lrec.Left;
 					ra.Left += b_rrec.Right - lrec.Left;
 					ra.Right += b_rrec.Right - lrec.Left;
@@ -642,22 +689,16 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 				}
 
 				if (pl != NULL) {
-					if (m_BlockArray[i].CheckDamageFlg(DAMAGE_ONLY_PLAYER) && m_BlockArray[i].CheckDamageDirection(BlockLeft)) {
+					if (block->CheckDamageFlg(DAMAGE_ONLY_PLAYER) && block->CheckDamageDirection(BlockLeft)) {
 						coll.damage = true;
 					}
 				}
 			}
 		}
+		break;
+	default:
+		break;
 	}
-
-	if (!leftFallFlg) {
-		coll.unfallleftflg = true;
-	}
-	if (!rightFallFlg) {
-		coll.unfallrightflg = true;
-	}
-
-	return coll;
 }
 
 void CStage::CheckPointThrough(CRectangle rect)

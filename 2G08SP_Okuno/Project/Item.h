@@ -9,6 +9,8 @@ class CItem
 private:
 	const float		JumpFSp = 0.7f;							//落下時の加速度（減速度）
 	const float		JumpMaxSpeed = 8.0f;						//落下の上限速度
+	const float		SwimFSp = 0.02f;
+	const float		SwimMaxSpeed = 0.8f;
 	const float		BShowAnimTime = 1.0f;
 
 	enum JumpStatus {
@@ -29,6 +31,7 @@ private:
 	bool			m_bShow;		//表示フラグ
 	int				m_ShowState;	//表示状態
 	int				m_stgh;
+	bool			m_bInWater;
 	int				m_JumpStatus;	//状態
 
 public:
@@ -65,5 +68,19 @@ public:
 	bool GetShow() { return m_bShow; };
 	bool GetDisplay() { return m_ShowState == STATE_SHOW; };
 	void SetDisplay(int state) { if (m_ShowState != STATE_DISAPPEAR) m_ShowState = state; }
+
+	float GetMoveSpeed(bool reverse) {
+		float re = 0;
+		if (m_Define->move != 0) {
+			re = 1.2f;
+		}
+		if (m_bInWater) {
+			re *= SwimMove;
+		}
+		if (reverse) {
+			re *= -1;
+		}
+		return re;
+	}
 };
 

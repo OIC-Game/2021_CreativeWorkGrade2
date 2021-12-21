@@ -297,7 +297,7 @@ void CPlayer::Update(float wx, float wy)
 		m_SwimFlg = true;
 		SwimmingFn(btnPull && !m_bGoal);
 
-		if (m_Move.y < 0 && m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_SWIM) {
+		if (m_Move.y > 0 && m_Motion.GetMotionNo() % ANIM_COUNT != ANIM_SWIM) {
 			m_Motion.ChangeMotion(m_Motion.GetMotionNo() / ANIM_COUNT * ANIM_COUNT + ANIM_SWIM);
 		}
 	}

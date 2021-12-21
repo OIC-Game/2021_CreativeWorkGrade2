@@ -3,6 +3,7 @@
 #include "Mof.h"
 
 constexpr float ViewWidth = 800;
+constexpr float	SwimMove = 0.5f;
 
 enum b_Direction {
 	BlockNone = 0,

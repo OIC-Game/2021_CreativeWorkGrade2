@@ -29,7 +29,6 @@ private:
 	const float		SwimUSp = 0.2f;
 	const float		SwimFSp = 0.02f;
 	const float		SwimMaxSpeed = 0.8f;
-	const float		SwimMove = 0.5f;
 
 
 	enum t_ANIM_TYPE {

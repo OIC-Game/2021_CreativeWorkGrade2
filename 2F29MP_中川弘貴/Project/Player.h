@@ -1,5 +1,6 @@
 #pragma once
 #include "GameApp.h"
+#include "AI.h"
 
 //ぷよのサイズ
 #define		PUYO_SIZE	50
@@ -71,6 +72,8 @@ struct FieldPos
 class CPlayer
 {
 private:
+	//Computer
+	CComputer	m_AI;
 
 	//ぷよ格納用配列
 	int			m_field[FH][FW];
@@ -170,38 +173,65 @@ public:
 	void Rotate(bool vsAiFlg);
 	void Render(bool vsAiFlg);
 	void Release(void);
-	void FieldRender(int initPosX)
-	{
-		//フィールドの描画
-		for (int y = 0; y < FH; y++)
-		{
-			for (int x = 0; x < FW; x++)
-			{
-				if (m_field[y][x] == Green)
-				{
-					m_GreenPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
-				}
-				if (m_field[y][x] == Yellow)
-				{
-					m_YellowPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
-				}
-				if (m_field[y][x] == Blue)
-				{
-					m_BluePuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
-				}
-				if (m_field[y][x] == Red)
-				{
-					m_RedPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
-				}
-				if (m_field[y][x] == Wall)
-				{
-					CGraphicsUtilities::RenderFillRect(initPosX + x * BL, BL * 2 + y * BL, initPosX + x * BL + BL, y * BL + BL * 3, MOF_COLOR_BLACK);
-				}
-
-			}
-		}
-	}
+	void FieldRender(int initPosX);
 	void NextPuyoRender(int x, int y);
 	void MovingPuyoRender();
+	bool IsWall(int way)
+	{
+		//todo:enum作ってわかりやすくする leftwall,rightwall,てきな
+		//左壁
+		if (way == 0)
+		{
+			if (((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+				m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
+					m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		//右壁
+		if (way == 1)
+		{
+			if (((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+				m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
+					m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
+				(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		//下壁
+		if (way == 2)
+		{
+			if ((m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty && m_eRotation == Top) ||
+				(m_field[m_sFldPos.y + 2][m_sFldPos.x] != Empty && m_eRotation == Bottom) ||
+				((m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] != Empty ||
+					m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty) && m_eRotation == Left) ||
+				((m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] != Empty ||
+					m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty) && m_eRotation == Right))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		return false;
+	}
 };
 

@@ -111,6 +111,7 @@ void CPlayer::Initialize(bool vsAiFlg)
 	{
 		m_pos.x = SW - 300;
 		m_pos.y = INIT_POSITION_Y;
+		m_AI.Initialize();
 	}
 
 	m_spin.x = INIT_SPIN_X;
@@ -166,6 +167,11 @@ void CPlayer::Update(bool vsAiFlg)
 		gChangeScene = SCENENO_TITLE;
 	}
 
+	if (vsAiFlg)
+	{
+		m_AI.Update();
+	}
+
 	//処理全体の流れ
 	switch (m_eFlow)
 	{
@@ -191,6 +197,7 @@ void CPlayer::Update(bool vsAiFlg)
 		GameOverUpdate();
 		break;
 	}
+
 }
 
 void CPlayer::ReadyUpdate()
@@ -235,12 +242,7 @@ void CPlayer::DropUpdate(bool vsAiFlg)
 	if (m_dropTimeCnt < 0)
 	{
 		//確定しているか
-		if ((m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y + 2][m_sFldPos.x] != Empty && m_eRotation == Bottom) ||
-			((m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] != Empty ||
-				m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty) && m_eRotation == Left) ||
-				((m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] != Empty ||
-					m_field[m_sFldPos.y + 1][m_sFldPos.x] != Empty) && m_eRotation == Right))
+		if (IsWall(2))
 		{
 
 			//画面外に設置しないように
@@ -474,19 +476,10 @@ void CPlayer::GameOverUpdate()
 
 void CPlayer::Movement(bool vsAiFlg)
 {
-	if (vsAiFlg)
-	{
-		return;
-	}
-
 	//左に移動
-	if (g_pInput->IsKeyPush(MOFKEY_A) &&
-		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
-				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
+	if (/*((*/g_pInput->IsKeyPush(MOFKEY_A) && !vsAiFlg/*) || 
+		(m_AI.GetLeftMove() && vsAiFlg))*/ &&
+		!IsWall(0))
 	{
 		//移動音
 		m_moveSound.Play();
@@ -496,13 +489,9 @@ void CPlayer::Movement(bool vsAiFlg)
 		m_pos.x -= PUYO_SIZE;
 		m_sFldPos.x -= 1;
 	}
-	else if (g_pInput->IsKeyHold(MOFKEY_A) &&
-		((m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x - 1] == Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty &&
-				m_field[m_sFldPos.y + 1][m_sFldPos.x - 1] == Empty && m_eRotation == Bottom) ||
-				(m_field[m_sFldPos.y][m_sFldPos.x - 1] == Empty && m_eRotation == Right) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x - 2] == Empty && m_eRotation == Left)))
+	else if (((g_pInput->IsKeyHold(MOFKEY_A) && !vsAiFlg) ||
+		(m_AI.GetLeftMove() && vsAiFlg)) &&
+		!IsWall(0))
 	{
 		if (m_leftHoldTimeCnt <= 0)
 		{
@@ -520,13 +509,9 @@ void CPlayer::Movement(bool vsAiFlg)
 	}
 
 	//右に移動
-	if (g_pInput->IsKeyPush(MOFKEY_D) &&
-		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
-				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
+	if (/*((*/g_pInput->IsKeyPush(MOFKEY_D) && !vsAiFlg/*) ||
+		(m_AI.GetRightMove() && vsAiFlg))*/ &&
+		!IsWall(1))
 	{
 		//移動音
 		m_moveSound.Play();
@@ -536,13 +521,9 @@ void CPlayer::Movement(bool vsAiFlg)
 		m_pos.x += PUYO_SIZE;
 		m_sFldPos.x += 1;
 	}
-	else if (g_pInput->IsKeyHold(MOFKEY_D) &&
-		((m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-			m_field[m_sFldPos.y - 1][m_sFldPos.x + 1] == Empty && m_eRotation == Top) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty &&
-				m_field[m_sFldPos.y + 1][m_sFldPos.x + 1] == Empty && m_eRotation == Bottom) ||
-				(m_field[m_sFldPos.y][m_sFldPos.x + 1] == Empty && m_eRotation == Left) ||
-			(m_field[m_sFldPos.y][m_sFldPos.x + 2] == Empty && m_eRotation == Right)))
+	else if (((g_pInput->IsKeyHold(MOFKEY_D) && !vsAiFlg) ||
+		(m_AI.GetRightMove() && vsAiFlg)) &&
+		!IsWall(1))
 	{
 		if (m_rightHoldTimeCnt <= 0)
 		{
@@ -560,14 +541,16 @@ void CPlayer::Movement(bool vsAiFlg)
 	}
 
 	//キーによって下に移動(1マス)
-	if (g_pInput->IsKeyPush(MOFKEY_S))
+	if (/*((*/g_pInput->IsKeyPush(MOFKEY_S) && !vsAiFlg/*) ||
+		(m_AI.GetDownMove() && vsAiFlg))*/)
 	{
 		m_downHoldTimeCnt = INIT_HOLD_TIME;
 		//押したときに1マス落とす
 		m_dropTimeCnt = -1;
 	}
 	//キーによって下に移動(高速降下)
-	else if (g_pInput->IsKeyHold(MOFKEY_S))
+	else if (((g_pInput->IsKeyHold(MOFKEY_S) && !vsAiFlg) ||
+		(m_AI.GetDownMove() && vsAiFlg)))
 	{
 		if (m_downHoldTimeCnt <= 0) {
 			//長押しで高速降下
@@ -582,14 +565,9 @@ void CPlayer::Movement(bool vsAiFlg)
 
 void CPlayer::Rotate(bool vsAiFlg)
 {
-	if (vsAiFlg)
-	{
-		return;
-	}
-
-
 	//回転・左方向
-	if (g_pInput->IsKeyPush(MOFKEY_J))
+	if (((g_pInput->IsKeyPush(MOFKEY_J) && !vsAiFlg) ||
+		(m_AI.GetLeftRotate() && vsAiFlg)))
 	{
 		if (m_eRotation == Top)
 		{
@@ -656,7 +634,8 @@ void CPlayer::Rotate(bool vsAiFlg)
 	}
 
 	//回転・右方向
-	if (g_pInput->IsKeyPush(MOFKEY_K))
+	if (((g_pInput->IsKeyPush(MOFKEY_K) && !vsAiFlg) ||
+		(m_AI.GetRightRotate() && vsAiFlg)))
 	{
 		if (m_eRotation == Top)
 		{
@@ -818,14 +797,14 @@ void CPlayer::Render(bool vsAiFlg)
 	}
 
 
-	////カウントダウン表示
-	//if (m_eFlow == Ready)
-	//{
-	//	if (m_readyTimeCnt >= 110)
-	//		CGraphicsUtilities::RenderString(210, 350, MOF_COLOR_BLACK, "Ready");
-	//	else if (m_readyTimeCnt >= 20)
-	//		CGraphicsUtilities::RenderString(220, 350, MOF_COLOR_BLACK, "Go");
-	//}
+	//カウントダウン表示
+	if (m_eFlow == Ready)
+	{
+		if (m_readyTimeCnt >= 110)
+			CGraphicsUtilities::RenderString(470, 350, MOF_COLOR_BLACK, "Ready");
+		else if (m_readyTimeCnt >= 20)
+			CGraphicsUtilities::RenderString(480, 350, MOF_COLOR_BLACK, "Go");
+	}
 
 	
 
@@ -874,6 +853,38 @@ void CPlayer::Release(void)
 	m_gameBGM.Release();
 	m_pauseSound.Release();
 	m_gameOverSound.Release();
+}
+
+void CPlayer::FieldRender(int initPosX)
+{
+	//フィールドの描画
+	for (int y = 0; y < FH; y++)
+	{
+		for (int x = 0; x < FW; x++)
+		{
+			if (m_field[y][x] == Green)
+			{
+				m_GreenPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+			}
+			if (m_field[y][x] == Yellow)
+			{
+				m_YellowPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+			}
+			if (m_field[y][x] == Blue)
+			{
+				m_BluePuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+			}
+			if (m_field[y][x] == Red)
+			{
+				m_RedPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+			}
+			if (m_field[y][x] == Wall)
+			{
+				CGraphicsUtilities::RenderFillRect(initPosX + x * BL, BL * 2 + y * BL, initPosX + x * BL + BL, y * BL + BL * 3, MOF_COLOR_BLACK);
+			}
+
+		}
+	}
 }
 
 void CPlayer::NextPuyoRender(int x, int y)

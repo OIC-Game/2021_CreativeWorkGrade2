@@ -57,6 +57,14 @@ bool CStage::Load()
 	{
 		return false;
 	}
+	if (!m_BossBlack.Load("BossBlack.png"))
+	{
+		return false;
+	}
+	if (!m_BossWhite.Load("BossWhite.png"))
+	{
+		return false;
+	}
 	return true;
 }
 
@@ -88,13 +96,13 @@ void CStage::Update(CEnemy* ene,int ecnt)
 			{
 				//ìGèoåª
 				ene[i].SetTexture(&m_EnemyTextureWhite,&m_EnemyShotTextureWhite);
-				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type);
+				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type, m_pEnemyStart[m_EnemyNo].hp);
 			}
 			if (m_pEnemyStart[m_EnemyNo].Color == 1)
 			{
 				//ìGèoåª
 				ene[i].SetTexture(&m_EnemyTextureBlack, &m_EnemyShotTextureBlack);
-				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type);
+				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type, m_pEnemyStart[m_EnemyNo].hp);
 			}
 			break;
 		}
@@ -128,6 +136,8 @@ void CStage::Release()
 	m_EnemyShotTexture.Release();
 	m_EnemyShotTextureBlack.Release();
 	m_EnemyShotTextureWhite.Release();
+	m_BossBlack.Release();
+	m_BossWhite.Release();
 }
 
 //void CStage::RenderDebug(void)

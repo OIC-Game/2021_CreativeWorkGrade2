@@ -49,15 +49,18 @@ void CEnemy::Initialize(void){
  * 引数
  * [in]			px				発射Ｘ座標
  * [in]			py				発射Ｙ座標
+ * [in]			encol			敵色
+ * [in]			type			敵の種類
+ * [in]			hp				体力
  */
-void CEnemy::Start(float px,float py ,int encol,int type){
+void CEnemy::Start(float px,float py ,int encol,int type,int hp){
 	m_PosX = px - m_pTexture->GetWidth() * 0.5f;
 	m_PosY = py - m_pTexture->GetHeight();
 	m_EnemyColor = encol;
 	m_SpeedX = 0;
-	m_SpeedY = 0.4;
+	m_SpeedY = ENEMY_MOVESPEED;
 	m_bShow = true;
-	m_HP = 2;
+	m_HP = hp;
 	m_ShotWaitSet = 60;
 	m_ShotWait = m_ShotWaitSet;
 	Secondcount = 0;
@@ -110,6 +113,14 @@ void CEnemy::Update(void){
 	{
 		HardEnemyMove(true);
 		NomalEnemyMove();
+	}
+	if (m_EnemyType == 6)
+	{
+		BossMoveBlack();
+	}
+	if (m_EnemyType == 7)
+	{
+		BossMoveWhite();
 	}
 	
 
@@ -165,6 +176,16 @@ void CEnemy::Update(void){
  *
  */
 void CEnemy::Render(void){
+
+	//死んでも弾は消えない
+	for (int i = 0; i < ENEMYSHOT_LINE; i++)
+	{
+		for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+		{
+			m_ShotArray[i][j].Render();
+		}
+	}
+
 	//非表示
 	if(!m_bShow)
 	{
@@ -173,13 +194,6 @@ void CEnemy::Render(void){
 	//テクスチャの描画
 	m_pTexture->Render(m_PosX,m_PosY);
 
-	for (int i = 0; i < ENEMYSHOT_LINE; i++)
-	{
-		for (int j = 0; j < ENEMYSHOT_COUNT; j++)
-		{
-			m_ShotArray[i][j].Render();
-		}
-	}
 }
 
 /**
@@ -237,6 +251,7 @@ void CEnemy::StopAndStartMove()
 	}
 }
 
+//Trueで左移動、falseで右移動
 void CEnemy::SlantMove(bool left)
 {
 	if (left)
@@ -249,6 +264,7 @@ void CEnemy::SlantMove(bool left)
 	}
 }
 
+//Trueで左移動、falseで右移動
 void CEnemy::HardEnemyMove(bool left)
 {
 	
@@ -276,10 +292,18 @@ void CEnemy::HardEnemyMove(bool left)
 
 void CEnemy::BossMoveBlack()
 {
+
 }
 
 void CEnemy::BossMoveWhite()
 {
+
+}
+
+void CEnemy::ShowMove()
+{
+	if(m_PosY <= 100)
+		m_SpeedY = ENEMY_MOVESPEED;
 }
 
 

@@ -13,6 +13,7 @@ typedef struct tag_ENEMYSTART
 	float Scroll;
 	int	  Color;
 	int	  Type;
+	int	  hp;
 }ENEMYSTART;
 
 class CStage
@@ -30,6 +31,9 @@ private:
 	CTexture    m_EnemyShotTexture;
 	CTexture    m_EnemyShotTextureBlack;
 	CTexture    m_EnemyShotTextureWhite;
+
+	CTexture	m_BossBlack;
+	CTexture	m_BossWhite;
 
 public:
 	CStage();

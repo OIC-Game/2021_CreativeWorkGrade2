@@ -8,8 +8,7 @@ CEnemyShot::CEnemyShot() :
 m_pTexture(NULL) ,
 m_PosX(0.0f) ,
 m_PosY(0.0f) ,
-m_SpdX(0.0f) ,
-m_SpdY(0.0f) ,
+m_Speed(0.0f) ,
 m_bShow(false) {
 }
 
@@ -28,8 +27,7 @@ CEnemyShot::~CEnemyShot(){
 void CEnemyShot::Initialize(void){
 	m_PosX = 0;
 	m_PosY = 0;
-	m_SpdX = 0;
-	m_SpdY = 0;
+	m_Speed = 0;
 	m_bShow = false;
 }
 /**
@@ -41,12 +39,13 @@ void CEnemyShot::Initialize(void){
  * [in]			py				”­ŽË‚xÀ•W
  * [in]			sx				ˆÚ“®‚w‘¬“x
  * [in]			sy				ˆÚ“®‚x‘¬“x
+ * [in]			type			’e‚ÌŽí—Þ
  */
-void CEnemyShot::Fire(float px,float py,float sx,float sy){
+void CEnemyShot::Fire(float px,float py,float spd,int type){
 	m_PosX = px - m_pTexture->GetWidth() * 0.5f;
 	m_PosY = py;
-	m_SpdX = sx;
-	m_SpdY = sy;
+	m_Speed = spd;
+	m_ShotType = type;
 	m_bShow = true;
 }
 
@@ -62,8 +61,11 @@ void CEnemyShot::Update(){
 	}
 
 	//‘¬“x‚ð—˜—p‚µ‚½ˆÚ“®
-	m_PosX += m_SpdX;
-	m_PosY += m_SpdY;
+	if (m_ShotType == 0)
+	{
+		m_PosX += 0;
+		m_PosY += m_Speed;
+	}
 
 	//‰æ–ÊŠO‚ÅÁ‹Ž
 	if(m_PosX + m_pTexture->GetWidth() < 0 || m_PosX > g_pGraphics->GetTargetWidth() ||

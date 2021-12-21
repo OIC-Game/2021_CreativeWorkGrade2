@@ -5,9 +5,10 @@
 
 #define		ENEMY_MOVESPEED		1
 
-//
+//敵の射撃本数
 #define		ENEMYSHOT_LINE		10
 #define     ENEMYSHOT_COUNT		50
+
 //敵１体分の情報を管理するクラス
 class CEnemy {
 private:
@@ -31,7 +32,7 @@ public:
 	CEnemy();
 	~CEnemy();
 	void Initialize(void);				//初期化処理
-	void Start(float px,float py,int encol,int type);		//出現処理（px,pyの位置から出現させる）
+	void Start(float px,float py,int encol,int type,int hp);		//出現処理（px,pyの位置から出現させる）
 	void Update(void);					//移動等の更新処理
 	void Render(void);					//描画処理
 	void RenderDebug(int i);			//デバッグ描画処理
@@ -75,6 +76,8 @@ public:
 	void BossMoveBlack();
 	//ボス白
 	void BossMoveWhite();
+	//死なない出現
+	void ShowMove();
 
 	void ShotSelect(int j);
 

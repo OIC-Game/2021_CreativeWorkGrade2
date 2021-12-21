@@ -28,6 +28,8 @@ private:
 	bool					m_DeadFlg;
 	float Count ;
 
+	
+
 
 
 	//ƒ‚[ƒVƒ‡ƒ“í—Ş’è‹`

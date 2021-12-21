@@ -412,4 +412,21 @@ void CPlayer::CollisionJump(void)
 }
 
 
+//ƒAƒCƒeƒ€‚Æ‚Ì“–‚½‚è”»’è
+bool CPlayer::CollisionItem(CItem& itm)
+{
+	if (!itm.GetShow()) {
+		return false;
+	}
+	//
+	CRectangle prec = GetRect();
+	CRectangle irec=itm
+
+
+
+
+
+}
+
+
 

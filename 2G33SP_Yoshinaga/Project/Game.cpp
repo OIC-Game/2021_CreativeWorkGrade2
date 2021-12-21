@@ -182,6 +182,7 @@ void CGame::Release(void) {
 		m_EnemyArray = NULL;
 	}
 
+	
 
 }
 

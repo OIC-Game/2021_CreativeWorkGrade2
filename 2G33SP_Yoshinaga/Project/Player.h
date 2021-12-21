@@ -6,6 +6,8 @@
 
 #include "GameDefine.h"
 
+#include "Item.h"
+
 
 //ˆÚ“®‘¬“x
 #define		PLAYER_SPEED			0.5f
@@ -87,7 +89,11 @@ public:
 
 	bool CPlayer::CollisionEnemyHed(CEnemy& ene);
 
-	bool GetCollisionFlg(){
-		return m_HedCollFlg;
+	bool GetCollisionFlg() {
+		return m_HedCollFlg;		
 	}
+
+	bool CollisionItem(CItem& itm);
+
+
 };

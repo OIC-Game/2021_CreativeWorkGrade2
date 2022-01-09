@@ -67,6 +67,7 @@ void CbreakBlock::Render(float wx, float wy)
 	// -2 Adjust ?
 	if (m_bTouched) {
 		m_Pos.y += 2;
+		GetPos();
 		m_bTouched = false;
 	}
 }
@@ -95,7 +96,7 @@ void CbreakBlock::GetPos(void)
 	if (m_PosWait > 0 && m_PosY<m_Pos.y )
 	{
 		m_PosWait--;
-		m_Pos.y -= 3;
+		m_Pos.y -= 2;
 		if (m_Pos.y < m_PosY)
 		{
 			m_Pos.y = m_PosY;

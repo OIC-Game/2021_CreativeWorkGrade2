@@ -102,7 +102,7 @@ void CGame::Update(void)
 		// TODO: –¾‚ç‚©‚É‚¨‚©‚µ‚¢
 		if(m_Stage.Collision(m_BlockArray[i].GetRect() , ox, oy));
 		{
-			m_BlockArray[i].CollisionStage(ox, oy);
+			//m_BlockArray[i].CollisionStage(ox, oy);
 			m_Player.CollisionBlock(m_BlockArray[i], ox, oy);
 		}
 	}

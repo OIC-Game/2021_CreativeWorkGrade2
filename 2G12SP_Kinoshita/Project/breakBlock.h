@@ -25,6 +25,8 @@ private:
 
 	bool	m_bTouched;
 
+
+
 public:
 	CbreakBlock();
 	~CbreakBlock();
@@ -53,7 +55,8 @@ public:
 //  void SetPos(int pos);
 //	void AdjustPosition();
 
-	void AddPos(Vector2 pos) { 
+	void AddPos(Vector2 pos) 
+	{ 
 		m_bTouched = true;
 		m_Pos += pos; 
 	}

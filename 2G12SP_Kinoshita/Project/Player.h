@@ -28,6 +28,12 @@
 #define Item_count           500
 
 #define Item_Wait            20
+
+//çUåÇïù
+#define		PLAYER_ATTACKWIDTH		30
+
+//ìñÇΩÇËîªíËå∏êäïù
+#define		PLAYER_RECTDECREASE		12
 class CPlayer
 {
 private:
@@ -44,8 +50,12 @@ private:
 	bool  m_bDash;
 
 	CRectangle  m_SrcRect;
-	CTexture      player;
+	CTexture    player;
+	CTexture    player2;
+	int         Characternumber;
+
 	CSpriteMotionController  m_Motion;
+	CSpriteMotionController  m_Motion2;
 
 	bool m_bDead;
 	bool m_bSky;
@@ -64,7 +74,7 @@ private:
 	int           m_ItemCount;
 	int           m_Itemwait;
 	bool           m_ItemShow;
-	//CItem       m_ItemArray[m_ItemCount];
+
 	CQuestionBlock    m_Question;
 
 	enum tag_MOTION
@@ -83,6 +93,22 @@ private:
 		MOTION_COUNT,
 
 	};
+
+	enum tag_MOTION2 {
+		MOTION_WAIT2,
+		MOTION_MOVE2,
+		MOTION_JUMPSTART2,
+		MOTION_JUMP2,
+		MOTION_JUMPEND2,
+		MOTION_ATTACK,
+		MOTION_ATTACK2,
+		MOTION_DAMAGE2,
+		MOTION_DASHSTART,
+		MOTION_DASHEND,
+
+		MOTION_COUNT2,
+	};
+
 public:
 	CPlayer();
 	~CPlayer();
@@ -127,6 +153,17 @@ public:
 	CItem *GetItem() { return m_ItemArray; }
 	bool  GetItemshow() { return m_ItemShow; }
 	
-	
+	bool IsAttack() { return m_Motion2.GetMotionNo() == MOTION_ATTACK; }
+	/*CRectangle GetRect() {
+		
+	}*/
+	CRectangle GetAttackRect() {
+		//îΩì]íÜ
+		if (m_bReverse)
+		{
+			return CRectangle(m_PosX - PLAYER_ATTACKWIDTH, m_PosY, m_PosX + PLAYER_RECTDECREASE, m_PosY + m_SrcRect.GetHeight());
+		}
+		return CRectangle(m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - PLAYER_ATTACKWIDTH, m_PosY, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
+	}
 };
 

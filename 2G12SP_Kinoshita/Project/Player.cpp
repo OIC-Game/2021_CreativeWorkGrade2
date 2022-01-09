@@ -3,6 +3,7 @@
 CPlayer::CPlayer() :
 	player(),
 	m_Motion(),
+	m_Motion2(),
 	m_PosX(0.0f),
 	m_PosY(0.0f),
 	m_bMove(false),
@@ -17,7 +18,8 @@ CPlayer::CPlayer() :
 	m_ItemTexture(),
 	m_ItemTextureCount(),
 	m_ItemCount(0),
-	m_Itemwait()
+	m_Itemwait(),
+	Characternumber()
 {
 }
 
@@ -31,6 +33,11 @@ bool CPlayer::Lood(void)
 	{
 		return false;
 	}
+	if (!player2.Load("player.png"))
+	{
+		return false;
+	}
+
 
 	if (!m_ItemTexture.Load("kinoko.png"))
 	{
@@ -108,6 +115,77 @@ bool CPlayer::Lood(void)
 
 	};
 	m_Motion.Create(anim, MOTION_COUNT);
+
+	SpriteAnimationCreate anim2[] = {
+		//待機
+		{
+			"待機",
+			0,0,
+			60,64,
+			TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0},{5,6,0},{5,7,0}}
+		},
+		//移動
+		{
+			"移動",
+			0,70,
+			60,64,
+			TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0},{5,4,0},{5,5,0}}
+		},
+		//ジャンプ
+		{
+			"ジャンプ開始",
+			0,140,
+			60,64,
+			FALSE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0}}
+		},
+		{
+			"ジャンプ中",
+			0,140,
+			60,64,
+			FALSE,{{5,3,0}}
+		},
+		{
+			"ジャンプ終了",
+			240,140,
+			60,64,
+			FALSE,{{2,0,0},{2,1,0}}
+		},
+		//攻撃
+		{
+			"攻撃",
+			0, 350,
+			90, 64,
+			FALSE, { { 2, 0, 0 }, { 2, 1, 0 }, { 2, 2, 0 }, { 2, 3, 0 }, { 2, 4, 0 }, { 2, 5, 0 }, { 2, 6, 0 } }
+		},
+		//攻撃2
+		{
+			"攻撃2",
+			0, 420,
+			90, 64,
+			FALSE, { { 2, 0, 0 }, { 2, 1, 0 }, { 2, 2, 0 }, { 2, 3, 0 }, { 2, 4, 0 }, { 2, 5, 0 }, { 2, 6, 0 } }
+		},
+		//ダメージ
+		{
+			"ダメージ",
+			480,0,
+			60,64,
+			FALSE,{{20,0,0}}
+		},
+		//ダッシュ
+		{
+			"ダッシュ開始",
+			180, 280,
+			60, 64,
+			FALSE, { { 2, 0, 0 }, { 8, 1, 0 } }
+		},
+		{
+			"ダッシュ終了",
+			300, 280,
+			60, 64,
+			FALSE, { { 4, 0, 0 }, { 4, 1, 0 } }
+		},
+	};
+	m_Motion2.Create(anim, MOTION_COUNT2);
 	return true;
 }
 
@@ -128,11 +206,12 @@ void CPlayer::Initalize()
 	m_bSky = false;
 	m_bGoal = false;
 	m_Motion.ChangeMotion(MOTION_WAIT);
+	m_Motion2.ChangeMotion(MOTION_WAIT2);
 	for (int i = 0; i < Item_count; i++)
 	{
 		m_ItemArray[i].Initialize();
 	}
-
+	Characternumber = 0;
 }
 
 void CPlayer::Update(void)
@@ -155,14 +234,38 @@ void CPlayer::Update(void)
 
 
 	m_bMove = false;
-
-	if (m_Power == 0)
+	if (Characternumber == 0)
 	{
+		if (m_Power == 0)
+		{
 			UpdateKey();
+		}
+		else  if (m_Power == 1)
+		{
+			UpdateKey();
+		}
 	}
-	else  if (m_Power == 1)
+	else if(Characternumber==1)
 	{
+		if (m_Motion2.GetMotionNo() == MOTION_ATTACK || m_Motion2.GetMotionNo() == MOTION_JUMPEND2)
+		{
+			if (m_Motion2.IsEndMotion())
+			{
+				m_Motion2.ChangeMotion(MOTION_WAIT2);
+			}
+		}
+		/*else if (m_Motion.GetMotionNo() == MOTION_DAMAGE)
+		{
+			if (m_Motion.IsEndMotion())
+			{
+
+				m_Motion.ChangeMotion(MOTION_WAIT);
+			}
+		}*/
+		else
+		{
 			UpdateKey();
+		}
 	}
 
 	UpdateMove();
@@ -192,8 +295,16 @@ void CPlayer::Update(void)
 	}
 
 	//アニメーション更新
-	m_Motion.AddTimer(CUtilities::GetFrameSecond());
-	m_SrcRect = m_Motion.GetSrcRect();
+	if (Characternumber == 0)
+	{
+		m_Motion.AddTimer(CUtilities::GetFrameSecond());
+		m_SrcRect = m_Motion.GetSrcRect();
+	}
+	else if(Characternumber==1)
+	{
+		m_Motion2.AddTimer(CUtilities::GetFrameSecond());
+		m_SrcRect = m_Motion2.GetSrcRect();
+	}
 
 
 	if (m_DamageWait > 0)
@@ -205,47 +316,88 @@ void CPlayer::Update(void)
 		m_ItemArray[i].Update();
 	}
 
+	if (g_pInput->IsKeyPush(MOFKEY_C))
+	{
+		if (Characternumber == 0)
+		{
+			Characternumber = 1;
+		}
+		else if (Characternumber == 1)
+		{
+			Characternumber = 0;
+		}
+	}
+
 }
 
 void CPlayer::UpdateMove(void)
 {
-	if (!m_bMove)
+	if (Characternumber == 0)
 	{
-		if (m_MoveX > 0)
+		if (!m_bMove)
 		{
-			m_MoveX -= PLAYER_SPEED;
-			if (m_MoveX <= 0)
+			if (m_MoveX > 0)
 			{
-				m_MoveX = 0;
+				m_MoveX -= PLAYER_SPEED;
+				if (m_MoveX <= 0)
+				{
+					m_MoveX = 0;
+				}
+				m_MoveX -= PLAYER_SPEED2;
+				if (m_MoveX <= 0)
+				{
+					m_MoveX = 0;
+				}
 			}
-			m_MoveX -= PLAYER_SPEED2;
-			if (m_MoveX <= 0)
-			{
-				m_MoveX = 0;
-			}
-		}
 
-		else if (m_MoveX < 0)
-		{
-			m_MoveX += PLAYER_SPEED;
-			if (m_MoveX >= 0)
+			else if (m_MoveX < 0)
 			{
-				m_MoveX = 0;
+				m_MoveX += PLAYER_SPEED;
+				if (m_MoveX >= 0)
+				{
+					m_MoveX = 0;
+				}
+				m_MoveX += PLAYER_SPEED2;
+				if (m_MoveX >= 0)
+				{
+					m_MoveX = 0;
+				}
 			}
-			m_MoveX += PLAYER_SPEED2;
-			if (m_MoveX >= 0)
+			else if (m_Motion.GetMotionNo() == MOTION_MOVE || m_Motion.GetMotionNo() == MOTION_Dash)
 			{
-				m_MoveX = 0;
+				m_Motion.ChangeMotion(MOTION_WAIT);
 			}
-		}
-		else if (m_Motion.GetMotionNo() == MOTION_MOVE || m_Motion.GetMotionNo() == MOTION_Dash)
-		{
-			m_Motion.ChangeMotion(MOTION_WAIT);
-		}
 
-		else if (m_Motion.GetMotionNo() == MOTION_SupeerMove || m_Motion.GetMotionNo() == MOTION_SupeerDash)
+			else if (m_Motion.GetMotionNo() == MOTION_SupeerMove || m_Motion.GetMotionNo() == MOTION_SupeerDash)
+			{
+				m_Motion.ChangeMotion(MOTION_SupeerWAIT);
+			}
+		}
+	}
+	else if (Characternumber == 1)
+	{
+		if (!m_bMove)
 		{
-			m_Motion.ChangeMotion(MOTION_SupeerWAIT);
+			if (m_MoveX > 0)
+			{
+				m_MoveX -= PLAYER_SPEED;
+				if (m_MoveX <= 0)
+				{
+					m_MoveX = 0;
+				}
+			}
+			else if (m_MoveX < 0)
+			{
+				m_MoveX += PLAYER_SPEED;
+				if (m_MoveX >= 0)
+				{
+					m_MoveX = 0;
+				}
+			}
+		}
+		else if (m_Motion2.GetMotionNo() == MOTION_MOVE2/* || m_Motion.GetMotionNo() == MOTION_Dash*/)
+		{
+			m_Motion2.ChangeMotion(MOTION_WAIT2);
 		}
 	}
 	m_MoveY += GRAVITY;
@@ -257,124 +409,169 @@ void CPlayer::UpdateMove(void)
 
 void CPlayer::UpdateKey(void)
 {
+	if (Characternumber == 0)
+	{
+		if (g_pInput->IsKeyHold(MOFKEY_LEFT))
+		{
+			m_MoveX -= PLAYER_SPEED;
+			m_bReverse = true;
+			m_bMove = true;
+			m_bDash = false;
+			if (m_MoveX < -PLAYER_MAXSPEED)
+			{
+				m_MoveX = -PLAYER_MAXSPEED;
+			}
+
+			if (m_Power == 0)
+			{
+				if (m_Motion.GetMotionNo() == MOTION_WAIT)
+				{
+					m_Motion.ChangeMotion(MOTION_MOVE);
+				}
+			}
+			else
+			{
+				if (m_Motion.GetMotionNo() == MOTION_SupeerWAIT)
+				{
+					m_Motion.ChangeMotion(MOTION_SupeerMove);
+				}
+			}
+
+			if (g_pInput->IsKeyHold(MOFKEY_LEFT) && g_pInput->IsKeyHold(MOFKEY_B))
+			{
+				m_MoveX -= PLAYER_SPEED * 4;
+				m_bReverse = true;
+				m_bMove = true;
+				m_bDash = true;
+				if (m_MoveX < -PLAYER_MAXSPEED2)
+				{
+					m_MoveX = -PLAYER_MAXSPEED2;
+				}
+				if (m_Power == 0)
+				{
+					if (m_Motion.GetMotionNo() == MOTION_WAIT || m_Motion.GetMotionNo() == MOTION_MOVE)
+					{
+						m_Motion.ChangeMotion(MOTION_Dash);
+					}
+				}
+				else
+				{
+					if (m_Motion.GetMotionNo() == MOTION_SupeerWAIT || m_Motion.GetMotionNo() == MOTION_SupeerMove)
+					{
+						m_Motion.ChangeMotion(MOTION_SupeerDash);
+					}
+				}
+			}
+		}
+
+		else if (g_pInput->IsKeyHold(MOFKEY_RIGHT))
+		{
+			m_MoveX += PLAYER_SPEED;
+			m_bReverse = false;
+			m_bMove = true;
+			m_bDash = false;
+			if (m_MoveX > PLAYER_MAXSPEED)
+			{
+				m_MoveX = PLAYER_MAXSPEED;
+			}
+			if (m_Power == 0)
+			{
+				if (m_Motion.GetMotionNo() == MOTION_WAIT)
+				{
+					m_Motion.ChangeMotion(MOTION_MOVE);
+				}
+			}
+			else
+			{
+				if (m_Motion.GetMotionNo() == MOTION_SupeerWAIT)
+				{
+					m_Motion.ChangeMotion(MOTION_SupeerMove);
+				}
+			}
+			if (g_pInput->IsKeyHold(MOFKEY_B))
+			{
+
+				m_MoveX += PLAYER_SPEED * 4;
+				m_bReverse = false;
+				m_bMove = true;
+				m_bDash = true;
+				if (m_MoveX > PLAYER_MAXSPEED2)
+				{
+					m_MoveX = PLAYER_MAXSPEED2;
+				}
+				if (m_Power == 0)
+				{
+					if (m_Motion.GetMotionNo() == MOTION_WAIT || m_Motion.GetMotionNo() == MOTION_MOVE)
+					{
+						m_Motion.ChangeMotion(MOTION_Dash);
+					}
+				}
+				else if (m_Power == 1)
+				{
+					if (m_Motion.GetMotionNo() == MOTION_SupeerWAIT || m_Motion.GetMotionNo() == MOTION_SupeerMove)
+					{
+						m_Motion.ChangeMotion(MOTION_SupeerDash);
+					}
+				}
+			}
+		}
+
+		if (g_pInput->IsKeyHold(MOFKEY_UP) && !m_bJump)
+		{
+			m_bJump = true;
+			m_MoveY = PLAYER_JUMP;
+			if (m_Power == 0)
+			{
+				m_Motion.ChangeMotion(MOTION_JUMPSTART);
+			}
+			else
+			{
+				m_Motion.ChangeMotion(MOTION_SupeerJUMPSTART);
+			}
+		}
+	}
+	else if (Characternumber == 1)
+	{
 	if (g_pInput->IsKeyHold(MOFKEY_LEFT))
 	{
 		m_MoveX -= PLAYER_SPEED;
 		m_bReverse = true;
 		m_bMove = true;
-		m_bDash = false;
 		if (m_MoveX < -PLAYER_MAXSPEED)
 		{
 			m_MoveX = -PLAYER_MAXSPEED;
 		}
-
-		if (m_Power == 0)
+		if (m_Motion2.GetMotionNo() == MOTION_WAIT2)
 		{
-			if (m_Motion.GetMotionNo() == MOTION_WAIT)
-			{
-				m_Motion.ChangeMotion(MOTION_MOVE);
-			}
-		}
-		else
-		{
-			if (m_Motion.GetMotionNo() == MOTION_SupeerWAIT)
-			{
-				m_Motion.ChangeMotion(MOTION_SupeerMove);
-			}
-		}
-
-		if (g_pInput->IsKeyHold(MOFKEY_LEFT) && g_pInput->IsKeyHold(MOFKEY_B))
-		{
-			m_MoveX -= PLAYER_SPEED * 4;
-			m_bReverse = true;
-			m_bMove = true;
-			m_bDash = true;
-			if (m_MoveX < -PLAYER_MAXSPEED2)
-			{
-				m_MoveX = -PLAYER_MAXSPEED2;
-			}
-			if (m_Power == 0)
-			{
-				if (m_Motion.GetMotionNo() == MOTION_WAIT || m_Motion.GetMotionNo() == MOTION_MOVE)
-				{
-					m_Motion.ChangeMotion(MOTION_Dash);
-				}
-			}
-			else
-			{
-				if (m_Motion.GetMotionNo() == MOTION_SupeerWAIT || m_Motion.GetMotionNo() == MOTION_SupeerMove)
-				{
-					m_Motion.ChangeMotion(MOTION_SupeerDash);
-				}
-			}
+			m_Motion2.ChangeMotion(MOTION_MOVE2);
 		}
 	}
-
 	else if (g_pInput->IsKeyHold(MOFKEY_RIGHT))
 	{
 		m_MoveX += PLAYER_SPEED;
 		m_bReverse = false;
 		m_bMove = true;
-		m_bDash = false;
 		if (m_MoveX > PLAYER_MAXSPEED)
 		{
 			m_MoveX = PLAYER_MAXSPEED;
 		}
-		if (m_Power == 0)
+		if (m_Motion2.GetMotionNo() == MOTION_WAIT2)
 		{
-			if (m_Motion.GetMotionNo() == MOTION_WAIT)
-			{
-				m_Motion.ChangeMotion(MOTION_MOVE);
-			}
-		}
-		else
-		{
-			if (m_Motion.GetMotionNo() == MOTION_SupeerWAIT)
-			{
-				m_Motion.ChangeMotion(MOTION_SupeerMove);
-			}
-		}
-		if (g_pInput->IsKeyHold(MOFKEY_B))
-		{
-
-			m_MoveX += PLAYER_SPEED * 4;
-			m_bReverse = false;
-			m_bMove = true;
-			m_bDash = true;
-			if (m_MoveX > PLAYER_MAXSPEED2)
-			{
-				m_MoveX = PLAYER_MAXSPEED2;
-			}
-			if (m_Power == 0)
-			{
-				if (m_Motion.GetMotionNo() == MOTION_WAIT || m_Motion.GetMotionNo() == MOTION_MOVE)
-				{
-					m_Motion.ChangeMotion(MOTION_Dash);
-				}
-			}
-			else if (m_Power == 1)
-			{
-				if (m_Motion.GetMotionNo() == MOTION_SupeerWAIT || m_Motion.GetMotionNo() == MOTION_SupeerMove)
-				{
-					m_Motion.ChangeMotion(MOTION_SupeerDash);
-				}
-			}
+			m_Motion2.ChangeMotion(MOTION_MOVE2);
 		}
 	}
-
 	if (g_pInput->IsKeyHold(MOFKEY_UP) && !m_bJump)
 	{
 		m_bJump = true;
 		m_MoveY = PLAYER_JUMP;
-		if (m_Power == 0)
-		{
-			m_Motion.ChangeMotion(MOTION_JUMPSTART);
-		}
-		else
-		{
-			m_Motion.ChangeMotion(MOTION_SupeerJUMPSTART);
-		}
+		m_Motion2.ChangeMotion(MOTION_JUMPSTART2);
 	}
+
+	if (g_pInput->IsKeyPush(MOFKEY_SPACE))
+	{
+		m_Motion2.ChangeMotion(MOTION_ATTACK);
+	}
+    }
 }
 
 void CPlayer::Render(float wx, float wy)
@@ -395,7 +592,18 @@ void CPlayer::Render(float wx, float wy)
 		dr.Right = dr.Left;
 		dr.Left = tmp;
 	}
-	player.Render(px, py, dr);
+	if (Characternumber == 0)
+	{
+		player.Render(px, py, dr);
+	}
+	else if (Characternumber == 1)
+	{
+		if (m_Motion.GetMotionNo() == MOTION_ATTACK)
+		{
+			px -= PLAYER_ATTACKWIDTH;
+		}
+		player2.Render(px, py, dr);
+	}
 
 	for (int i = 0; i < Item_count; i++)
 	{
@@ -427,6 +635,7 @@ void CPlayer::RenderDebug(float wx, float wy)
 void CPlayer::Release(void)
 {
 	player.Release();
+	player2.Release();
 	m_ItemTexture.Release();
 }
 
@@ -435,20 +644,40 @@ void CPlayer::CollisionStage(float ox, float oy)
 	m_PosX += ox;
 	m_PosY += oy;
 
-	if (oy < 0 && m_MoveY>0)
+	if (Characternumber == 0)
 	{
-		m_MoveY = 0;
-		if (m_bJump)
+		if (oy < 0 && m_MoveY>0)
 		{
-			m_bJump = false;
-			//m_Motion.ChangeMotion(m_Power == 0 ? MOTION_JUMPEND : MOTION_SupeerJUMPEND);
-			m_Motion.ChangeMotion(m_Power == 0 ? MOTION_WAIT : MOTION_SupeerWAIT);
+			m_MoveY = 0;
+			if (m_bJump)
+			{
+				m_bJump = false;
+				//m_Motion.ChangeMotion(m_Power == 0 ? MOTION_JUMPEND : MOTION_SupeerJUMPEND);
+				m_Motion.ChangeMotion(m_Power == 0 ? MOTION_WAIT : MOTION_SupeerWAIT);
+			}
+		}
+		else if (oy > 0 && m_MoveY < 0)
+		{
+			m_MoveY = 0;
+
 		}
 	}
-	else if (oy > 0 && m_MoveY < 0)
+	else if (Characternumber == 1)
 	{
-		m_MoveY = 0;
+		if (oy < 0 && m_MoveY>0)
+		{
+			m_MoveY = 0;
+			if (m_bJump)
+			{
+				m_bJump = false;
+				m_Motion2.ChangeMotion(MOTION_JUMPEND);
+			}
+		}
+		else if (oy > 0 && m_MoveY < 0)
+		{
+			m_MoveY = 0;
 
+		}
 	}
 
 	if (ox < 0 && m_MoveX >0)
@@ -759,6 +988,12 @@ CRectangle CPlayer::GetRect(void)
 			m_PosX + 20, m_PosY + 30, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
 		);
 	}
+
+	if (IsAttack())
+	{
+		return CRectangle(m_PosX + PLAYER_RECTDECREASE, m_PosY + PLAYER_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - PLAYER_ATTACKWIDTH, m_PosY + m_SrcRect.GetHeight());
+	}
+	return CRectangle(m_PosX + PLAYER_RECTDECREASE, m_PosY + PLAYER_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE, m_PosY + m_SrcRect.GetHeight());
 }
 
 CRectangle CPlayer::GetLEG(void)

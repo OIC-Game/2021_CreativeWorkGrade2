@@ -32,8 +32,12 @@ private:
 	CTexture    m_EnemyShotTextureBlack;
 	CTexture    m_EnemyShotTextureWhite;
 
-	CTexture	m_BossBlack;
-	CTexture	m_BossWhite;
+	CTexture	m_BossBlackTextureLeft;
+	CTexture	m_BossBlackTextureRight;
+	CTexture	m_BossWhiteTexture;
+
+	CTexture	m_BlackWallTexture;
+	CTexture	m_WhiteWallTexture;
 
 public:
 	CStage();

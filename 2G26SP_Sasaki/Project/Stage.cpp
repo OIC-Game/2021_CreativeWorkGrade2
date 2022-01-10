@@ -57,11 +57,23 @@ bool CStage::Load()
 	{
 		return false;
 	}
-	if (!m_BossBlack.Load("BossBlack.png"))
+	if (!m_BossBlackTextureLeft.Load("BossBlackLeft.png"))
 	{
 		return false;
 	}
-	if (!m_BossWhite.Load("BossWhite.png"))
+	if (!m_BossBlackTextureRight.Load("BossBlackRight.png"))
+	{
+		return false;
+	}
+	if (!m_BossWhiteTexture.Load("BossWhite.png"))
+	{
+		return false;
+	}
+	if (!m_BlackWallTexture.Load("E_WallBlack.png"))
+	{
+		return false;
+	}
+	if (!m_WhiteWallTexture.Load("E_WallBlack.png"))
 	{
 		return false;
 	}
@@ -95,13 +107,31 @@ void CStage::Update(CEnemy* ene,int ecnt)
 			if (m_pEnemyStart[m_EnemyNo].Color == 0)
 			{
 				//ìGèoåª
-				ene[i].SetTexture(&m_EnemyTextureWhite,&m_EnemyShotTextureWhite);
+				if (m_pEnemyStart[m_EnemyNo].Type == 10)
+				{
+					ene[i].SetTexture(&m_BossWhiteTexture, &m_EnemyShotTextureWhite);
+				}
+				else
+				{
+					ene[i].SetTexture(&m_EnemyTextureWhite, &m_EnemyShotTextureWhite);
+				}
 				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type, m_pEnemyStart[m_EnemyNo].hp);
 			}
 			if (m_pEnemyStart[m_EnemyNo].Color == 1)
 			{
 				//ìGèoåª
-				ene[i].SetTexture(&m_EnemyTextureBlack, &m_EnemyShotTextureBlack);
+				if (m_pEnemyStart[m_EnemyNo].Type == 8)
+				{
+					ene[i].SetTexture(&m_BossBlackTextureLeft, &m_EnemyShotTextureBlack);
+				}
+				else if (m_pEnemyStart[m_EnemyNo].Type == 9)
+				{
+					ene[i].SetTexture(&m_BossBlackTextureRight, &m_BlackWallTexture);
+				}
+				else
+				{
+					ene[i].SetTexture(&m_EnemyTextureBlack, &m_EnemyShotTextureBlack);
+				}
 				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type, m_pEnemyStart[m_EnemyNo].hp);
 			}
 			break;
@@ -121,7 +151,6 @@ void CStage::Render()
 	{
 		m_Texture.Render(0.0f,y);
 	}
-	
 }
 
 
@@ -136,8 +165,11 @@ void CStage::Release()
 	m_EnemyShotTexture.Release();
 	m_EnemyShotTextureBlack.Release();
 	m_EnemyShotTextureWhite.Release();
-	m_BossBlack.Release();
-	m_BossWhite.Release();
+	m_BossBlackTextureLeft.Release();
+	m_BossBlackTextureRight.Release();
+	m_BossWhiteTexture.Release();
+	m_BlackWallTexture.Release();
+	m_WhiteWallTexture.Release();
 }
 
 //void CStage::RenderDebug(void)

@@ -216,11 +216,11 @@ bool CPlayer::Collision(CEnemy& ene)
 	int enecolor    = ene.GetEnemyColor();
 	if(m_PlayerColor != enecolor)
 	{ 
-		//if (prec.CollisionRect(erec))
-		//{
-		//	m_bDead = true;
-		//	return true;
-		//}
+		if (prec.CollisionRect(erec))
+		{
+			m_bDead = true;
+			return true;
+		}
 	}
 
 	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
@@ -233,8 +233,8 @@ bool CPlayer::Collision(CEnemy& ene)
 		//FŽŸ‘æ‚Å“G‚É’e‚ª“–‚½‚ç‚È‚¢
 		//’e‚ÌF
 		int plshtcol = m_ShotArray[i].GetPlayerColorShow();
-		//if (m_PlayerShotColor != enecolor)
-		//{
+		if (m_PlayerShotColor != enecolor)
+		{
 		if (srec.CollisionRect(erec))
 		{
 			if (plshtcol != enecolor)
@@ -244,7 +244,7 @@ bool CPlayer::Collision(CEnemy& ene)
 				return true;
 			}
 		}
-		//}
+		}
 	}
 	for (int i = 0; i < ENEMYSHOT_LINE; i++)
 	{
@@ -257,12 +257,12 @@ bool CPlayer::Collision(CEnemy& ene)
 			CRectangle srec = ene.GetShot(i,j).GetRect();
 			if (m_PlayerColor != enecolor)
 			{
-				//if (srec.CollisionRect(prec))
-				//{
-				//	m_bDead = true;
-				//	ene.GetShot(i).SetShow(false);
-				//	return true;
-				//}
+				if (srec.CollisionRect(prec))
+				{
+					m_bDead = true;
+					ene.GetShot(i,j).SetShow(false);
+					return true;
+				}
 			}
 		}
 	}

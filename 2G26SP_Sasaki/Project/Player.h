@@ -5,12 +5,12 @@
 #include "PlayerShot.h"
 
 //プレイヤーの当たり判定の幅
-#define		PLAYER_WIDTHRECT -8
+#define		PLAYER_WIDTHRECT 6
 
-#define		PLAYER_HEIGHTRECT -6
+#define		PLAYER_HEIGHTRECT 4
 
 //移動速度
-#define      PLAYER_SPEED 3
+#define      PLAYER_SPEED 6
 
 #define      PLAYERSHOT_COUNT  20
 
@@ -67,6 +67,6 @@ public:
 
 	CRectangle GetRect()
 	{
-		return CRectangle(m_PosX + PLAYER_WIDTHRECT, m_PosY + PLAYER_HEIGHTRECT, m_PosX + m_Texture.GetWidth() + PLAYER_WIDTHRECT, m_PosY + m_Texture.GetHeight() + PLAYER_HEIGHTRECT);
+		return CRectangle(m_PosX + PLAYER_WIDTHRECT, m_PosY + PLAYER_HEIGHTRECT, m_PosX + m_Texture.GetWidth() - PLAYER_WIDTHRECT, m_PosY + m_Texture.GetHeight() - PLAYER_HEIGHTRECT);
 	}
 };

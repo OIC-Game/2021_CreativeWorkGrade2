@@ -66,7 +66,7 @@ MofBool CGameApp::Initialize(void){
 
 	//デバック用
 	//ステージのスクロール値
-	//g_Stage.MoveScroll(6000);
+	g_Stage.MoveScroll(3300);
 
 	return TRUE;
 }
@@ -101,7 +101,7 @@ MofBool CGameApp::Update(void){
 		for (int i = 0; i < ENEMY_COUNT; i++)
 		{
 			//敵が出ているかどうかの確認
-			if (g_EnemyArray[i].GetShow())
+			if (g_EnemyArray[i].GetShow()&&g_EnemyArray[i].GetEnemyType() != 8&& g_EnemyArray[i].GetEnemyType() != 9)
 			{
 				btmp = false;
 				//敵が一体でもなので、2体目以降の出ている敵がいるかは問題にならない。
@@ -110,6 +110,14 @@ MofBool CGameApp::Update(void){
 		}
 		//敵が一体も出ていなければtrue,一体でも出ていればfalse
 		g_bclear = btmp;
+
+		if (g_bclear)
+		{
+			for (int i = 0; i < ENEMY_COUNT; i++)
+			{
+				g_EnemyArray[i].EnemyDead();
+			}
+		}
 	}
 
 	//デバッグ表示の切り替え

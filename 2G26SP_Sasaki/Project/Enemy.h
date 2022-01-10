@@ -6,8 +6,8 @@
 #define		ENEMY_MOVESPEED		1
 
 //敵の射撃本数
-#define		ENEMYSHOT_LINE		10
-#define     ENEMYSHOT_COUNT		50
+#define		ENEMYSHOT_LINE		20
+#define     ENEMYSHOT_COUNT		60
 
 //敵１体分の情報を管理するクラス
 class CEnemy {
@@ -26,7 +26,12 @@ private:
 	int						m_EnemyType;
 
 	int						Secondcount;
+	int						freeSecond;
 	int						second;
+	bool					m_bStart;
+
+	float					ShotScaleX;
+	float					ShotScaleY;
 
 public:
 	CEnemy();
@@ -38,6 +43,8 @@ public:
 	void RenderDebug(int i);			//デバッグ描画処理
 	void SetTexture(CTexture* pt){ m_pTexture = pt; }	//画像の設定。必ず呼び出すこと！
 	bool GetShow(void){ return m_bShow; }				//表示状態の取得
+	int	 GetEnemyType(void) { return m_EnemyType; }
+	void EnemyDead();
 
 	CRectangle GetRect()
 	{
@@ -72,27 +79,42 @@ public:
 	void SlantMove(bool left);
 	//回転
 	void HardEnemyMove(bool left);
-	//ボス黒
-	void BossMoveBlack();
+	//ボス黒左
+	void BossMoveBlackLeft();
+	//ボス黒右
+	void BossMoveBlackRight();
 	//ボス白
 	void BossMoveWhite();
 	//死なない出現
 	void ShowMove();
 
+	
 	void ShotSelect(int j);
+
 
 	//真下
 	void DownBullet(int j);
-	//斜め右下鋭角
-	void SlantRightBullet(int j);
-	//斜め右下広角
+
+	void SlantRightBullet1(int j);
 	void SlantRightBullet2(int j);
-	//斜め左下鋭角
-	void SlantLeftBullet(int j);
-	//斜め左下広角
+	void SlantRightBullet3(int j);
+	void SlantRightBullet4(int j);
+	void SlantRightBullet5(int j);
+	void SlantRightBullet6(int j);
+
+	void SlowBullet(int j);
+	
+	void SlantLeftBullet1(int j);
 	void SlantLeftBullet2(int j);
+	void SlantLeftBullet3(int j);
+	void SlantLeftBullet4(int j);
+	void SlantLeftBullet5(int j);
+	void SlantLeftBullet6(int j);
+	
 	//右
 	void RightBullet(int j);
 	//左
 	void LeftBullet(int j);
+
+	void WallBullet(int j);
 };

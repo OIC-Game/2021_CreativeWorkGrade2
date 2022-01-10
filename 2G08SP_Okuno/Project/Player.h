@@ -95,6 +95,7 @@ private:
 	bool			m_bPipeIn;
 	bool			m_bGoal;		//ゴールフラグ
 	float			m_DmgTime;		//ダメージを受けた場合の無敵時間
+	int				m_Coin;			//マリオのコイン
 	int				m_Life;			//マリオのライフ
 
 	bool			m_SwimFlg = false; //デバッグ用
@@ -123,7 +124,7 @@ public:
 
 	bool Load(CTexture* tex, CTexture* skillTex, CSoundBuffer* sounds);
 
-	void Initialize(Vector2 pos, int life);
+	void Initialize(Vector2 pos, int life, int coin);
 
 	void Update(float wx, float wy);
 
@@ -139,6 +140,7 @@ public:
 	void CollisionEnemy(CEnemy& ene);
 
 	void CollisionItem(CItem& item);
+	void GetItem(CItem& item);
 
 	void Damage(bool death);
 
@@ -201,6 +203,8 @@ public:
 	void SetLife(int life) { m_Life = life; };
 
 	int GetLife() { return m_Life; };
+
+	int GetCoin() { return m_Coin; };
 
 	int GetSoundCount() { return SOUND_COUNT; };
 

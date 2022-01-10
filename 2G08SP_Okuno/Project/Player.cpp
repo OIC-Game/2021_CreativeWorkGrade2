@@ -37,7 +37,7 @@ bool CPlayer::Load(CTexture* tex, CTexture* skillTex, CSoundBuffer* sounds)
 	return true;
 }
 
-void CPlayer::Initialize(Vector2 pos, int life)
+void CPlayer::Initialize(Vector2 pos, int life, int coin)
 {
 	m_Pos = pos;
 	m_bPipe = false;
@@ -54,6 +54,7 @@ void CPlayer::Initialize(Vector2 pos, int life)
 	m_bInWater = false;
 	m_DmgTime = 0;
 	m_Life = life;
+	m_Coin = coin;
 	m_BRect = GetRect(false);
 	m_Motion.ChangeMotion(0);
 }
@@ -576,31 +577,42 @@ void CPlayer::CollisionItem(CItem& item)
 	prec.Expansion(-6, -6);
 
 	if (irec.CollisionRect(prec)) {
-		CItemDefine* bd = CGameDefine::GetGameDefine()->GetItemByIdx(item.GetType() + 1);
-
+		GetItem(item);
 		item.Get();
-		if (bd->itemType == ITEM_NORMAL) {
-			if (m_TypeIdx < bd->ext1) {
-				m_TypeIdx = bd->ext1;
-			}
-			else {
-				return;
-			}
-			m_SoundArray[SOUND_ITEM_NORMAL].Play();
-			float dh = m_Motion.GetSrcRect().GetHeight();
-			m_Motion.ChangeMotion(m_Motion.GetMotionNo() % ANIM_COUNT + m_TypeIdx * ANIM_COUNT);
+		return;
+	}
+}
 
-			dh -= m_Motion.GetSrcRect().GetHeight();
-			m_Pos.y += dh;
+void CPlayer::GetItem(CItem& item)
+{
+	CItemDefine* bd = CGameDefine::GetGameDefine()->GetItemByIdx(item.GetType() + 1);
+
+	if (bd->itemType == ITEM_NORMAL) {
+		if (m_TypeIdx < bd->ext1) {
+			m_TypeIdx = bd->ext1;
 		}
-		else if (bd->itemType == ITEM_1UP) {
-			m_Life += bd->ext1;
+		else {
+			return;
+		}
+		m_SoundArray[SOUND_ITEM_NORMAL].Play();
+		float dh = m_Motion.GetSrcRect().GetHeight();
+		m_Motion.ChangeMotion(m_Motion.GetMotionNo() % ANIM_COUNT + m_TypeIdx * ANIM_COUNT);
+
+		dh -= m_Motion.GetSrcRect().GetHeight();
+		m_Pos.y += dh;
+	}
+	else if (bd->itemType == ITEM_1UP) {
+		m_Life += bd->ext1;
+		m_SoundArray[SOUND_ITEM_1UP].Play();
+	}
+	else if (bd->itemType == ITEM_COIN) {
+		m_SoundArray[SOUND_ITEM_COIN].Play();
+		int mbCoin = m_Coin % 100;
+		m_Coin += bd->ext1;
+		if ((m_Coin % 100) < mbCoin) {
+			m_Life += 1;
 			m_SoundArray[SOUND_ITEM_1UP].Play();
 		}
-		else if (bd->itemType == ITEM_COIN) {
-			m_SoundArray[SOUND_ITEM_COIN].Play();
-		}
-		return;
 	}
 }
 

@@ -158,6 +158,7 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 	}
 
 	if (m_GoalFlg) {
+		m_StageArray[m_StageCursor].UpdateScroll(pl);
 		if (pl.GoalFn(ox, m_GoalType, GetGoalBottom(), GetStageWidth(), clearBgmPlay)) {
 			m_SceneChangeFlg = true;
 			m_SceneNext = G_SCENE_GAMECLEAR;
@@ -167,18 +168,30 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 
 	if (m_PipeFlg != PIPE_FLAG_UNKNOWN && m_PipeFlg != PIPE_FLAG_OUT_END) {
 		int flg = m_PipeFlg;
-		if (m_ThroughPipe.GetInPipe().Type == 0) flg = pl.PipeInFn(m_ThroughPipe.GetInPipe());
-		else if (m_ThroughPipe.GetInPipe().Type == 1) {
-			m_PipeAnimTime += CUtilities::GetFrameSecond();
-			if (m_StageArray[m_StageCursor].DoorAnimation(pl.GetRect(false), m_PipeAnimTime, m_PipeFlg == PIPE_FLAG_IN_NOW)) {
-				if (m_PipeFlg == PIPE_FLAG_IN_NOW) {
-					flg = PIPE_FLAG_IN_END;
-				}
-				else {
-					flg = PIPE_FLAG_OUT_END;
-					m_PipeFlg = PIPE_FLAG_OUT_END;
-					pl.PipeOutFn_Door(m_ThroughPipe.GetOutPipe());
-					m_StageArray[m_StageCursor].EndDoorAnimation(pl.GetRect(false));
+		int isIn = m_PipeFlg == PIPE_FLAG_IN_NOW;
+
+		if (isIn && m_ThroughPipe.GetInPipe().Type == 0) {
+			flg = pl.PipeInFn(m_ThroughPipe.GetInPipe());
+		}/*
+		else if (m_PipeFlg == PIPE_FLAG_IN_NOW && m_ThroughPipe.GetOutPipe().Type == 0) {
+			flg = pl.PipeOutFn(m_ThroughPipe.GetOutPipe());
+		}*/
+		else {
+			int type = m_ThroughPipe.GetInPipe().Type;
+			if (!isIn) type = m_ThroughPipe.GetOutPipe().Type;
+
+			if (type == 1) {
+				m_PipeAnimTime += CUtilities::GetFrameSecond();
+				if (m_StageArray[m_StageCursor].DoorAnimation(pl.GetRect(false), m_PipeAnimTime, isIn)) {
+					if (m_PipeFlg == PIPE_FLAG_IN_NOW) {
+						flg = PIPE_FLAG_IN_END;
+					}
+					else {
+						flg = PIPE_FLAG_OUT_END;
+						m_PipeFlg = PIPE_FLAG_OUT_END;
+						pl.PipeOutFn_Door(m_ThroughPipe.GetOutPipe());
+						m_StageArray[m_StageCursor].EndDoorAnimation(pl.GetRect(false));
+					}
 				}
 			}
 		}

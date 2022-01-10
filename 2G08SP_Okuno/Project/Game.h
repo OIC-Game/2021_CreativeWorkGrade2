@@ -27,6 +27,7 @@ private:
 	bool			m_ClearBgmFlg;
 	bool			m_FailedBgmFlg;
 	int				m_Life;
+	int				m_Coin;
 	int				m_nScene;
 	float			m_SceneChangeTime;
 	int				m_nStageIdx;

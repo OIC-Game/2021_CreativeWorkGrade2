@@ -44,7 +44,7 @@ public:
 
 	void Render(float wx, float wy);
 
-	void Update(float wx, float wy);
+	bool Update(float wx, float wy);
 
 	/// <summary>
 	/// ステージへの埋まりを解消する

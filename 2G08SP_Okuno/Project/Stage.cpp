@@ -204,6 +204,78 @@ void CStage::StageFlash()
 
 void CStage::Update(CPlayer& pl)
 {
+	UpdateScroll(pl);
+
+	if (pl.IsPipe()) return;
+
+	for (int i = 0; i < GetBlockCount(); i++) {
+		m_BlockArray[i].Update();
+	}
+
+	for (int i = 0; i < 2; i++) {
+		if (!pl.GetSkillObj()[i].GetShowNow()) continue;
+		pl.GetSkillObj()[i].CollisionStage(Collision(NULL, NULL, pl.GetSkillObj()[i].GetBRect(), pl.GetSkillObj()[i].GetRect(), pl.GetSkillObj()[i].GetMove()));
+	}
+
+	for (int i = 0; i < GetEnemyCount(); i++) {
+		if (!m_EnemyArray[i].GetShow()) {
+			continue;
+		}
+		CRectangle erec_b = m_EnemyArray[i].GetRect();
+		m_EnemyArray[i].Update(GetScrollX(), GetScrollY(), pl.GetRect(true));
+		if (m_EnemyArray[i].GetDisplay()) {
+			pl.CollisionEnemy(m_EnemyArray[i]);
+		}
+		if (!m_EnemyArray[i].GetDisplay()) {
+			continue;
+		}
+		CRectangle erec_a = m_EnemyArray[i].GetRect();
+
+		m_EnemyArray[i].CollisionStage(Collision(NULL, &m_EnemyArray[i], erec_b, erec_a, m_EnemyArray[i].GetMove()));
+	}
+
+
+	for (int i = 0; i < GetItemCount(); i++) {
+		if (!m_ItemArray[i].GetShow()) {
+			continue;
+		}
+		CRectangle irec_b = m_ItemArray[i].GetRect();
+		bool isGet = m_ItemArray[i].Update(GetScrollX(), GetScrollY());
+		if (isGet) {
+			pl.GetItem(m_ItemArray[i]);
+		}
+		if (m_ItemArray[i].GetDisplay()) {
+			pl.CollisionItem(m_ItemArray[i]);
+		}
+		if (!m_ItemArray[i].GetDisplay()) {
+			continue;
+		}
+		CRectangle irec_a = m_ItemArray[i].GetRect();
+
+		m_ItemArray[i].CollisionStage(Collision(NULL, NULL, irec_b, irec_a, m_ItemArray[i].GetMove()));
+	}
+
+	for (int i = 0; i < GetEnemyCount(); i++) {
+		if (!m_EnemyArray[i].GetDisplay()) continue;
+
+		for (int j = 0; j < GetEnemyCount(); j++) {
+			if (i == j || !m_EnemyArray[j].GetDisplay()) {
+				continue;
+			}
+			m_EnemyArray[i].CollisionEnemy(m_EnemyArray[j]);
+		}
+		for (int k = 0; k < 2; k++) {
+			CSkillObj* sObj = &pl.GetSkillObj()[k];
+			if (!sObj->GetShowNow()) {
+				continue;
+			}
+			m_EnemyArray[i].CollisionSkill(*sObj);
+		}
+	}
+}
+
+void CStage::UpdateScroll(CPlayer& pl)
+{
 	CRectangle prec = pl.GetRect(false);
 	float sw = ViewWidth;
 	float hsw = sw * 0.4f;
@@ -252,70 +324,6 @@ void CStage::Update(CPlayer& pl)
 	}
 	else {
 		m_ScrollY = (stgh - sh) / 2;
-	}
-
-	if (pl.IsPipe()) return;
-
-	for (int i = 0; i < GetBlockCount(); i++) {
-		m_BlockArray[i].Update();
-	}
-
-	for (int i = 0; i < 2; i++) {
-		if (!pl.GetSkillObj()[i].GetShowNow()) continue;
-		pl.GetSkillObj()[i].CollisionStage(Collision(NULL, NULL, pl.GetSkillObj()[i].GetBRect(), pl.GetSkillObj()[i].GetRect(), pl.GetSkillObj()[i].GetMove()));
-	}
-
-	for (int i = 0; i < GetEnemyCount(); i++) {
-		if (!m_EnemyArray[i].GetShow()) {
-			continue;
-		}
-		CRectangle erec_b = m_EnemyArray[i].GetRect();
-		m_EnemyArray[i].Update(GetScrollX(), GetScrollY(), pl.GetRect(true));
-		if (m_EnemyArray[i].GetDisplay()) {
-			pl.CollisionEnemy(m_EnemyArray[i]);
-		}
-		if (!m_EnemyArray[i].GetDisplay()) {
-			continue;
-		}
-		CRectangle erec_a = m_EnemyArray[i].GetRect();
-
-		m_EnemyArray[i].CollisionStage(Collision(NULL, &m_EnemyArray[i], erec_b, erec_a, m_EnemyArray[i].GetMove()));
-	}
-
-
-	for (int i = 0; i < GetItemCount(); i++) {
-		if (!m_ItemArray[i].GetShow()) {
-			continue;
-		}
-		CRectangle irec_b = m_ItemArray[i].GetRect();
-		m_ItemArray[i].Update(GetScrollX(), GetScrollY());
-		if (m_ItemArray[i].GetDisplay()) {
-			pl.CollisionItem(m_ItemArray[i]);
-		}
-		if (!m_ItemArray[i].GetDisplay()) {
-			continue;
-		}
-		CRectangle irec_a = m_ItemArray[i].GetRect();
-
-		m_ItemArray[i].CollisionStage(Collision(NULL, NULL, irec_b, irec_a, m_ItemArray[i].GetMove()));
-	}
-
-	for (int i = 0; i < GetEnemyCount(); i++) {
-		if (!m_EnemyArray[i].GetDisplay()) continue;
-
-		for (int j = 0; j < GetEnemyCount(); j++) {
-			if (i == j || !m_EnemyArray[j].GetDisplay()) {
-				continue;
-			}
-			m_EnemyArray[i].CollisionEnemy(m_EnemyArray[j]);
-		}
-		for (int k = 0; k < 2; k++) {
-			CSkillObj* sObj = &pl.GetSkillObj()[k];
-			if (!sObj->GetShowNow()) {
-				continue;
-			}
-			m_EnemyArray[i].CollisionSkill(*sObj);
-		}
 	}
 }
 
@@ -377,8 +385,13 @@ void CStage::RenderLayerOver()
 		m_BlockArray[i].Render(GetScrollX(), GetScrollY());
 	}
 
-	int scw = g_pGraphics->GetTargetWidth();
-	int sch = g_pGraphics->GetTargetHeight();
+	/*
+	int scw = ViewWidth;
+	float scale = g_pGraphics->GetTargetWidth() / ViewWidth;
+	int sch = g_pGraphics->GetTargetHeight() / scale;
+	float s = scale;
+	int bw = m_BgTexture.GetWidth() * s;
+	int bh = m_BgTexture.GetHeight() * s;
 	float stgw = CHIPSIZE * m_XSize;
 	float stgh = CHIPSIZE * m_YSize;
 	if (m_ScrollY < 0) {
@@ -392,7 +405,7 @@ void CStage::RenderLayerOver()
 	}
 	if (m_ScrollX + stgw < scw) {
 		CGraphicsUtilities::RenderFillRect(-m_ScrollX + stgw, 0, scw, sch, MOF_COLOR_BLACK);
-	}
+	}*/
 }
 
 void CStage::RenderDebug_Enemy()
@@ -472,35 +485,38 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 			}
 		}
 
-		if (cr.Left >= rb.Right) {
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockRight);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockDown);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockUp);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockLeft);
+		int ra_center_h = (ra.Top + ra.Bottom) / 2;
+		int ra_center_w = (ra.Left + ra.Right) / 2;
+
+		if (cr.Left >= rb.Right && cr.Top < ra_center_h && cr.Bottom > ra_center_h) {
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockRight);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockDown);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockUp);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockLeft);
 		}
-		else if (cr.Right <= rb.Left) {
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockLeft);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockDown);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockUp);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockRight);
-		}
-		else if (cr.Top <= rb.Bottom) {
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockDown);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockUp);
+		else if (cr.Right <= rb.Left && cr.Top < ra_center_h && cr.Bottom > ra_center_h) {
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockLeft);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockDown);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockUp);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockRight);
+		}/*
+		else if (cr.Bottom <= rb.Top) {
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, &leftFallFlg, &rightFallFlg, BlockDown);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, &leftFallFlg, &rightFallFlg, BlockUp);
 			if (m_BlockArray[i].GetType() < 0) {
 				continue;
 			}
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockRight);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockLeft);
-		}
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, &leftFallFlg, &rightFallFlg, BlockRight);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, &leftFallFlg, &rightFallFlg, BlockLeft);
+		}*/
 		else {
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockDown);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockUp);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockDown);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockUp);
 			if (m_BlockArray[i].GetType() < 0) {
 				continue;
 			}
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockRight);
-			Collision_Dir(pl, ene, rb, ra, move, &m_BlockArray[i], cr, coll, leftFallFlg, rightFallFlg, BlockLeft);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockRight);
+			Collision_Dir(pl, ene, &rb, &ra, move, &m_BlockArray[i], cr, &coll, leftFallFlg, rightFallFlg, BlockLeft);
 		}
 	}
 
@@ -514,7 +530,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 	return coll;
 }
 
-void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle& ra, CVector2 move, CBlock* block, CRectangle blockRect, CCollisionData& coll, bool& leftFallFlg, bool& rightFallFlg, int direction) {
+void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle* rb, CRectangle* ra, CVector2 move, CBlock* block, CRectangle blockRect, CCollisionData* coll, bool& leftFallFlg, bool& rightFallFlg, int direction) {
 
 	switch (direction)
 	{
@@ -522,17 +538,17 @@ void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle&
 		if (move.y >= 0) {
 			CRectangle b_trec = blockRect;
 			//接地判定
-			CRectangle brec = CRectangle(min(rb.Left, ra.Left), min(rb.Bottom, ra.Bottom), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom));
+			CRectangle brec = CRectangle(min(rb->Left, ra->Left), min(rb->Bottom, ra->Bottom), max(rb->Right, ra->Right), max(rb->Bottom, ra->Bottom));
 			//brec.Bottom += 1;
 			brec.Expansion(-6, 0);
 
-			if (!block->CheckDirection(BlockAll) || (blockRect.Right <= rb.Left && blockRect.Right >= ra.Left) || (blockRect.Left >= rb.Right && blockRect.Left <= ra.Right)) {
+			if (!block->CheckDirection(BlockAll) || (blockRect.Right <= rb->Left && blockRect.Right >= ra->Left) || (blockRect.Left >= rb->Right && blockRect.Left <= ra->Right)) {
 				b_trec.Bottom = b_trec.Top + 6;
 			}
 
 			if (b_trec.CollisionRect(brec)) {
 				if (block->CheckDirection(BlockDown) && !block->CheckDamageDirection(BlockDown)) {
-					coll.og = true;
+					coll->og = true;
 
 					if (pl != NULL) {
 						pl->SlideMove(block->GetMove());
@@ -567,19 +583,19 @@ void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle&
 					break;
 				}*/
 				if (block->CheckDirection(BlockDown)) {
-					coll.oy += b_trec.Top - brec.Bottom;
-					ra.Top += b_trec.Top - brec.Bottom;
-					ra.Bottom += b_trec.Top - brec.Bottom;
+					coll->oy += b_trec.Top - brec.Bottom;
+					ra->Top += b_trec.Top - brec.Bottom;
+					ra->Bottom += b_trec.Top - brec.Bottom;
 
-					if (rb.Top > ra.Top) {
-						rb.Top = ra.Top;
-						rb.Bottom = ra.Bottom;
+					if (rb->Top > ra->Top) {
+						rb->Top = ra->Top;
+						rb->Bottom = ra->Bottom;
 					}
 				}
 
 				if (pl != NULL) {
 					if (block->CheckDamageFlg(DAMAGE_ONLY_PLAYER) && block->CheckDamageDirection(BlockDown)) {
-						coll.damage = true;
+						coll->damage = true;
 					}
 				}
 			}
@@ -590,11 +606,11 @@ void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle&
 
 			CRectangle b_brec = blockRect;
 			//上方向判定
-			CRectangle trec = CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Top, ra.Top));
+			CRectangle trec = CRectangle(min(rb->Left, ra->Left), min(rb->Top, ra->Top), max(rb->Right, ra->Right), max(rb->Top, ra->Top));
 			trec.Expansion(-6, 0);
 			trec += CVector2(0, 1);
 
-			if (!block->CheckDirection(BlockAll) || (blockRect.Right <= rb.Left && blockRect.Right >= ra.Left) || (blockRect.Left >= rb.Right && blockRect.Left <= ra.Right)) {
+			if (!block->CheckDirection(BlockAll) || (blockRect.Right <= rb->Left && blockRect.Right >= ra->Left) || (blockRect.Left >= rb->Right && blockRect.Left <= ra->Right)) {
 				b_brec.Top = b_brec.Bottom - 6;
 			}
 
@@ -605,20 +621,20 @@ void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle&
 					break;
 				}*/
 				if (block->CheckDirection(BlockUp)) {
-					coll.oy += b_brec.Bottom - trec.Top;
-					ra.Top += b_brec.Bottom - trec.Top;
-					ra.Bottom += b_brec.Bottom - trec.Top;
+					coll->oy += b_brec.Bottom - trec.Top;
+					ra->Top += b_brec.Bottom - trec.Top;
+					ra->Bottom += b_brec.Bottom - trec.Top;
 
-					if (rb.Top < ra.Top) {
-						rb.Top = ra.Top;
-						rb.Bottom = ra.Bottom;
+					if (rb->Top < ra->Top) {
+						rb->Top = ra->Top;
+						rb->Bottom = ra->Bottom;
 					}
 				}
 
 				if (pl != NULL) {
 					block->AttackBlock(pl, m_pItemTexture);
 					if (block->CheckDamageFlg(DAMAGE_ONLY_PLAYER) && block->CheckDamageDirection(BlockUp)) {
-						coll.damage = true;
+						coll->damage = true;
 					}
 				}
 			}
@@ -629,7 +645,7 @@ void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle&
 
 			CRectangle b_lrec = blockRect;
 			//右方向判定
-			CRectangle rrec = CRectangle(min(rb.Right, ra.Right), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom));
+			CRectangle rrec = CRectangle(min(rb->Right, ra->Right), min(rb->Top, ra->Top), max(rb->Right, ra->Right), max(rb->Bottom, ra->Bottom));
 			rrec.Expansion(0, -6);
 
 			if (!block->CheckDirection(BlockAll)) {
@@ -642,19 +658,19 @@ void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle&
 					break;
 				}*/
 				if (block->CheckDirection(BlockRight)) {
-					coll.ox += b_lrec.Left - rrec.Right;
-					ra.Left += b_lrec.Left - rrec.Right;
-					ra.Right += b_lrec.Left - rrec.Right;
+					coll->ox += b_lrec.Left - rrec.Right;
+					ra->Left += b_lrec.Left - rrec.Right;
+					ra->Right += b_lrec.Left - rrec.Right;
 
-					if (rb.Left > ra.Left) {
-						rb.Left = ra.Left;
-						rb.Right = ra.Right;
+					if (rb->Left > ra->Left) {
+						rb->Left = ra->Left;
+						rb->Right = ra->Right;
 					}
 				}
 
 				if (pl != NULL) {
 					if (block->CheckDamageFlg(DAMAGE_ONLY_PLAYER) && block->CheckDamageDirection(BlockRight)) {
-						coll.damage = true;
+						coll->damage = true;
 					}
 				}
 			}
@@ -665,7 +681,7 @@ void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle&
 
 			CRectangle b_rrec = blockRect;
 			//左方向判定
-			CRectangle lrec = CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Left, ra.Left), max(rb.Bottom, ra.Bottom));
+			CRectangle lrec = CRectangle(min(rb->Left, ra->Left), min(rb->Top, ra->Top), max(rb->Left, ra->Left), max(rb->Bottom, ra->Bottom));
 			lrec.Expansion(0, -6);
 
 			if (!block->CheckDirection(BlockAll)) {
@@ -678,19 +694,19 @@ void CStage::Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle&
 					break;
 				}*/
 				if (block->CheckDirection(BlockLeft)) {
-					coll.ox += b_rrec.Right - lrec.Left;
-					ra.Left += b_rrec.Right - lrec.Left;
-					ra.Right += b_rrec.Right - lrec.Left;
+					coll->ox += b_rrec.Right - lrec.Left;
+					ra->Left += b_rrec.Right - lrec.Left;
+					ra->Right += b_rrec.Right - lrec.Left;
 
-					if (rb.Left < ra.Left) {
-						rb.Left = ra.Left;
-						rb.Right = ra.Right;
+					if (rb->Left < ra->Left) {
+						rb->Left = ra->Left;
+						rb->Right = ra->Right;
 					}
 				}
 
 				if (pl != NULL) {
 					if (block->CheckDamageFlg(DAMAGE_ONLY_PLAYER) && block->CheckDamageDirection(BlockLeft)) {
-						coll.damage = true;
+						coll->damage = true;
 					}
 				}
 			}
@@ -731,11 +747,14 @@ bool CStage::DoorAnimation(CRectangle rect, float animTime, bool isIn)
 		if (keyCount < 0) return true;
 	}
 
+
+	int dCount = 0;
 	for (int i = 0; i < m_BlockCount; i++) {
 		int type = m_BlockArray[i].GetType();
 		if (type < 0 || type < DOOR_F1 || (type >= (DOOR_F1 + DOOR_FN) && type < DOOR_F2) || type >= (DOOR_F2 + DOOR_FN)) continue;
 		CRectangle cr = m_BlockArray[i].GetRect();
 		if (rect.Left > cr.Right && cr.Right > rect.Right + CHIPSIZE && rect.Top > cr.Bottom && cr.Bottom > rect.Bottom + CHIPSIZE) continue;
+		dCount++;
 
 		//現在のアニメーションのチップに置き換える
 		int fChip = DOOR_F1;
@@ -746,7 +765,7 @@ bool CStage::DoorAnimation(CRectangle rect, float animTime, bool isIn)
 		CBlockDefine* bd = CGameDefine::GetGameDefine()->GetBlockByIdx(type + 1);
 		m_BlockArray[i].Load(&m_ChipTexture, CVector2(cr.Left, cr.Top), tr, m_BlockArray[i].GetItem(), type, bd->broken, bd);
 	}
-	return false;
+	return dCount == 0;
 }
 
 void CStage::EndDoorAnimation(CRectangle rect) 

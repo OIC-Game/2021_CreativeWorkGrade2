@@ -55,10 +55,10 @@ void CItem::Render(float wx, float wy)
 	m_Texture->RenderScale((m_Pos.x - wx) * scale, (m_Pos.y - wy + sub) * scale, scale, rect);
 }
 
-void CItem::Update(float wx, float wy)
+bool CItem::Update(float wx, float wy)
 {
 	if (!m_bShow || m_ShowState == STATE_DISAPPEAR) {
-		return;
+		return false;
 	}
 	if (m_ShowState == STATE_DISSHOW) {
 		CRectangle rect = GetRect();
@@ -66,27 +66,30 @@ void CItem::Update(float wx, float wy)
 			m_ShowState = STATE_SHOW;
 		}
 		else {
-			return;
+			return false;
 		}
 	}
 	else if (m_ShowState == STATE_SHOW) {
 		CRectangle rect = GetRect();
 		if (rect.Right < wx || rect.Left > wx + ViewWidth) {
 			m_ShowState = STATE_DISSHOW;
-			return;
+			return false;
 		}
 	}
+
+	bool isGet = false;
 
 	if (m_ShowState == STATE_YET) {
 		m_ShowState = STATE_SHOW;
 	}
 	if (m_animShow && m_animShowTime < BShowAnimTime) {
 		m_animShowTime += CUtilities::GetFrameSecond();
-		if (m_animShowTime < BShowAnimTime) return;
+		if (m_animShowTime < BShowAnimTime) return false;
 		else {
 			m_animShow = false;
 			if (m_Define->itemType == ITEM_COIN && m_Define->move == 0) {
 				Get();
+				isGet = true;
 			}
 		}
 	}
@@ -115,6 +118,7 @@ void CItem::Update(float wx, float wy)
 	if (m_Pos.y > m_stgh) {
 		m_ShowState = STATE_DISAPPEAR;
 	}
+	return isGet;
 }
 
 void CItem::CollisionStage(CCollisionData coll)

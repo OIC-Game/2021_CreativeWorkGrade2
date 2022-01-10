@@ -46,6 +46,7 @@ public:
 	void StageFlash(); //ステージ内の敵などのステータスを表示状態にする
 
 	void Update(CPlayer& pl);
+	void UpdateScroll(CPlayer& pl);
 
 	void Render();
 	void RenderLayerOver();
@@ -63,7 +64,7 @@ public:
 	/// <param name="og">接地（着地）しているかどうかを入れる</param>
 	/// <returns>接触情報を返す</returns>
 	CCollisionData Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRectangle ra, CVector2 move);
-	void Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle& rb, CRectangle& ra, CVector2 move, CBlock* block, CRectangle blockRect, CCollisionData& coll, bool& leftFallFlg, bool& rightFallFlg, int direction);
+	void Collision_Dir(CPlayer* pl, CEnemy* ene, CRectangle* rb, CRectangle* ra, CVector2 move, CBlock* block, CRectangle blockRect, CCollisionData* coll, bool& leftFallFlg, bool& rightFallFlg, int direction);
 
 	void CheckPointThrough(CRectangle rect);
 

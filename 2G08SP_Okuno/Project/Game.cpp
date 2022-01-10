@@ -73,6 +73,7 @@ bool CGame::Load(CTexture* playerTex)
 
 
 	m_Life = pllifeDefault; //ébíËìIÇ…ÉâÉCÉtÇÃèâä˙ílÇÃê›íË
+	m_Coin = 0;
 
 	//if (!m_Stage.Load("Stage1.txt", "Stage1Values.txt")) {
 	//	return false;
@@ -98,7 +99,7 @@ bool CGame::Initialize(std::string fname, int stageIdx)
 
 	m_Stage.Initialize();
 
-	m_Player.Initialize(m_Stage.GetStartPos(), m_Life);
+	m_Player.Initialize(m_Stage.GetStartPos(), m_Life, m_Coin);
 	m_Player.SetStageHeight(m_Stage.GetStageHeight());
 
 	m_nScene = G_SCENE_LIFE;
@@ -150,7 +151,7 @@ void CGame::Update()
 				m_BGM.Play();
 			}
 
-			m_Player.Initialize(m_Stage.GetStartPos(), m_Life);
+			m_Player.Initialize(m_Stage.GetStartPos(), m_Life, m_Coin);
 			m_Player.SetStageHeight(m_Stage.GetStageHeight());
 		}
 	}
@@ -195,6 +196,7 @@ void CGame::Update()
 			if (m_BGM.IsPlay()) {
 				m_BGM.Stop();
 			}
+			m_Coin = m_Player.GetCoin();
 			m_Life = m_Player.GetLife();
 			if (m_Life < 0) {
 				m_nScene = G_SCENE_GAMEOVER;
@@ -234,9 +236,9 @@ void CGame::Render()
 
 		CGraphicsUtilities::RenderString(10, 10, "ÉQÅ[ÉÄ");
 
-		CGraphicsUtilities::CalculateStringRect(0, 0, "LIFEÅ~000 TIME 000", tRect);
+		CGraphicsUtilities::CalculateStringRect(0, 0, "COINÅ~000 LIFEÅ~000 TIME 000", tRect);
 
-		CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() - tRect.Right - 150, 10, "LIFEÅ~%3d TIME %3.0f", m_Player.GetLife(), m_Time);
+		CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() - tRect.Right - 150, 10, "COINÅ~%3d LIFEÅ~%3d TIME %3.0f", m_Player.GetCoin() % 100, m_Player.GetLife(), m_Time);
 
 		if (m_Time <= 0) {
 			CGraphicsUtilities::CalculateStringRect(0, 0, "TIME UP", tRect);

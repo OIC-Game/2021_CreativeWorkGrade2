@@ -85,6 +85,7 @@ void CEnemy::Update(float wx, float wy, CRectangle prec)
 		}
 		m_ShowState = STATE_SHOW;
 	}
+	m_bReverse = m_Move.x < 0;
 
 	m_Motion.AddTimer(CUtilities::GetFrameSecond());
 
@@ -330,14 +331,15 @@ void CEnemy::Trampled(CRectangle prec)
 		m_Motion.Create(m_define->anim, m_define->animCount);
 		m_Pos.y += bHeight - GetRect().GetHeight();
 		m_Move.x = m_define->x_ext1;
-		if (CheckMoveFlg(MOVE_LEFT)) {
-			m_Move.x *= -1;
-		}
-		else if ((m_define->move & MOVE_SENSE) == MOVE_SENSE) {
+		
+		if ((m_define->move & MOVE_SENSE) == MOVE_SENSE) {
 			CRectangle erec = GetRect();
 			if ((prec.Left + prec.Right) / 2 > (erec.Left + erec.Right) / 2) {
 				m_Move.x *= -1;
 			}
+		}
+		else if (CheckMoveFlg(MOVE_LEFT)) {
+			m_Move.x *= -1;
 		}
 	}
 	else {
@@ -368,16 +370,14 @@ bool CEnemy::Touched(CRectangle prec, bool sence)
 		}
 		m_Motion.Create(m_define->anim, m_define->animCount);
 		m_Move.x = m_define->x_ext1;
-		if (CheckMoveFlg(MOVE_LEFT)) {
-			m_Move.x *= -1;
-		}
-		else if ((m_define->move & MOVE_SENSE) == MOVE_SENSE) {
-			if (sence) {
-				CRectangle erec = GetRect();
-				if ((prec.Left + prec.Right) / 2 > (erec.Left + erec.Right) / 2) {
-					m_Move.x *= -1;
-				}
+		if (sence) {
+			CRectangle erec = GetRect();
+			if ((prec.Left + prec.Right) / 2 > (erec.Left + erec.Right) / 2) {
+				m_Move.x *= -1;
 			}
+		}
+		else if (CheckMoveFlg(MOVE_LEFT)) {
+			m_Move.x *= -1;
 		}
 		return true;
 	}

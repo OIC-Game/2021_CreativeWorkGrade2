@@ -39,6 +39,8 @@ enum tag_SCENENO {
 #define		PLAYER_CLEAR_POSITIONX 4573
 //無敵時間（サイズ変更時）
 #define		PLAYER_INVINCIBLE 90
+//移動する床用追加矩形
+#define		PLAYER_ADD_BUTTOMRECT 10
 
 
 
@@ -64,6 +66,7 @@ enum tag_STAGENUMBER
 {
 	STAGE_1_1,
 	STAGE_2_1,
+	STAGE_3_1,
 	STAGE_LAST,
 
 	STAGE_COUNT,

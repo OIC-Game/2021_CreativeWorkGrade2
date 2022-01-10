@@ -186,6 +186,10 @@ bool CStage::Load(char* pName)
 	{
 		return false;
 	}
+	if (!stage_ExplosionSE.Load("Explosion.mp3"))
+	{
+		return false;
+	}
 
 	return true;
 
@@ -281,7 +285,7 @@ void CStage::Update(CPlayer& pl)
 	//座標が画面端によっている(角端から200pixel)場合スクロールを行って補正する。
 	if (stage_number == STAGE_LAST)
 	{
-		if (pl.Getplayer_PositionX() < 5270 && !pl.GetWarpFlg() && pl.Getplayer_PositionY() <= 1000)
+		if (pl.Getplayer_PositionX() < 10752 && !pl.GetWarpFlg() && pl.Getplayer_PositionY() <= 1000)
 		{
 			if (prect.Left - stage_Scroll.x < 400) {
 				stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
@@ -299,14 +303,28 @@ void CStage::Update(CPlayer& pl)
 		else if (pl.GetWarpFlg() && !stage_FixScroll)
 		{
 
-			stage_Scroll.x = 6175;
+			stage_Scroll.x = 12064;
 
 			stage_FixScroll = true;
 		}
 	}
+	else if (stage_number == STAGE_3_1)
+	{
+		if (prect.Left - stage_Scroll.x < 200) {
+			stage_Scroll.x -= 200 - (prect.Left - stage_Scroll.x);
+			if (stage_Scroll.x <= 0) {
+				stage_Scroll.x = 0;
+			}
+		}
+		else if (prect.Right - stage_Scroll.x > sw - 700) {
+			stage_Scroll.x += (prect.Right - stage_Scroll.x) - (sw - 700);
+			if (stage_Scroll.x >= stgw - sw) {
+				stage_Scroll.x = stgw - sw;
+			}
+		}
+	}
 	else
 	{
-
 		if (prect.Left - stage_Scroll.x < 400) {
 			stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);
 			if (stage_Scroll.x <= 0) {
@@ -409,7 +427,7 @@ void CStage::Update(CPlayer& pl)
 		}
 		if (pl.GetBossClearFlg())
 		{
-			if (stage_Scroll.x < 7400)
+			if (stage_Scroll.x < 13332)
 				stage_Scroll.x += 5;
 		}
 		
@@ -446,7 +464,8 @@ void CStage::Update(CPlayer& pl)
 		stage_BlockDestroyWait--;
 		if (stage_BlockDestroyWait <= 0)
 		{
-			if (stage_pChipData[stage_tmpChipY * stage_XCount + stage_tmpChipX] == CHIP_BLOCK)
+			if (stage_pChipData[stage_tmpChipY * stage_XCount + stage_tmpChipX] == CHIP_BLOCK || 
+				stage_pChipData[stage_tmpChipY * stage_XCount + stage_tmpChipX] == CHIP_BLUEBLOCK)
 			{
 				//非表示
 				stage_pChipData[stage_tmpChipY * stage_XCount + stage_tmpChipX] = 0;
@@ -469,14 +488,12 @@ void CStage::Update(CPlayer& pl)
 	if (pl.GetMarioDead())
 	{
 
-		int x = 223;
+		int x = 407;
 		for (int y = 12; y < 16; y++)
 		{
 			stage_pChipData[y * stage_XCount + x] = 0;
 		}
 	}
-
-
 }
 
 void CStage::Render(void)
@@ -593,6 +610,7 @@ void CStage::Release(void)
 	{
 		stage_MarioSE[i].Release();
 	}
+	stage_ExplosionSE.Release();
 
 }
 
@@ -629,7 +647,7 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				continue;
 			}
 			//ゴールフラッグも当たり判定をしない
-			else if (cn == CHIP_GOALFLAG_L - 1 || cn == CHIP_GOALFLAG_R - 1)
+			else if (cn == CHIP_GOALFLAG_L - 1 || cn == CHIP_GOALFLAG_R - 1 || cn == 4)
 			{
 				continue;
 			}
@@ -640,6 +658,10 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 			}
 			//水の当たり判定をしない
 			if (cn == 49 || cn == 50 || cn == 51)
+			{
+				continue;
+			}
+			if (cn == 56 || cn == 57)
 			{
 				continue;
 			}
@@ -785,7 +807,7 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				{
 					pl.SetBossClearTrantionFlg(true);
 				}
-				if (cn == 57)
+				if (cn == 63)
 				{
 					pl.SetPlayerMaguroFly(true);
 				}
@@ -803,7 +825,7 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 				{
 					pl.Setplayer_ClearFlg(true);
 				}
-				if (cn == CHIP_CLEARTRANSITION - 1)
+				if (cn == CHIP_CLEARTRANSITION - 1 || cn == 58)
 				{
 					pl.Setplayer_ClearTransitionFlg(true);
 				}
@@ -823,7 +845,7 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 						pl.SetPlayerPos(Vector2(3600, 458));
 					}
 				}
-				if (cn == 57)
+				if (cn == 63)
 				{
 					pl.SetPlayerMaguroFly(true);
 				}
@@ -833,6 +855,27 @@ bool CStage::Collision(CRectangle r, float& ox, float& oy, bool& og, bool& dead,
 	}
 
 	return re;
+
+}
+
+void CStage::ExplotionCastle()
+{
+	for (int y = 1; y < 7; y++)
+	{
+		for (int x = 294; x < 300; x++)
+		{
+			if (stage_pChipData[y * stage_XCount + x] == 58)
+			{
+				continue;
+			}
+			stage_pChipData[y * stage_XCount + x] = 58;
+		}
+	}
+	if (!stage_ExplosionSE.IsPlay())
+	{
+		stage_ExplosionSE.Play();
+	}
+	
 
 }
 

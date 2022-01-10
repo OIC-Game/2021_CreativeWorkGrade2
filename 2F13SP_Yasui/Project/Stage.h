@@ -46,11 +46,9 @@ private:
 	CSoundBuffer	stage_BlockAttackSE;
 	CSoundBuffer	stage_BlockDestroySE;
 
-	CSoundBuffer	stage_MarioJumpSE;
-	CSoundBuffer	stage_MarioDeadSE;
-	CSoundBuffer	stage_MarioChangeSE;
 	CSoundBuffer	stage_MarioFireSE;
 	CSoundBuffer    stage_MarioSE[MARIOSOUND_COUNT];
+	CSoundBuffer	stage_ExplosionSE;
 
 
 
@@ -80,6 +78,8 @@ public:
 	float GetScrollY() { return stage_Scroll.y; };
 	int GetEnemyCount() { return stage_EnemyCount; }
 	int GetItemCount() { return stage_ItemCount; }
+
+	void ExplotionCastle();
 	
 };
 

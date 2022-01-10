@@ -46,6 +46,9 @@ void CItem::Initialize(float px, float py, int type,int stageState) {
 	item_ReverseFlg = false;
 	item_TopReverseFlg = false;
 	item_MaguroFlyFlg = false;
+	item_AppearTime = 0;
+	item_EffectEndFlg = false;
+	item_MaguroExplosionFlg = false;
 	switch (item_Type)
 	{
 		case ITEM_MUSH:
@@ -164,7 +167,10 @@ void CItem::Initialize(float px, float py, int type,int stageState) {
 		{
 			item_Move.x = 0;
 			item_ReverseFlg = true;
-			
+			if (stageState == STAGESTATE_SKY)
+			{
+				item_Move.x = 5;//2;
+			}
 
 			break;
 		}
@@ -263,6 +269,63 @@ void CItem::Update(float wx,float wy) {
 			{
 				item_Move.y -= 0.5f;
 			}
+			else if (item_StageState == STAGESTATE_SKY)
+			{
+				if (item_EffectEndFlg)
+				{
+					item_AppearTime--;
+					if(item_AppearTime <= 0)
+					{
+						item_Show = false;
+						
+					}
+				}
+				if (item_Position.x > 1500 && item_Position.x < 3200)
+				{
+					if (item_Position.y > 128)
+					{
+						item_Move.y = -2.5f;
+					}
+					else
+					{
+						item_Move.y = 0;
+					}
+				}
+				else if (item_Position.x > 4200 && item_Position.x < 6500)
+				{
+					if (item_Position.y < 450)
+					{
+						item_Move.y = 2.5f;
+					}
+					else
+					{
+						item_Move.y = 0;
+					}
+				}
+				if (item_Position.x > 8200)
+				{
+					if (item_Position.y > 128)
+					{
+						item_Move.y -= 0.5f;
+					}
+					else
+					{
+						item_Move.y = 0;
+						item_Move.x += 0.5f;
+					}
+				}
+
+
+				if (item_Position.x > 9408 && !item_EffectEndFlg)
+				{
+					item_EndEffect = item_pEffectManager->Start(Vector2(item_Position.x + 150, item_Position.y - 10), EFFECT_EXPLOSITON, 5.0f);
+					item_AppearTime = 10;
+					item_Move = Vector2(0, 0);
+					item_EffectEndFlg = true;
+					item_MaguroExplosionFlg = true;
+				}
+				 
+			}
 
 
 			item_Position.x += item_Move.x;
@@ -328,7 +391,7 @@ void CItem::CollisionStage(float ox, float oy) {
  */
 void CItem::Render(float wx, float wy) {
 	//非表示
-	if (!item_Show)
+	if (!item_Show || item_EffectEndFlg)
 	{
 		return;
 	}
@@ -396,4 +459,73 @@ void CItem::Release(void) {
 void CItem::BlockJump(bool jumpFlg)
 {
 	item_BlockJump = jumpFlg;
+}
+
+void CItem::CollisionMaguro(CRectangle r,Vector2& offset, bool& jumpFlg, Vector2& addPos)
+{
+
+	CRectangle itemRect = GetRect();
+
+	
+	CRectangle grec = r;
+	grec.Top = grec.Bottom;
+	grec.Bottom = grec.Top + 1;
+	grec.Expansion(-6, 0);
+	if (itemRect.CollisionRect(grec)) {
+		jumpFlg = true;
+	}
+	//当たり判定用のキャラクタ矩形
+	//下で範囲を限定した専用の矩形を作成する
+	CRectangle bottomRect = r;
+	bottomRect.Top = bottomRect.Bottom - 1;
+	bottomRect.Expansion(-6, 0);
+	//下と当たり判定
+	if (itemRect.CollisionRect(bottomRect)) {
+		//下の埋まりなのでチップ上端から矩形の下端の値を引いた値が埋まりの値
+		//ボトムの矩形を追加しているのでその分だけマイナス
+		offset.y += itemRect.Top - (bottomRect.Bottom - PLAYER_ADD_BUTTOMRECT);
+		r.Top += itemRect.Top - bottomRect.Bottom;
+		r.Bottom += itemRect.Top - bottomRect.Bottom;
+		addPos += item_Move;
+	}
+	//当たり判定用のキャラクタ矩形
+	//上で範囲を限定した専用の矩形を作成する
+	CRectangle topRect = r;
+	topRect.Bottom = topRect.Top + 1;		//上の矩形は下側を上と同じ値にする
+	topRect.Expansion(-6, 0);				//横の範囲を少し狭める
+	//上と当たり判定
+	if (itemRect.CollisionRect(topRect)) {
+
+		//上の埋まりなのでチップ下端から矩形の上の値を引いた値が埋まりの値
+		//ボトムの矩形を追加しているのでその分だけマイナス
+		offset.y += (bottomRect.Bottom - PLAYER_ADD_BUTTOMRECT) - topRect.Top;
+		r.Top += itemRect.Bottom - topRect.Top;
+		r.Bottom += itemRect.Bottom - topRect.Top;
+		addPos += item_Move;
+	}
+	//当たり判定用のキャラクタ矩形
+	//左、右それぞれで範囲を限定した専用の矩形を作成する
+	CRectangle leftRect = r;
+	leftRect.Right = leftRect.Left + 1;		//左の矩形は右側を左と同じ値にする
+	leftRect.Expansion(0, -6);			//縦の範囲を少し狭める
+	CRectangle rightRect = r;
+	rightRect.Left = rightRect.Right - 1;		//右の矩形は左側を右と同じ値にする
+	rightRect.Expansion(0, -6);			//縦の範囲を少し狭める
+	//左と当たり判定
+	if (itemRect.CollisionRect(leftRect)) {
+
+		offset.x += itemRect.Right - leftRect.Left;
+		r.Left += itemRect.Right - leftRect.Left;
+		r.Right += itemRect.Right - leftRect.Left;
+
+	}
+	//右と当たり判定
+	else if (itemRect.CollisionRect(rightRect)) {
+
+		offset.x += itemRect.Left - rightRect.Right;
+		r.Left += itemRect.Left - rightRect.Right;
+		r.Right += itemRect.Left - rightRect.Right;
+	}
+
+
 }

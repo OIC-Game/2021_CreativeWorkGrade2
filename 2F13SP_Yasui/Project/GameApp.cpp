@@ -35,9 +35,9 @@ MofBool CGameApp::Initialize(void){
 	
 	CUtilities::SetCurrentDirectory("Resource");
 	bossWarpFlg = false;
-	stage_number = 1;
+	stage_number = 2;
 	g_pSceneBase = new CTitle;
-	g_pSceneBase->SetStageNumber(1);
+	g_pSceneBase->SetStageNumber(2);
 	g_pSceneBase->Load();
 	g_pSceneBase->Initialize();
 	

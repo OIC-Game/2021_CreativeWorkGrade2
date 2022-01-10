@@ -1,6 +1,7 @@
 #pragma once
 #include	"Mof.h"
 #include	"GlobalDefine.h"
+#include	"EffectManager.h"
 
 
 	//ƒAƒCƒeƒ€Ží—Þ—ñ‹“
@@ -24,12 +25,18 @@ private:
 	bool					item_Show;
 	bool					item_BlockJump;
 	CRectangle				item_SrcRect;
+	float					item_AppearTime;
+	bool					item_EffectEndFlg;
 	bool					item_Appear;
 	int						item_CoinCount;
 	bool					item_ReverseFlg;
 	bool					item_TopReverseFlg;
 	bool					item_MaguroFlyFlg;
 	int						item_StageState;
+	CEffectManager*			item_pEffectManager;
+	CEffect*					item_EndEffect;
+	bool					item_MaguroExplosionFlg;
+
 
 public:
 	CItem();
@@ -50,5 +57,8 @@ public:
 	bool GetCoinCount(void) { return item_CoinCount; }
 	void SetCoinCount(int coinCount) { item_CoinCount += coinCount; }
 	void SetMaguroFly(bool isFly) { item_MaguroFlyFlg = isFly; }
+	void CollisionMaguro(CRectangle r,Vector2& offset,bool& jumpFlg,Vector2& addPos);
+	void SetEffectManager(CEffectManager* pManager) { item_pEffectManager = pManager; }
+	bool GetMaguroExplosion() { return item_MaguroExplosionFlg; }
 };
 

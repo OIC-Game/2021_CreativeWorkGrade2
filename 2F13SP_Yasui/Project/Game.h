@@ -7,6 +7,8 @@
 #include	<array>
 #include	"SceneBase.h"
 #include	"GlobalDefine.h"
+#include	"EffectManager.h"
+
 class CGame : public CSceneBase{
 private:
 	CSoundBuffer	game_BGM;
@@ -32,6 +34,8 @@ private:
 	bool			game_ab;
 	bool			game_MarioFireSEFlg;
 	int				game_StageState;
+
+	CEffectManager	game_EffectManager;
 
 
 	std::array<const char*, 2 >stagePathArray;

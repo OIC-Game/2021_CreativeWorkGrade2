@@ -107,6 +107,7 @@ void CEnemy::Initialize(float px, float py, int type,int stageState)
 	lastFire = false;
 	hipDropCount = 0;
 	enemy_sinMove = 0.0f;
+	enemy_DamageWait = 0;
 
 	//敵のスピードや当たり判定サイズ設定＆アニメーション設定
 	EnemyInitialize();
@@ -189,7 +190,10 @@ void CEnemy::Update(float wx,float wy)
 	}
 	case ENEMY_HUGEMUSH:
 	{
-		
+		if (enemy_DamageWait > 0)
+		{
+			enemy_DamageWait--;
+		}
 		if (enemy_Motion.GetMotionNo() == HUGEMOTION_DAMAGEMOVE)
 		{
 			if (CUtilities::Random(0, 10) > 5)
@@ -969,7 +973,7 @@ void CEnemy::MarioActionModeDash()
 		one = true;
 	}
 	//ブレーキ
-	if (enemy_Position.x > 7080 && enemy_Move.x > 0 && one)
+	if (enemy_Position.x > 12975 && enemy_Move.x > 0 && one)
 	{
 		enemy_Move.x = 0;
 		if (enemy_Move.x <= 10)
@@ -993,7 +997,7 @@ void CEnemy::MarioActionModeDash()
 		}
 
 	}
-	else if (enemy_Position.x < 6220 && enemy_Move.x < 0 && one)
+	else if (enemy_Position.x < 12110 && enemy_Move.x < 0 && one)
 	{
 		enemy_Move.x = 0;
 		if (enemy_Move.x >= -10)
@@ -1543,7 +1547,12 @@ void CEnemy::MarioActionModeMove()
 
 void CEnemy::Damage()
 {
+	if (enemy_DamageWait > 0)
+	{
+		return;
+	}
 	enemy_HP--;
+	enemy_DamageWait = 10;
 	if (enemy_Type == ENEMY_HUGEMUSH)
 	{
 		if (enemy_HP <= 1)

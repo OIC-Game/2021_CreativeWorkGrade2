@@ -77,6 +77,7 @@ private:
 	int								hipDropCount;
 
 	float							enemy_sinMove;
+	int							enemy_DamageWait;
 	
 
 	

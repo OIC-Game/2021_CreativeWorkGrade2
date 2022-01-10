@@ -88,6 +88,15 @@ bool CGame::Load(void)
 		g_Stage.Load("Stage2.txt");
 		break;
 	}
+	case STAGE_3_1:
+	{
+		if (!game_BGM.Load("BGM.mp3"))
+		{
+			return false;
+		}
+		g_Stage.Load("Stage3.txt");
+		break;
+	}
 	case STAGE_LAST:
 	{
 		g_Stage.Load("Stage_Boss.txt");
@@ -139,6 +148,7 @@ bool CGame::Load(void)
 	//アイテムメモリ確保
 	m_ItemArray = new CItem[g_Stage.GetItemCount()];
 
+	game_EffectManager.Load();
 
 	return true;
 }
@@ -162,8 +172,14 @@ void CGame::Initialize(void) {
 	case STAGE_2_1:
 	{
 		game_StageState = STAGESTATE_WATER;
-		//game_PlayerInitializePosition = Vector2(50, 150);
-		game_PlayerInitializePosition = Vector2(6100, 450);
+		game_PlayerInitializePosition = Vector2(50, 150);
+		//game_PlayerInitializePosition = Vector2(6100, 450);
+		break;
+	}
+	case STAGE_3_1:
+	{
+		game_StageState = STAGESTATE_SKY;
+		game_PlayerInitializePosition = Vector2(140, 420);
 		break;
 	}
 	case STAGE_LAST:
@@ -233,6 +249,11 @@ void CGame::Initialize(void) {
 	game_tempPlayerPositionY = 0.0f;
 	game_playMarioSEFlg = false;
 	game_ab = false;
+	game_EffectManager.Initialize();
+	for (int i = 0; i < g_Stage.GetItemCount(); i++)
+	{
+		m_ItemArray[i].SetEffectManager(&game_EffectManager);
+	}
 
 }
 
@@ -380,6 +401,10 @@ void CGame::Update(void) {
 			m_ItemArray[i].SetMaguroFly(g_Player.GetPlayerMaguroFly());
 		}
 		m_ItemArray[i].Update(g_Stage.GetScrollX(), g_Stage.GetScrollY());
+		if (m_ItemArray[i].GetType() == ITEM_BIG_MAGURO && m_ItemArray[i].GetMaguroExplosion() && !m_ItemArray[i].GetShow())
+		{
+			g_Stage.ExplotionCastle();
+		}
 		float ox = 0, oy = 0;
 		jumpFlg = false;
 		magmaDead = false;
@@ -387,6 +412,7 @@ void CGame::Update(void) {
 		{
 			continue;
 		}
+		
 		if (g_Stage.Collision(m_ItemArray[i].GetRect(), ox, oy,og,enemyDead,jumpFlg,g_Player,magmaDead))
 		{
 			if (magmaDead)
@@ -424,6 +450,7 @@ void CGame::Update(void) {
 		g_Player.Setplayer_DeadFlg(true);
 	}
 
+	game_EffectManager.Update();
 
 	//連続で敵を倒し中、途中で地面に着いたとき、敵の死亡カウントを0にする
 	if (!g_Player.Getplayer_JumpFlg() && g_Player.Getplayer_FallFlg())
@@ -570,6 +597,7 @@ void CGame::Render(void) {
 	{
 		m_EnemyArray[i].Render(g_Stage.GetScrollX(), g_Stage.GetScrollY());
 	}
+	game_EffectManager.Render(Vector2(g_Stage.GetScrollX(), g_Stage.GetScrollY()));
 	CGraphicsUtilities::RenderString(300, 50, "COIN");
 	CGraphicsUtilities::RenderString(100, 50, "%.6d", score);
 	CGraphicsUtilities::RenderString(800, 50, "%.3d", (int)game_Time);
@@ -660,6 +688,7 @@ void CGame::Release(void)
 		game_BGM.Release();
 		break;
 	}
+	game_EffectManager.Release();
 	
 	//SE解放
 	game_GameOverSE.Release();

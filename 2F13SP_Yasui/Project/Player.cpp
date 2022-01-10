@@ -12,6 +12,7 @@ extern	int		getScore;
 extern	int		scoreDesplayTime;
 extern	int		enemyDeadCount = 0;
 extern  int     getCoinCount;
+extern	int		stage_number;
 
 
 
@@ -175,12 +176,19 @@ void CPlayer::Update(void)
 		player_Move = 0;
 		player_Position.x = 0;
 	}
-	if (player_Position.x > 7500 && !player_BossClearFlg)
+	if (player_Position.x > 13500 && !player_BossClearFlg && stage_number == STAGE_LAST)
 	{
 		
 		player_BossClearFlg = true;
 	}
-	if (player_NowStageState == STAGESTATE_WATER)
+	if (stage_number == STAGE_2_1)
+	{
+		if (player_Position.y > 980)
+		{
+			player_DeadFlg = true;
+		}
+	}
+	else if (stage_number == STAGE_3_1)
 	{
 		if (player_Position.y > 980)
 		{
@@ -192,10 +200,10 @@ void CPlayer::Update(void)
 	if (!player_DeadFlg && !player_ClearFlg && !player_BossClearFlg)
 	{
 		
-		if (player_WarpFlg && player_Position.x < 6000)
+		if (player_WarpFlg && !player_tmpWarpFlg)
 		{
 			player_tmpWarpFlg = player_WarpFlg;
-			player_Position.x = 6400;
+			player_Position.x = 12400;
 			player_Position.y = 500;
 		}
 
@@ -939,9 +947,32 @@ bool CPlayer::CollisionItem(CItem& item)
 	//アイテムの矩形と自分の矩形で当たり判定
 	CRectangle playerRect = GetRectPlayer();
 	CRectangle itemRect = item.GetRect();
+	CRectangle playerAddRect = playerRect;
+	playerAddRect.Bottom += PLAYER_ADD_BUTTOMRECT;
+	if (item.GetType() == ITEM_BIG_MAGURO)
+	{
+		if (player_NowStageState == STAGESTATE_WATER)
+		{
+			return false;
+		}
+		if (playerAddRect.CollisionRect(itemRect))
+		{
+			Vector2 offset(0, 0);
+			Vector2 addPos(0, 0);
+			bool	og = false;
+			item.CollisionMaguro(playerAddRect, offset, og, addPos);
+			CollisionStage(offset.x, offset.y);
+			player_Position += addPos;
+			FallCheck(og);
+			return true;
+		}
+	}
 	if (playerRect.CollisionRect(itemRect))
 	{
-		item.SetShow(false);
+		if (item.GetType() != ITEM_BIG_MAGURO)
+		{
+			item.SetShow(false);
+		}
 		switch (item.GetType())
 		{
 		case ITEM_MUSH:
@@ -982,6 +1013,7 @@ bool CPlayer::CollisionItem(CItem& item)
 			return true;
 		
 	}
+	
 	return false;
 }
 

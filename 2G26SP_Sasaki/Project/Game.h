@@ -1,37 +1,31 @@
 //#pragma once
-//#include	"Mof.h"
+//
 //#include    "Player.h"
 //#include    "Stage.h"
 //#include    "Enemy.h"
 //#include    "Stage1.h"
 //
-//#define ENEMY_COUNT 20
+////敵の最大数
+//#define ENEMY_COUNT 40
 //
-//class CGame
+//class Game
 //{
 //private:
+//
 //	//プレイヤー
 //	CPlayer     g_Player;
-//
+//	
 //	//ステージ
 //	CStage     g_Stage;
-//
-//	//CTexture m_EnemyTexture;
+//	
 //	CEnemy   g_EnemyArray[ENEMY_COUNT];
-//
-//	bool g_bclear = false;
-//
-//	//デバッグ表示フラグ
-//	bool g_bDebug = false;
+//	
+//	bool g_bclear;
 //
 //public:
-//	CGame();
-//	~CGame();
+//	void Initialize();
+//	void Update();
 //
-//	void Initialize();				
-//	void Update();						
-//	void Render();						
-//	void Release();
 //
 //};
 //

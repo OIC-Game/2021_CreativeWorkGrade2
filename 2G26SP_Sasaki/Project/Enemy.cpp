@@ -379,9 +379,7 @@ void CEnemy::BossMoveBlackRight()
 		m_SpeedY = -ENEMY_MOVESPEED * 0.5;
 	}
 
-
 	//•Ç’e‚Ì‘å‚«‚³
-
 	ShotScaleX += freeSecond;
 	if (ShotScaleY < 0.7)
 		ShotScaleY -= Secondcount * 0.2;
@@ -520,12 +518,6 @@ void CEnemy::ShotSelect(int j)
 		}
 	}
 }
-
-//0 + 8
-//1 + 7
-//2 + 6
-//3 + 5
-//4 + 4
 
 void CEnemy::DownBullet(int j)
 {

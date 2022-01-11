@@ -49,6 +49,7 @@ void CItem::Initialize(float px, float py, int type,int stageState) {
 	item_AppearTime = 0;
 	item_EffectEndFlg = false;
 	item_MaguroExplosionFlg = false;
+	item_MoveTime = 0.0f;
 	switch (item_Type)
 	{
 		case ITEM_MUSH:
@@ -125,6 +126,20 @@ void CItem::Initialize(float px, float py, int type,int stageState) {
 			item_Motion.Create(anime, 1);
 			break;
 		}
+		case ITEM_PLANE:
+		{
+			//アニメーションを作成
+			SpriteAnimationCreate anime[] = {
+				{
+					"飛行機",
+					0,0,
+					128,64,
+					FALSE,{{5,0,0}}
+				},
+			};
+			item_Motion.Create(anime, 1);
+			break;
+		}
 		default :
 		{
 			//アニメーションを作成
@@ -169,9 +184,14 @@ void CItem::Initialize(float px, float py, int type,int stageState) {
 			item_ReverseFlg = true;
 			if (stageState == STAGESTATE_SKY)
 			{
-				item_Move.x = 5;//2;
+				item_Move.x = 2;
 			}
 
+			break;
+		}
+		case ITEM_PLANE:
+		{
+			item_Move.x = -4;
 			break;
 		}
 		default:
@@ -280,39 +300,50 @@ void CItem::Update(float wx,float wy) {
 						
 					}
 				}
-				if (item_Position.x > 1500 && item_Position.x < 3200)
+
+				item_MoveTime += CUtilities::GetFrameSecond();
+
+				//Y位置をキーフレームで変化
+				KeyFrame keyposY[] = {
+					{450,	5.0f},
+					{600,	10.0f},
+					{400,	15.0f},
+					{200,	20.0f},
+					{300,	25.0f},
+					{300,	30.0f},
+					{300,	68.5f},
+					{128,	69.0f},
+				};
+
+				float py = KeyFrameAnimation(keyposY, _countof(keyposY), item_MoveTime);
+
+				item_Position.y = py;
+
+				//if (item_Position.x > 1500 && item_Position.x < 3200)
+				//{
+				//	if (item_Position.y > 128)
+				//	{
+				//		item_Move.y = -2.5f;
+				//	}
+				//	else
+				//	{
+				//		item_Move.y = 0;
+				//	}
+				//}
+				//else if (item_Position.x > 4200 && item_Position.x < 6500)
+				//{
+				//	if (item_Position.y < 450)
+				//	{
+				//		item_Move.y = 2.5f;
+				//	}
+				//	else
+				//	{
+				//		item_Move.y = 0;
+				//	}
+				//}
+				if (item_Position.x > 8250)
 				{
-					if (item_Position.y > 128)
-					{
-						item_Move.y = -2.5f;
-					}
-					else
-					{
-						item_Move.y = 0;
-					}
-				}
-				else if (item_Position.x > 4200 && item_Position.x < 6500)
-				{
-					if (item_Position.y < 450)
-					{
-						item_Move.y = 2.5f;
-					}
-					else
-					{
-						item_Move.y = 0;
-					}
-				}
-				if (item_Position.x > 8200)
-				{
-					if (item_Position.y > 128)
-					{
-						item_Move.y -= 0.5f;
-					}
-					else
-					{
-						item_Move.y = 0;
-						item_Move.x += 0.5f;
-					}
+					item_Move.x += 0.5f;
 				}
 
 
@@ -327,6 +358,13 @@ void CItem::Update(float wx,float wy) {
 				 
 			}
 
+
+			item_Position.x += item_Move.x;
+			item_Position.y += item_Move.y;
+			break;
+		}
+		case ITEM_PLANE:
+		{
 
 			item_Position.x += item_Move.x;
 			item_Position.y += item_Move.y;
@@ -353,7 +391,7 @@ void CItem::Update(float wx,float wy) {
  * [in]			oy					Y埋まり量
  */
 void CItem::CollisionStage(float ox, float oy) {
-	if (item_Type == ITEM_FOAM_MUSH || item_Type == ITEM_FOAM_COIN || item_Type == ITEM_BIG_MAGURO)
+	if (item_Type == ITEM_FOAM_MUSH || item_Type == ITEM_FOAM_COIN || item_Type == ITEM_BIG_MAGURO || item_Type == ITEM_PLANE)
 	{
 		return;
 	}

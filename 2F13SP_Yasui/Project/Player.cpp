@@ -960,16 +960,34 @@ bool CPlayer::CollisionItem(CItem& item)
 			Vector2 offset(0, 0);
 			Vector2 addPos(0, 0);
 			bool	og = false;
-			item.CollisionMaguro(playerAddRect, offset, og, addPos);
-			CollisionStage(offset.x, offset.y);
-			player_Position += addPos;
-			FallCheck(og);
+			switch (item.GetType())
+			{
+			case ITEM_BIG_MAGURO:
+			{
+				item.CollisionMaguro(playerAddRect, offset, og, addPos);
+				CollisionStage(offset.x, offset.y);
+				player_Position += addPos;
+				FallCheck(og);
+				break;
+			}
+			case ITEM_PLANE:
+			{
+				item.CollisionMaguro(playerAddRect, offset, og, addPos);
+				CollisionStage(offset.x, offset.y);
+				player_Position += addPos;
+				FallCheck(og);
+				break;
+			}
+			default:
+				break;
+			}
+			
 			return true;
 		}
 	}
 	if (playerRect.CollisionRect(itemRect))
 	{
-		if (item.GetType() != ITEM_BIG_MAGURO)
+		if (item.GetType() != ITEM_BIG_MAGURO && item.GetType() != ITEM_PLANE)
 		{
 			item.SetShow(false);
 		}

@@ -40,7 +40,7 @@ enum tag_SCENENO {
 //無敵時間（サイズ変更時）
 #define		PLAYER_INVINCIBLE 90
 //移動する床用追加矩形
-#define		PLAYER_ADD_BUTTOMRECT 10
+#define		PLAYER_ADD_BUTTOMRECT 8
 
 
 
@@ -98,7 +98,7 @@ enum tag_STAGESTATE
 
 /*制限時間*/
 #define		GAME_TIMELIMIT 150
-#define		GAME_TIMELIMIT_BOSS 300
+#define		GAME_TIMELIMIT_BOSS 400
 
 /*スコア*/
 #define		SCORE_GETITEM 1000
@@ -109,3 +109,53 @@ enum tag_STAGESTATE
 //スコア表示時間
 #define		SCORE_DISPLAYTIME 60
 
+//時間と値のキーフレーム
+struct KeyFrame {
+	float		value;
+	float		time;
+};
+/**
+ * @brief		キーフレームの配列から現在の状態を求める
+ * @param[in]	keys		キーフレームの配列
+ * @param[in]	keyCount	キーフレームの配列の数
+ * @param[in]	t			現在の時間
+ * @return		時間[t]の時の状態
+ */
+static float KeyFrameAnimation(KeyFrame* keys, int keyCount, float t) {
+	//結果
+	float re = 0;
+	//スタートしていない
+	if (t < keys[0].time)
+	{
+		re = keys[0].value;
+	}
+	//ゴール済み
+	else if (t >= keys[keyCount - 1].time)
+	{
+		re = keys[keyCount - 1].value;
+	}
+	//間の位置を求める
+	else
+	{
+		for (int i = 1; i < keyCount; i++)
+		{
+			//キーの時間より時間が手前なら
+			if (t < keys[i].time)
+			{
+				//補間した値を計算する
+				//この区間の開始の状態
+				float start = keys[i - 1].value;
+				//この区間で変化する量
+				float cval = keys[i].value - keys[i - 1].value;
+				//この区間にかかる時間
+				float ctime = keys[i].time - keys[i - 1].time;
+				//この区間を進んだ時間
+				float now = t - keys[i - 1].time;
+				re = start + cval * (now / ctime);
+				break;
+			}
+		}
+	}
+	//結果を返す
+	return re;
+}

@@ -11,7 +11,7 @@
 		ITEM_FOAM_MUSH,				//泡キノコ
 		ITEM_FOAM_COIN,				//泡コイン
 		ITEM_BIG_MAGURO,			//巨大マグロ
-		ITEM_AIRPLANE,
+		ITEM_PLANE,
 		ITEM_PEACH,
 
 		ITEM_TYPECOUNT,
@@ -38,6 +38,8 @@ private:
 	CEffectManager*			item_pEffectManager;
 	CEffect*					item_EndEffect;
 	bool					item_MaguroExplosionFlg;
+
+	float					item_MoveTime;
 
 
 public:

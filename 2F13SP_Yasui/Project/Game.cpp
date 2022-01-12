@@ -90,7 +90,7 @@ bool CGame::Load(void)
 	}
 	case STAGE_3_1:
 	{
-		if (!game_BGM.Load("BGM.mp3"))
+		if (!game_BGM.Load("BGM3.mp3"))
 		{
 			return false;
 		}
@@ -118,7 +118,10 @@ bool CGame::Load(void)
 		break;
 	}
 	
-
+	if (!game_Font.Create(80, "MS ゴシック"))
+	{
+		return false;
+	}
 
 	//BGMロード
 	
@@ -142,7 +145,7 @@ bool CGame::Load(void)
 	{
 		return false;
 	}
-	if (game_EndSE.Load("End.mp3"))
+	if (!game_EndSE.Load("End.mp3"))
 	{
 		return false;
 	}
@@ -254,6 +257,7 @@ void CGame::Initialize(void) {
 	game_playMarioSEFlg = false;
 	game_ab = false;
 	game_GameEndFlg = false;
+	game_GameEndStrDispFlg = false;
 	game_EffectManager.Initialize();
 	for (int i = 0; i < g_Stage.GetItemCount(); i++)
 	{
@@ -311,7 +315,7 @@ void CGame::Update(void) {
 		//プレイヤーサイズが変化中の時動かなくする
 		if (g_Player.Getplayer_ChangeWaitFlg())
 		{
-			return;
+			break;
 		}
 		if (m_EnemyArray[i].GetType() == ENEMY_MARIO)
 		{
@@ -399,7 +403,7 @@ void CGame::Update(void) {
 		//プレイヤーサイズが変化中の時動かなくする
 		if (g_Player.Getplayer_ChangeWaitFlg())
 		{
-			return;
+			break;
 		}
 		if (m_ItemArray[i].GetType() == ITEM_BIG_MAGURO && g_Player.GetPlayerMaguroFly())
 		{
@@ -413,7 +417,7 @@ void CGame::Update(void) {
 		float ox = 0, oy = 0;
 		jumpFlg = false;
 		magmaDead = false;
-		if (m_ItemArray[i].GetType() == ITEM_FOAM_COIN || m_ItemArray[i].GetType() == ITEM_FOAM_MUSH || m_ItemArray[i].GetType() == ITEM_BIG_MAGURO)
+		if (m_ItemArray[i].GetType() == ITEM_FOAM_COIN || m_ItemArray[i].GetType() == ITEM_FOAM_MUSH || m_ItemArray[i].GetType() == ITEM_BIG_MAGURO || m_ItemArray[i].GetType() == ITEM_PLANE)
 		{
 			continue;
 		}
@@ -444,7 +448,7 @@ void CGame::Update(void) {
 			g_Player.CollisionItem(m_ItemArray[i]);
 	}
 	//タイマー処理
-	if (g_Player.Getplayer_DeadFlg() == false && g_Player.Getplayer_ClearFlg() == false)
+	if (g_Player.Getplayer_DeadFlg() == false && g_Player.Getplayer_ClearFlg() == false && g_Player.Getplayer_ChangeWaitFlg() == false && g_Player.GetBossClearFlg() == false)
 	{
 		//クリア&ゲームオーバーをしていないとき
 		game_Time -= 1 * CUtilities::GetFrameSecond();
@@ -454,7 +458,6 @@ void CGame::Update(void) {
 		game_Time = 0.0f;
 		g_Player.Setplayer_DeadFlg(true);
 	}
-
 	game_EffectManager.Update();
 
 	//連続で敵を倒し中、途中で地面に着いたとき、敵の死亡カウントを0にする
@@ -577,7 +580,7 @@ void CGame::Update(void) {
 			game_GameEndFlg = true;
 			game_EndSE.Play();
 		}
-		if (!game_GameEndFlg && game_EndSE.IsPlay())
+		if (game_GameEndFlg && !game_EndSE.IsPlay())
 		{
 			m_NextScene = SCENENO_TITLE;
 			stage_number = STAGE_1_1;
@@ -622,10 +625,24 @@ void CGame::Render(void) {
 		}
 	case STAGE_LAST:
 	{
+		if (game_EndSE.IsPlay() && game_GameEndFlg)
+		{
+			game_Font.RenderString(210, 150, "WHO ARE YOU?");
+			CGraphicsUtilities::RenderString(580, 440, "?");
+		}
 		CGraphicsUtilities::RenderString(600, 50, "BOSS");
 		break;
 	}
-
+	case STAGE_2_1:
+	{
+		CGraphicsUtilities::RenderString(600, 50, "２ー１");
+		break;
+	}
+	case STAGE_3_1:
+	{
+		CGraphicsUtilities::RenderString(600, 50, "３ー１");
+		break;
+	}
 	default:
 		break;
 	}
@@ -701,10 +718,12 @@ void CGame::Release(void)
 	}
 	game_EffectManager.Release();
 	
+	game_Font.Release();
 	//SE解放
 	game_GameOverSE.Release();
 	game_GameClearSE.Release();
 	game_MarioDeadSE.Release();
 	game_BossClearSE.Release();
 	game_EndSE.Release();
+	
 }

@@ -879,4 +879,23 @@ void CStage::ExplotionCastle()
 
 }
 
+void CStage::EndString()
+{
+	for (int y = 18; y < 23; y++)
+	{
+		for (int x = 423; x < 442; x++)
+		{
+			if (stage_pChipData[y * stage_XCount + x] == 57)
+			{
+				continue;
+			}
+			if (stage_pChipData[y * stage_XCount + x] == 0)
+			{
+				continue;
+			}
+			stage_pChipData[y * stage_XCount + x] = 0;
+		}
+	}
+}
+
 

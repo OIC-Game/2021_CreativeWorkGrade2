@@ -80,6 +80,7 @@ public:
 	int GetItemCount() { return stage_ItemCount; }
 
 	void ExplotionCastle();
+	void EndString();
 	
 };
 

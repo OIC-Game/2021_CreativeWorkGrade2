@@ -15,6 +15,7 @@
 		ENEMY_MAGURO,			//マグロ
 		ENEMY_IKA,				//イカ
 		ENEMY_KAZIKI,			//カジキ
+		ENEMY_MUSH_FLY,			//飛ぶキノコ
 
 		ENEMY_TYPECOUNT,
 	};

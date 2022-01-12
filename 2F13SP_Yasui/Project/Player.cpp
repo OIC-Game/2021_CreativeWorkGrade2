@@ -164,6 +164,8 @@ void CPlayer::Update(void)
 {
 	//プレイヤー死亡判定
 	DeadJudge();
+
+	
 	if (player_MaguroFlyFlg)
 	{
 		player_HideFlg = true;
@@ -383,6 +385,8 @@ void CPlayer::Update(void)
 		}
 
 	}
+
+	
 
 	//ダメージのインターバルを減らす
 	if (player_DamageWait > 0)
@@ -749,7 +753,7 @@ CRectangle CPlayer::GetRectTexture(void)
 */
 void CPlayer::CollisionStage(float ox, float oy)
 {
-
+	
 	//死亡フラグfalseの時当たり判定を行う
 	if (!player_DeadFlg && !player_ClearTransitionFlg)
 	{
@@ -887,6 +891,10 @@ bool CPlayer::CollisionEnemy(CEnemy & ene)
 			}
 			else
 			{
+				if (ene.GetType() == ENEMY_MUSH_FLY)
+				{
+					player_Jump = -(PLAYER_ENEMYSTEP_JUMPSPEED + 3);
+				}
 				ene.Dead(true);
 				score += SCORE_ENEMYSTEP;
 				if (player_NowStageState == STAGESTATE_WATER)
@@ -963,13 +971,54 @@ bool CPlayer::CollisionItem(CItem& item)
 			item.CollisionMaguro(playerAddRect, offset, og, addPos);
 			CollisionStage(offset.x, offset.y);
 			player_Position += addPos;
-			FallCheck(og);
+			if (og)
+			{
+				player_JumpFlg = false;
+				player_CheckGround = true;
+				if (player_ChangeBig)
+				{
+					player_Motion.ChangeMotion(MOTION_BIG_WAIT, FALSE);
+				}
+				else
+				{
+					player_Motion.ChangeMotion(MOTION_SMALL_WAIT, FALSE);
+				}
+			}
+			
+			return true;
+		}
+	}
+	if (item.GetType() == ITEM_PLANE)
+	{
+		if (playerAddRect.CollisionRect(itemRect))
+		{
+			Vector2 offset(0, 0);
+			Vector2 addPos(0, 0);
+			bool	og = false;
+
+			item.CollisionMaguro(playerAddRect, offset, og, addPos);
+			CollisionStage(offset.x, offset.y);
+			player_Position += addPos;
+			if (og)
+			{
+				player_JumpFlg = false;
+				player_CheckGround = true;
+				if (player_ChangeBig)
+				{
+					player_Motion.ChangeMotion(MOTION_BIG_WAIT, FALSE);
+				}
+				else
+				{
+					player_Motion.ChangeMotion(MOTION_SMALL_WAIT, FALSE);
+				}
+			}
+
 			return true;
 		}
 	}
 	if (playerRect.CollisionRect(itemRect))
 	{
-		if (item.GetType() != ITEM_BIG_MAGURO)
+		if (item.GetType() != ITEM_BIG_MAGURO && item.GetType() != ITEM_PLANE)
 		{
 			item.SetShow(false);
 		}

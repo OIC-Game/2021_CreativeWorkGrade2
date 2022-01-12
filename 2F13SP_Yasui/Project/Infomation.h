@@ -4,7 +4,7 @@
 class CInfomation : public CSceneBase
 {
 private:
-
+	CTexture m_Texture;
 public:
 	CInfomation();
 	~CInfomation();

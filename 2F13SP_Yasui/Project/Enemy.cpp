@@ -164,7 +164,7 @@ void CEnemy::Update(float wx,float wy)
 	}
 
 	//d—Íˆ—
-	if (stage_number != STAGE_2_1)
+	if (stage_number != STAGE_2_1 && enemy_Type != ENEMY_MUSH_FLY)
 	{
 		enemy_Move.y += ENEMY_GRAVITY;
 		if (enemy_Move.y >= 20.0f)
@@ -250,6 +250,14 @@ void CEnemy::Update(float wx,float wy)
 		enemy_Move.y = sin(enemy_sinMove) ;
 		break;
 	}
+	case ENEMY_MUSH_FLY:
+	{
+		enemy_sinMove += CUtilities::GetFrameSecond() * 2;
+
+			enemy_Move.y = sin(enemy_sinMove) * 3.0f;
+
+		break;
+	}
 	default:
 		break;
 	}
@@ -265,7 +273,7 @@ void CEnemy::Update(float wx,float wy)
 	}
 	else
 	{
-		if (stage_number == STAGE_2_1)
+		if (stage_number == STAGE_2_1 || stage_number == STAGE_3_1)
 		{
 			enemy_Position.y += 4;
 		}
@@ -552,6 +560,11 @@ void CEnemy::Dead(bool bDead)
 		case ENEMY_KAZIKI:
 			enemy_Motion.ChangeMotion(FISHMOTION_DEAD);
 			break;
+		case ENEMY_MUSH_FLY:
+		{
+			enemy_Motion.ChangeMotion(MUSHMOTION_DEAD);
+			break;
+		}
 		default:
 			break;
 		}
@@ -1611,7 +1624,6 @@ void CEnemy::EnemyInitialize()
 		enemy_RectOffsetSize.x = 5;
 		enemy_RectOffsetSize.y = 5;
 		enemy_Reverse = false;
-		//enemy_HP = 2;
 		break;
 	}
 	case ENEMY_IKA:
@@ -1619,7 +1631,6 @@ void CEnemy::EnemyInitialize()
 		enemy_Move.x = -1.0f;
 		enemy_RectOffsetSize.x = 5;
 		enemy_RectOffsetSize.y = 5;
-		//enemy_HP = 2;
 		break;
 	}
 	case ENEMY_KAZIKI:
@@ -1628,7 +1639,13 @@ void CEnemy::EnemyInitialize()
 		enemy_RectOffsetSize.x = 5;
 		enemy_RectOffsetSize.y = 5;
 		enemy_Reverse = false;
-		//enemy_HP = 2;
+		break;
+	}
+	case ENEMY_MUSH_FLY:
+	{
+		enemy_Move.x = 0;
+		enemy_RectOffsetSize.x = 0;
+		enemy_RectOffsetSize.y = 0;
 		break;
 	}
 	default:
@@ -1881,6 +1898,25 @@ void CEnemy::EnemyInitialize()
 			},
 		};
 		enemy_Motion.Create(anime, FISHMOTION_COUNT);
+		break;
+	}
+	case ENEMY_MUSH_FLY:
+	{
+		SpriteAnimationCreate anime[] = {
+			{
+				"ˆÚ“®",
+				0,0,
+				32,32,
+				TRUE,{{10,0,0},{15,1,0}}
+			},
+			{
+				"Ž€–S",
+				0,32,
+				32,32,
+				FALSE,{{5,0,0}}
+			},
+		};
+		enemy_Motion.Create(anime, MUSHMOTION_COUNT);
 		break;
 	}
 	default:

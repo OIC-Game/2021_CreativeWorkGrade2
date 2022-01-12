@@ -17,6 +17,7 @@ private:
 	CSoundBuffer	game_GameOverSE;
 	CSoundBuffer	game_GameClearSE;
 	CSoundBuffer	game_EndSE;
+	CFont			game_Font;
 	bool			game_playSoundFlg;
 	bool			game_playBGMFlg;
 	CEnemy*			m_EnemyArray;
@@ -36,6 +37,7 @@ private:
 	bool			game_MarioFireSEFlg;
 	int				game_StageState;
 	bool			game_GameEndFlg;
+	bool			game_GameEndStrDispFlg;
 
 	CEffectManager	game_EffectManager;
 

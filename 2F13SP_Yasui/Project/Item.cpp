@@ -125,6 +125,20 @@ void CItem::Initialize(float px, float py, int type,int stageState) {
 			item_Motion.Create(anime, 1);
 			break;
 		}
+		case ITEM_PEACH:
+		{
+			//アニメーションを作成
+			SpriteAnimationCreate anime[] = {
+				{
+					"ピーチ",
+					0,0,
+					32,48,
+					FALSE,{{5,0,0}}
+				},
+			};
+			item_Motion.Create(anime, 1);
+			break;
+		}
 		default :
 		{
 			//アニメーションを作成

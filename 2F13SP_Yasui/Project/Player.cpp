@@ -203,7 +203,7 @@ void CPlayer::Update(void)
 		if (player_WarpFlg && !player_tmpWarpFlg)
 		{
 			player_tmpWarpFlg = player_WarpFlg;
-			player_Position.x = 12400;
+			player_Position.x = 12200;
 			player_Position.y = 500;
 		}
 

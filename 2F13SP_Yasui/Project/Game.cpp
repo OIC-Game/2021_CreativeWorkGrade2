@@ -142,6 +142,10 @@ bool CGame::Load(void)
 	{
 		return false;
 	}
+	if (game_EndSE.Load("End.mp3"))
+	{
+		return false;
+	}
 
 	//“Gƒƒ‚ƒŠŠm•Û
 	m_EnemyArray = new CEnemy[g_Stage.GetEnemyCount()];
@@ -249,6 +253,7 @@ void CGame::Initialize(void) {
 	game_tempPlayerPositionY = 0.0f;
 	game_playMarioSEFlg = false;
 	game_ab = false;
+	game_GameEndFlg = false;
 	game_EffectManager.Initialize();
 	for (int i = 0; i < g_Stage.GetItemCount(); i++)
 	{
@@ -567,12 +572,18 @@ void CGame::Update(void) {
 	if (g_Player.GetBossClearTrantionFlg() == true)
 	{
 
-		if (!game_BossClearSE.IsPlay())
+		if (!game_BossClearSE.IsPlay() && !game_GameEndFlg)
+		{
+			game_GameEndFlg = true;
+			game_EndSE.Play();
+		}
+		if (!game_GameEndFlg && game_EndSE.IsPlay())
 		{
 			m_NextScene = SCENENO_TITLE;
 			stage_number = STAGE_1_1;
 			m_bEnd = true;
 		}
+			
 	}
 }
 
@@ -695,4 +706,5 @@ void CGame::Release(void)
 	game_GameClearSE.Release();
 	game_MarioDeadSE.Release();
 	game_BossClearSE.Release();
+	game_EndSE.Release();
 }

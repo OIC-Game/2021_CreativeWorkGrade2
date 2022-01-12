@@ -269,6 +269,10 @@ void CEnemy::Update(float wx,float wy)
 		{
 			enemy_Position.y += 4;
 		}
+		else if (enemy_Type == ENEMY_KAZIKI)
+		{
+			enemy_Position.y += 4;
+		}
 
 		//敵が叩いたブロックと同じ位置にいた時
 		if (enemy_DeadJump)

@@ -285,7 +285,7 @@ void CStage::Update(CPlayer& pl)
 	//座標が画面端によっている(角端から200pixel)場合スクロールを行って補正する。
 	if (stage_number == STAGE_LAST)
 	{
-		if (pl.Getplayer_PositionX() < 10752 && !pl.GetWarpFlg() && pl.Getplayer_PositionY() <= 1000)
+		if (stage_Scroll.x < 10572 && !pl.GetWarpFlg() && pl.Getplayer_PositionY() <= 1000)
 		{
 			if (prect.Left - stage_Scroll.x < 400) {
 				stage_Scroll.x -= 400 - (prect.Left - stage_Scroll.x);

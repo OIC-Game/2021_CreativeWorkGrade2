@@ -11,6 +11,8 @@
 		ITEM_FOAM_MUSH,				//泡キノコ
 		ITEM_FOAM_COIN,				//泡コイン
 		ITEM_BIG_MAGURO,			//巨大マグロ
+		ITEM_AIRPLANE,
+		ITEM_PEACH,
 
 		ITEM_TYPECOUNT,
 	};

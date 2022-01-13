@@ -21,17 +21,14 @@ bool CGame::Load(void) {
 
 	//プレイヤー素材読み込み
 	m_Player.Load();
-
-
 	//ステージの素材読み込み
 	m_Stage.Load("Stage1.txt");
-
-	
-	
 	//敵メモリ確保
 	m_EnemyArray = new CEnemy[m_Stage.GetEnemyCount()];
-	return true;
+	//アイテムメモリ確保
+	m_ItemArray = new CItem[m_Stage.GetItemCount()];
 
+	return true;
 	}
 
 
@@ -41,10 +38,9 @@ void CGame::Initialize(void) {
 
 	m_Player.Initialize();
 
-	m_Stage.Initialize(m_EnemyArray);
-
 	//ステージの状態初期化
-	m_Stage.Initialize(m_EnemyArray);
+	m_Stage.Initialize(m_EnemyArray,m_ItemArray);
+
 
 	GameBGM.Load("FantasyBGM.mp3");
 
@@ -79,6 +75,23 @@ void CGame::Update(void) {
 
 		float ox = 0, oy = 0;
 
+		//アイテムの更新
+		for (int i = 0; i < m_Stage.GetItemCount(); i++)
+		{
+			if (!m_ItemArray[i].GetShow())
+			{
+				continue;
+			}
+			m_ItemArray[i].Update();
+			float ox = 0, oy = 0;
+			if (m_Stage.Collision(m_ItemArray[i].GetRect(), ox, oy))
+			{
+				m_ItemArray[i].CollisionStage(ox, oy);
+			}
+		}
+
+
+
 
 		for (int i = 0; i < m_Stage.GetEnemyCount(); i++)
 		{
@@ -102,6 +115,12 @@ void CGame::Update(void) {
 
 				m_EnemyArray[i].Damage();
 			}
+		}
+
+
+		for (int i = 0; i < m_Stage.GetItemCount(); i++)
+		{
+			m_Player.CollisionItem(m_ItemArray[i]);
 		}
 
 		float ClearPosX= m_Player.GetPosX();
@@ -155,7 +174,9 @@ void CGame::Update(void) {
 }
 
 void CGame::Render(void) {
+	//ステージの描画
 	m_Stage.Render();
+	//プレイヤーの描画
 	m_Player.Render(m_Stage.GetScrollX(), m_Stage.GetScrollY());
 
 
@@ -164,6 +185,13 @@ void CGame::Render(void) {
 	{
 		m_EnemyArray[i].Render(m_Stage.GetScrollX(), m_Stage.GetScrollY());
 	}
+
+	//アイテムの描画
+	for (int i = 0; i < m_Stage.GetItemCount(); i++)
+	{
+		m_ItemArray[i].Render(m_Stage.GetScrollX(), m_Stage.GetScrollY());
+	}
+
 }
 
 void CGame::RenderDebug(void)
@@ -178,6 +206,12 @@ void CGame::RenderDebug(void)
 	for (int i = 0; i < m_Stage.GetEnemyCount(); i++)
 	{
 		m_EnemyArray[i].RenderDebug(m_Stage.GetScrollX(), m_Stage.GetScrollY());
+	}
+
+	//アイテムのデバッグ描画
+	for (int i = 0; i < m_Stage.GetItemCount(); i++)
+	{
+		m_ItemArray[i].RenderDebug(m_Stage.GetScrollX(), m_Stage.GetScrollY());
 	}
 }
 
@@ -194,6 +228,11 @@ void CGame::Release(void) {
 		m_EnemyArray = NULL;
 	}
 
+	if (m_ItemArray)
+	{
+		delete[] m_ItemArray;
+		m_ItemArray = NULL;
+	}
 
 }
 

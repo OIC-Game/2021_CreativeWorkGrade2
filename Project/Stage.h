@@ -2,6 +2,7 @@
 #include "mof.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Item.h"
 
 
 
@@ -23,6 +24,11 @@ private:
 	char*			m_pEnemyData;
 	int				m_EnemyCount;
 
+	int				m_ItemTextureCount;
+	CTexture*		m_pItemTexture;
+	char*			m_pItemData;
+	int				m_ItemCount;
+
 	#define			QuestionBlock	12
 	//#define			Pipe			7,8
 
@@ -30,7 +36,7 @@ public:
 	CStage();
 	~CStage();
 	bool Load(char* pName);
-	void Initialize(CEnemy* pEnemy);
+	void Initialize(CEnemy* pEnemy,CItem* pItem);
 	void Update(CPlayer& pl);
 	bool Collision(CRectangle r, float& ox, float& oy);
 	void Render(void);
@@ -39,6 +45,7 @@ public:
 	float GetScrollX(){return m_ScrollX;}
 	float GetScrollY(){return m_ScrollY;}
 	int GetEnemyCount() { return m_EnemyCount; }
+	int GetItemCount() { return m_ItemCount; }
 
 };
 

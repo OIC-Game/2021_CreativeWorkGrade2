@@ -406,6 +406,24 @@ void CPlayer::Damage(void)
 	m_Motion.ChangeMotion(MOTION_DAMAGE);
 }
 
+bool CPlayer::CollisionItem(CItem& itm)
+{
+	if (!itm.GetShow())
+	{
+		return false;
+	}
+
+	//アイテムの矩形と自分の矩形で当たり判定
+	CRectangle prec = GetRect();
+	CRectangle irec = itm.GetRect();
+	if (prec.CollisionRect(irec))
+	{
+		itm.SetShow(false);		
+	}
+	
+	return false;
+}
+
 
 bool CPlayer::CollisionEnemyHed(CEnemy& ene)
 {

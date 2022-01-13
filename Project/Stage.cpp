@@ -1,12 +1,14 @@
 #include "Stage.h"
 
-CStage::CStage()
-{
+CStage::CStage():
 
-	m_ScrollX = 0;
-	m_ScrollY = 0;
-
-}
+m_ScrollX(0),
+m_ScrollY(0),
+m_EnemyCount(0),
+m_ItemTextureCount(0),
+m_pItemTexture(NULL),
+m_ItemCount(0)
+{}
 
 CStage::~CStage()
 {
@@ -91,13 +93,43 @@ bool CStage::Load(char* pName)
 		}
 	}
 
+	//アイテムのテクスチャ読み込み
+	pstr = strtok(NULL,",");
+	m_ItemTextureCount = atoi(pstr);
+	m_pItemTexture = new CTexture[m_ItemTextureCount];
+	for(int i = 0;i < m_ItemTextureCount;i++)
+	{
+		pstr = strtok(NULL,",");
+		if(!m_pItemTexture[i].Load(pstr))
+		{
+			return false;
+		}
+	}
+	
+	//配置データの読み込み
+	m_pItemData = (char*)malloc(m_XCount * m_YCount);
+	m_ItemCount = 0;
+	for(int y = 0;y < m_YCount;y++)
+	{
+		for(int x = 0;x < m_XCount;x++)
+		{
+			pstr = strtok(NULL,",");
+			m_pItemData[y * m_XCount + x] = atoi(pstr);
+			if(m_pItemData[y * m_XCount + x] > 0)
+			{
+				m_ItemCount++;
+			}
+		}
+	}
+
+
 	//ファイルを閉じる
 	fclose(fp);
 	free(pBuffer);
 	return true;
 }
 
-void CStage::Initialize(CEnemy* pEnemy)
+void CStage::Initialize(CEnemy* pEnemy, CItem* pItem)
 {
 	m_ScrollX = 0;
 	m_ScrollY = 0;
@@ -115,6 +147,24 @@ void CStage::Initialize(CEnemy* pEnemy)
 			}
 			pEnemy[n].SetTexture(&m_pEnemyTexture[on]);
 			pEnemy[n++].Initialize(x * m_ChipSize, y * m_ChipSize, on);
+		}
+	}
+
+
+	n = 0;
+	for (int y = 0; y < m_YCount; y++)
+	{
+		for (int x = 0; x < m_XCount; x++)
+		{
+			//配置番号
+			//番号０は配置しない
+			char on = m_pItemData[y * m_XCount + x] - 1;
+			if (on < 0)
+			{
+				continue;
+			}
+			pItem[n].SetTexture(&m_pItemTexture[on]);
+			pItem[n++].Initialize(x * m_ChipSize, y * m_ChipSize, on);
 		}
 	}
 
@@ -315,6 +365,16 @@ void CStage::Release(void)
 	{
 		delete[] m_pEnemyTexture;
 		m_pEnemyTexture = NULL;
+	}
+	if (m_pItemData)
+	{
+		free(m_pItemData);
+		m_pItemData = NULL;
+	}
+	if (m_pItemTexture)
+	{
+		delete[] m_pItemTexture;
+		m_pItemTexture = NULL;
 	}
 }
 

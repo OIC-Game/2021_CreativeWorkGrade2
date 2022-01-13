@@ -3,6 +3,7 @@
 #include	"Player.h"
 #include	"Stage.h"
 #include	"Enemy.h"
+#include    "Item.h"
 
 class CGame
 {	
@@ -15,10 +16,12 @@ class CGame
 
 		//“G
 		CEnemy*		m_EnemyArray;
+		//ƒAƒCƒeƒ€
+		CItem*		m_ItemArray;
 
 		CSoundBuffer	GameBGM;
 
-	
+		
 
 		
 		

@@ -6,6 +6,8 @@
 
 #include "GameDefine.h"
 
+#include "Item.h"
+
 
 //ˆÚ“®‘¬“x
 #define		PLAYER_SPEED			0.3f
@@ -66,6 +68,7 @@ public:
 	void Release(void);
 	void CollisionJump(void);
 	void Damage(void);
+	bool CollisionItem(CItem&itm);
 
 	int GetLife() {
 		return LifeCount;
@@ -81,14 +84,9 @@ public:
 	}
 
 	float GetPosX() {return px;}
-
 	float CPlayer::GetPosY();
-
 	bool CPlayer::CollisionEnemyBody(CEnemy& ene);
-
 	bool CPlayer::CollisionEnemyHed(CEnemy& ene);
+	bool GetCollisionFlg() {return m_HedCollisionFlg;}
 
-	bool GetCollisionFlg() {
-		return m_HedCollisionFlg;
-	}
 };

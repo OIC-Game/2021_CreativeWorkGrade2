@@ -28,6 +28,7 @@ private:
 	int				m_GoalBottom;
 
 	CSoundBuffer*	m_pSkillSound;
+	CSoundBuffer*   m_pPipeSound;
 
 	//bool		m_DebugFlg;
 
@@ -43,7 +44,7 @@ public:
 	CStageParent();
 	~CStageParent();
 
-	bool Load(std::string fname, CSoundBuffer* skillSound);
+	bool Load(std::string fname, CSoundBuffer* skillSound, CSoundBuffer* pipeSound);
 
 	void Initialize();
 

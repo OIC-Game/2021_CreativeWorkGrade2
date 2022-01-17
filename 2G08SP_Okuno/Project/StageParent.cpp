@@ -20,7 +20,7 @@ CStageParent::~CStageParent()
 {
 }
 
-bool CStageParent::Load(std::string fname, CSoundBuffer* skillSound)
+bool CStageParent::Load(std::string fname, CSoundBuffer* skillSound, CSoundBuffer* pipeSound)
 {
 	FILE* f = fopen(fname.c_str(), "rt");
 	if (f == NULL) {
@@ -104,6 +104,7 @@ bool CStageParent::Load(std::string fname, CSoundBuffer* skillSound)
 	free(buffer);
 
 	m_pSkillSound = skillSound;
+	m_pPipeSound = pipeSound;
 
 	return true;
 }
@@ -180,7 +181,7 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 			int type = m_ThroughPipe.GetInPipe().Type;
 			if (!isIn) type = m_ThroughPipe.GetOutPipe().Type;
 
-			if (type == 1) {
+			if (type == 1 && m_PipeFlg != PIPE_FLAG_IN_END) {
 				m_PipeAnimTime += CUtilities::GetFrameSecond();
 				if (m_StageArray[m_StageCursor].DoorAnimation(pl.GetRect(false), m_PipeAnimTime, isIn)) {
 					if (m_PipeFlg == PIPE_FLAG_IN_NOW) {
@@ -195,7 +196,7 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 				}
 			}
 		}
-		if (flg == PIPE_FLAG_IN_END) {
+		if (flg == PIPE_FLAG_IN_END && !m_pPipeSound->IsPlay()) {
 			CPipe::PipeData p = m_ThroughPipe.GetOutPipe();
 			m_StageCursor = p.Id; //現在のステージを移動先のステージに
 
@@ -215,6 +216,7 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 				else {
 					v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
 				}
+				m_pPipeSound->Play();
 			}
 			else if (p.Type == 1) {
 				v.y = p.Rect.Bottom - pl.GetRect(false).GetHeight();
@@ -250,6 +252,9 @@ void CStageParent::Update(CPlayer& pl, CRectangle prec_b, CRectangle prec_a, boo
 				m_PipeAnimTime = 0;
 				if (m_ThroughPipe.GetInPipe().Type == 1) {
 					pl.PipeInFn_Door(m_ThroughPipe.GetInPipe());
+				}
+				else {
+					m_pPipeSound->Play();
 				}
 				return;
 			}

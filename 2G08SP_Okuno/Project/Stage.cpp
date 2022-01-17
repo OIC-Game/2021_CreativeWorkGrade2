@@ -218,9 +218,7 @@ void CStage::Update(CPlayer& pl)
 	}
 
 	for (int i = 0; i < GetEnemyCount(); i++) {
-		if (!m_EnemyArray[i].GetShow()) {
-			continue;
-		}
+		if (m_EnemyArray[i].IsDisappear()) continue;
 		CRectangle erec_b = m_EnemyArray[i].GetRect();
 		m_EnemyArray[i].Update(GetScrollX(), GetScrollY(), pl.GetRect(true));
 		if (m_EnemyArray[i].GetDisplay()) {
@@ -236,15 +234,13 @@ void CStage::Update(CPlayer& pl)
 
 
 	for (int i = 0; i < GetItemCount(); i++) {
-		if (!m_ItemArray[i].GetShow()) {
-			continue;
-		}
+		if (m_ItemArray[i].IsDisappear()) continue;
 		CRectangle irec_b = m_ItemArray[i].GetRect();
 		bool isGet = m_ItemArray[i].Update(GetScrollX(), GetScrollY());
 		if (isGet) {
 			pl.GetItem(m_ItemArray[i]);
 		}
-		if (m_ItemArray[i].GetDisplay()) {
+		else if (m_ItemArray[i].GetDisplay()) {
 			pl.CollisionItem(m_ItemArray[i]);
 		}
 		if (!m_ItemArray[i].GetDisplay()) {
@@ -256,14 +252,15 @@ void CStage::Update(CPlayer& pl)
 	}
 
 	for (int i = 0; i < GetEnemyCount(); i++) {
-		if (!m_EnemyArray[i].GetDisplay()) continue;
+		if (!m_EnemyArray[i].GetShow() || !m_EnemyArray[i].GetDisplay()) continue;
 
 		for (int j = 0; j < GetEnemyCount(); j++) {
-			if (i == j || !m_EnemyArray[j].GetDisplay()) {
+			if (i == j || !m_EnemyArray[j].GetShow() || !m_EnemyArray[j].GetDisplay()) {
 				continue;
 			}
 			m_EnemyArray[i].CollisionEnemy(m_EnemyArray[j]);
 		}
+		if (!m_EnemyArray[i].GetDisplay()) continue;
 		for (int k = 0; k < 2; k++) {
 			CSkillObj* sObj = &pl.GetSkillObj()[k];
 			if (!sObj->GetShowNow()) {
@@ -478,6 +475,7 @@ CCollisionData CStage::Collision(CPlayer* pl, CEnemy* ene, CRectangle rb, CRecta
 		if (m_BlockArray[i].GetType() < 0) continue;
 		CRectangle cr = m_BlockArray[i].GetRect();
 		if (cr.Right - m_ScrollX < -CHIPSIZE || cr.Left - m_ScrollX > sw + CHIPSIZE) continue;
+		if (!cr.CollisionRect(CRectangle(min(rb.Left, ra.Left), min(rb.Top, ra.Top), max(rb.Right, ra.Right), max(rb.Bottom, ra.Bottom)))) continue;
 
 		if (m_BlockArray[i].GetType() == WATER_1 || m_BlockArray[i].GetType() == WATER_2) {
 			if (cr.CollisionRect(ra)) {

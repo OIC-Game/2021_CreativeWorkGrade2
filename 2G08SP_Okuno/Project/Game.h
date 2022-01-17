@@ -24,6 +24,7 @@ private:
 	CSoundBuffer	m_BGMClear;
 	CSoundBuffer	m_BGMFailed;
 	CSoundBuffer	m_SkillSound;
+	CSoundBuffer	m_PipeSound;
 	bool			m_ClearBgmFlg;
 	bool			m_FailedBgmFlg;
 	int				m_Life;
@@ -64,6 +65,8 @@ public:
 		m_BGM.SetVolume(v);
 		m_BGMClear.SetVolume(v);
 		m_BGMFailed.SetVolume(v);
+		m_SkillSound.SetVolume(v);
+		m_PipeSound.SetVolume(v);
 	}
 };
 

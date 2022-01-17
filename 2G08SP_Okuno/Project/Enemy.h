@@ -91,6 +91,7 @@ public:
 
 	bool GetShow() { return m_bShow; };
 	bool GetDisplay() { return m_ShowState == STATE_SHOW; };
+	bool IsDisappear() { return m_ShowState == STATE_DISAPPEAR; };
 	void SetShow(bool bShow) { m_bShow = bShow; };
 	void SetDisplay(int state) { if (m_ShowState != STATE_DISAPPEAR) m_ShowState = state; }
 

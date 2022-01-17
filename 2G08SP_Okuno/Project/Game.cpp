@@ -58,6 +58,12 @@ bool CGame::Load(CTexture* playerTex)
 	m_SkillSound.SetLoop(false);
 	m_SkillSound.SetVolume(g_SettingWin.GetSoundVolume());
 
+	if (!m_PipeSound.Load("pipe.mp3")) {
+		return false;
+	}
+	m_PipeSound.SetLoop(false);
+	m_PipeSound.SetVolume(g_SettingWin.GetSoundVolume());
+
 	m_SoundCount = m_Player.GetSoundCount();
 	m_SoundArray = new CSoundBuffer[m_SoundCount];
 	std::string* soundFiles = m_Player.GetSoundFiles();
@@ -93,7 +99,7 @@ bool CGame::Load(CTexture* playerTex)
 bool CGame::Initialize(std::string fname, int stageIdx)
 {
 	m_Stage.Release();
-	if (!m_Stage.Load(fname, &m_SkillSound)) {
+	if (!m_Stage.Load(fname, &m_SkillSound, &m_PipeSound)) {
 		return false;
 	}
 
@@ -252,7 +258,7 @@ void CGame::RenderDebug()
 {
 	if (m_nScene == G_SCENE_GAME) {
 		//m_Stage.RenderDebug();
-		m_Player.RenderDebug();
+		//m_Player.RenderDebug();
 	}
 	//CGraphicsUtilities::RenderString(400, 10, "upd :%3d render :%3d fps:%2d", m_updTime, m_renderTime, CUtilities::GetFPS());
 }
@@ -263,6 +269,7 @@ void CGame::Release()
 
 	m_SkillTexture.Release();
 	m_SkillSound.Release();
+	m_PipeSound.Release();
 
 	if (m_SoundArray) {
 		for (int i = 0; i < m_SoundCount; i++) {

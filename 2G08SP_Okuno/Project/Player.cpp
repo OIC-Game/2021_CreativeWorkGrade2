@@ -330,19 +330,21 @@ void CPlayer::Update(float wx, float wy)
 		}
 	}
 
-	for (int i = 0; i < 2; i++) {
-		m_SkillObj[i].Update(wx, wy);
+	if (!m_bPipe) {
+		for (int i = 0; i < 2; i++) {
+			m_SkillObj[i].Update(wx, wy);
+		}
 	}
 
 	//プレイヤーの位置に速度分加算する
-	if (m_JumpStatus != Manualing) {
+	if (m_JumpStatus != Manualing && !m_bPipe) {
 		m_Pos.x += m_Move.x;
 		m_Pos.y += m_Move.y;
 	}
 
 	//左端からはみ出さない
-	if (m_Pos.x < wx) {
-		m_Pos.x = wx;
+	if (m_Pos.x < 0) {
+		m_Pos.x = 0;
 	}
 
 	if (m_bGoal) return;
@@ -380,6 +382,7 @@ void CPlayer::Render(float wx, float wy)
 void CPlayer::RenderDebug()
 {
 	CGraphicsUtilities::RenderString(20, 30, "jumpSp:%2.2f mx:%2.2f my:%2.2f state:%1d water:%d swim:%d", m_JumpSp, m_Move.x, m_Move.y, m_JumpStatus, m_bInWater, m_SwimFlg);
+	CGraphicsUtilities::RenderString(20, 60, "x:%2.2f y:%2.2f", m_Pos.x, m_Pos.y);
 }
 
 void CPlayer::CollisionStage(CCollisionData coll)
@@ -651,7 +654,7 @@ int CPlayer::PipeInFn(CPipe::PipeData pipe)
 {
 	if (pipe.Type == 1) {
 		if (m_bPipeIn) {
-			return PIPE_FLAG_OUT_NOW;
+			return PIPE_FLAG_IN_END;
 		}
 		m_bPipeIn = true;
 		return PIPE_FLAG_IN_END;
@@ -680,7 +683,7 @@ int CPlayer::PipeInFn(CPipe::PipeData pipe)
 		return PIPE_FLAG_IN_NOW;
 	}
 	else if (m_bPipeIn) {
-		return PIPE_FLAG_OUT_NOW;
+		return PIPE_FLAG_IN_END;
 	}
 	if ((pipe.Dir & BlockRight) == BlockRight) {
 		if (m_Pos.x < pipe.Rect.Left) {
@@ -701,7 +704,7 @@ int CPlayer::PipeInFn(CPipe::PipeData pipe)
 		}
 	}
 	else {
-		if (m_Pos.y > pipe.Rect.Bottom) {
+		if (m_Pos.y + GetRect(false).GetHeight() > pipe.Rect.Bottom) {
 			m_Pos.y -= 1.0f;
 			return PIPE_FLAG_IN_NOW;
 		}
@@ -806,7 +809,7 @@ CPipe::PipeData CPlayer::GetPipeData(int id)
 	bool keyRight = g_pInput->IsKeyHold(MOFKEY_D) || g_pInput->IsKeyHold(MOFKEY_RIGHT);
 	bool keyDown = g_pInput->IsKeyHold(MOFKEY_S) || g_pInput->IsKeyHold(MOFKEY_DOWN);
 	bool keyLeft = g_pInput->IsKeyHold(MOFKEY_A) || g_pInput->IsKeyHold(MOFKEY_LEFT);
-	if (keyUp && (m_JumpStatus == OnGround || ((m_JumpStatus == Jumping || m_JumpStatus == Swimming) && m_Move.y < 0))) {
+	if (keyUp && (m_JumpStatus == OnGround || ((m_JumpStatus == Jumping || m_JumpStatus == Swimming) && m_Move.y <= 0))) {
 		p.Root = true;
 		p.Id = id;
 		p.Dir = BlockUp;
@@ -817,7 +820,7 @@ CPipe::PipeData CPlayer::GetPipeData(int id)
 	else if ((keyRight || keyDown || keyLeft) && m_JumpStatus == OnGround) {
 		p.Root = true;
 		p.Id = id;
-		p.Rect = GetRect(true);
+		p.Rect = GetRect(false);
 		p.Rect.Top = p.Rect.Bottom - 1;
 		p.Rect.Bottom = p.Rect.Bottom + 1;
 		if (keyRight) {

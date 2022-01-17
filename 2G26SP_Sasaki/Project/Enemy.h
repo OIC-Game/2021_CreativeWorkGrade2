@@ -5,6 +5,7 @@
 
 #define		ENEMY_MOVESPEED		1
 
+#define		ENEMYSHOT_TYPE		2
 //敵の射撃本数
 #define		ENEMYSHOT_LINE		20
 #define     ENEMYSHOT_COUNT		60
@@ -19,7 +20,7 @@ private:
 	float					m_SpeedY;	//ｙ方向の移動量
 	bool					m_bShow;	//表示（出現）している場合はtrue
 	int                     m_HP;       //敵のHP
-	CEnemyShot              m_ShotArray[ENEMYSHOT_LINE][ENEMYSHOT_COUNT];
+	CEnemyShot              m_ShotArray[ENEMYSHOT_TYPE][ENEMYSHOT_LINE][ENEMYSHOT_COUNT];
 	int                     m_ShotWait;
 	int                     m_ShotWaitSet;
 	int						m_EnemyColor;
@@ -56,20 +57,26 @@ public:
 
 	void Damage(int dmg);
 
-	void SetTexture(CTexture* pt, CTexture* st)
+	void SetTexture(CTexture* pt, CTexture* st, CTexture* st2)
 	{
 		m_pTexture = pt;
-		for (int i = 0; i < ENEMYSHOT_LINE; i++)
+		for (int t = 0; t < ENEMYSHOT_TYPE; t++)
 		{
-			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+			for (int i = 0; i < ENEMYSHOT_LINE; i++)
 			{
-				m_ShotArray[i][j].SetTexture(st);
+				for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+				{
+					if(t==0)
+						m_ShotArray[t][i][j].SetTexture(st);
+					if(t ==1)
+						m_ShotArray[1][i][j].SetTexture(st2);
+				}
 			}
 		}
 	}
 
 	//n番目の弾を取得（弾の参照を返す）
-	CEnemyShot& GetShot(int n,int m) { return m_ShotArray[n][m]; }
+	CEnemyShot& GetShot(int t,int n,int m) { return m_ShotArray[t][n][m]; }
 
 	//真下
 	void NomalEnemyMove();

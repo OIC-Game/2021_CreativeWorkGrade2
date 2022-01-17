@@ -73,7 +73,7 @@ bool CStage::Load()
 	{
 		return false;
 	}
-	if (!m_WhiteWallTexture.Load("E_WallBlack.png"))
+	if (!m_WhiteWallTexture.Load("E_WallWhite.png"))
 	{
 		return false;
 	}
@@ -109,11 +109,11 @@ void CStage::Update(CEnemy* ene,int ecnt)
 				//ìGèoåª
 				if (m_pEnemyStart[m_EnemyNo].Type == 10)
 				{
-					ene[i].SetTexture(&m_BossWhiteTexture, &m_EnemyShotTextureWhite);
+					ene[i].SetTexture(&m_BossWhiteTexture, &m_EnemyShotTextureWhite,&m_EnemyShotTextureBlack);
 				}
 				else
 				{
-					ene[i].SetTexture(&m_EnemyTextureWhite, &m_EnemyShotTextureWhite);
+					ene[i].SetTexture(&m_EnemyTextureWhite, &m_EnemyShotTextureWhite,&m_EnemyShotTextureBlack);
 				}
 				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type, m_pEnemyStart[m_EnemyNo].hp);
 			}
@@ -122,15 +122,15 @@ void CStage::Update(CEnemy* ene,int ecnt)
 				//ìGèoåª
 				if (m_pEnemyStart[m_EnemyNo].Type == 8)
 				{
-					ene[i].SetTexture(&m_BossBlackTextureLeft, &m_EnemyShotTextureBlack);
+					ene[i].SetTexture(&m_BossBlackTextureLeft, &m_EnemyShotTextureBlack,&m_EnemyShotTextureWhite);
 				}
 				else if (m_pEnemyStart[m_EnemyNo].Type == 9)
 				{
-					ene[i].SetTexture(&m_BossBlackTextureRight, &m_BlackWallTexture);
+					ene[i].SetTexture(&m_BossBlackTextureRight, &m_BlackWallTexture, &m_WhiteWallTexture);
 				}
 				else
 				{
-					ene[i].SetTexture(&m_EnemyTextureBlack, &m_EnemyShotTextureBlack);
+					ene[i].SetTexture(&m_EnemyTextureBlack, &m_EnemyShotTextureBlack, &m_EnemyShotTextureWhite);
 				}
 				ene[i].Start(m_pEnemyStart[m_EnemyNo].PosX, 0, m_pEnemyStart[m_EnemyNo].Color, m_pEnemyStart[m_EnemyNo].Type, m_pEnemyStart[m_EnemyNo].hp);
 			}

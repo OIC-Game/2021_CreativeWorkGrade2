@@ -67,11 +67,14 @@ void CEnemy::Start(float px,float py ,int encol,int type,int hp){
 	m_ShotWait = m_ShotWaitSet;
 	Secondcount = 0;
 	second = 60;
-	for (int i = 0; i < ENEMYSHOT_LINE; i++)
+	for (int t = 0; t < ENEMYSHOT_TYPE; t++)
 	{
-		for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+		for (int i = 0; i < ENEMYSHOT_LINE; i++)
 		{
-			m_ShotArray[i][j].Initialize();
+			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+			{
+				m_ShotArray[t][i][j].Initialize();
+			}
 		}
 	}
 	m_EnemyType = type;
@@ -83,12 +86,15 @@ void CEnemy::Start(float px,float py ,int encol,int type,int hp){
  */
 void CEnemy::Update(void){
 
-	//Ž€‚ñ‚Å‚à‰æ–ÊŠO‚És‚­‚Ü‚Å’e‚ÍÁ‚¦‚È‚¢
-	for (int i = 0; i < ENEMYSHOT_LINE; i++)
+	for (int t = 0; t < ENEMYSHOT_TYPE; t++)
 	{
-		for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+		//Ž€‚ñ‚Å‚à‰æ–ÊŠO‚És‚­‚Ü‚Å’e‚ÍÁ‚¦‚È‚¢
+		for (int i = 0; i < ENEMYSHOT_LINE; i++)
 		{
-			m_ShotArray[i][j].Update();
+			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+			{
+				m_ShotArray[t][i][j].Update();
+			}
 		}
 	}
 
@@ -185,18 +191,21 @@ void CEnemy::Update(void){
 	}
 	if (m_ShotWait <= 0)
 	{
-		for (int i = 0; i < ENEMYSHOT_LINE; i++)
+		for (int t = 0; t < ENEMYSHOT_TYPE; t++)
 		{
-			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+			for (int i = 0; i < ENEMYSHOT_LINE; i++)
 			{
-				if (m_ShotArray[i][j].GetShow())
+				for (int j = 0; j < ENEMYSHOT_COUNT; j++)
 				{
-					continue;
-				}
-				m_ShotWait = m_ShotWaitSet;
-				ShotSelect(j);
+					if (m_ShotArray[t][i][j].GetShow())
+					{
+						continue;
+					}
+					m_ShotWait = m_ShotWaitSet;
+					ShotSelect(j);
 
-				break;
+					break;
+				}
 			}
 		}
 	}
@@ -211,13 +220,15 @@ void CEnemy::Update(void){
  *
  */
 void CEnemy::Render(void){
-
-	//Ž€‚ñ‚Å‚à’e‚ÍÁ‚¦‚È‚¢
-	for (int i = 0; i < ENEMYSHOT_LINE; i++)
+	for (int t = 0; t < ENEMYSHOT_TYPE; t++)
 	{
-		for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+		//Ž€‚ñ‚Å‚à’e‚ÍÁ‚¦‚È‚¢
+		for (int i = 0; i < ENEMYSHOT_LINE; i++)
 		{
-			m_ShotArray[i][j].Render(ShotScaleX, ShotScaleY);
+			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+			{
+				m_ShotArray[t][i][j].Render(ShotScaleX, ShotScaleY);
+			}
 		}
 	}
 
@@ -226,6 +237,7 @@ void CEnemy::Render(void){
 	{
 		return;
 	}
+
 	//ƒeƒNƒXƒ`ƒƒ‚Ì•`‰æ
 	m_pTexture->RenderScale(m_PosX,m_PosY,1);
 
@@ -248,11 +260,14 @@ void CEnemy::RenderDebug(int i){
 	}
 	CGraphicsUtilities::RenderRect(GetRect(), MOF_XRGB(255, 0, 0));
 
-	for (int i = 0; i < ENEMYSHOT_LINE; i++)
+	for (int t = 0; t < ENEMYSHOT_TYPE; t++)
 	{
-		for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+		for (int i = 0; i < ENEMYSHOT_LINE; i++)
 		{
-			m_ShotArray[i][j].RenderDebug();
+			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+			{
+				m_ShotArray[t][i][j].RenderDebug();
+			}
 		}
 	}
 }
@@ -488,7 +503,7 @@ void CEnemy::ShotSelect(int j)
 	{
 		if (m_bStart)
 		{
-			if (!m_ShotArray[16][0].GetShow())
+			if (!m_ShotArray[0][16][0].GetShow())
 			{
 				WallBullet(j);
 				ShotScaleX = 1;
@@ -521,85 +536,85 @@ void CEnemy::ShotSelect(int j)
 
 void CEnemy::DownBullet(int j)
 {
-	m_ShotArray[0][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 2.8,0);
+	m_ShotArray[0][0][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 2.8,0);
 }
 
 void CEnemy::SlantRightBullet1(int j)
 {
-	m_ShotArray[1][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0.5, 2.6,0);
+	m_ShotArray[0][1][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0.5, 2.6,0);
 }
 
 void CEnemy::SlantRightBullet2(int j)
 {
-	m_ShotArray[2][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 1, 2.4,0);
+	m_ShotArray[0][2][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 1, 2.4,0);
 }
 
 void CEnemy::SlantRightBullet3(int j)
 {
-	m_ShotArray[3][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 1.5, 2.2,0);
+	m_ShotArray[0][3][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 1.5, 2.2,0);
 }
 
 void CEnemy::SlantRightBullet4(int j)
 {
-	m_ShotArray[4][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 2, 2,0);
+	m_ShotArray[0][4][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 2, 2,0);
 }
 
 void CEnemy::SlantRightBullet5(int j)
 {
-	m_ShotArray[5][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 2.5, 1.8, 0);
+	m_ShotArray[0][5][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 2.5, 1.8, 0);
 }
 
 void CEnemy::SlantRightBullet6(int j)
 {
-	m_ShotArray[6][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 3, 1.6, 0);
+	m_ShotArray[0][6][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 3, 1.6, 0);
 }
 
 void CEnemy::SlowBullet(int j)
 {
-	m_ShotArray[15][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 1.4, 0);
+	m_ShotArray[0][15][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 1.4, 0);
 }
 
 void CEnemy::SlantLeftBullet1(int j)
 {
-	m_ShotArray[7][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -0.5, 2.6, 0);
+	m_ShotArray[0][7][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -0.5, 2.6, 0);
 }
 
 void CEnemy::SlantLeftBullet2(int j)
 {
-	m_ShotArray[8][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -1, 2.4, 0);
+	m_ShotArray[0][8][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -1, 2.4, 0);
 }
 
 void CEnemy::SlantLeftBullet3(int j)
 {
-	m_ShotArray[9][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -1.5, 2.2, 0);
+	m_ShotArray[0][9][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -1.5, 2.2, 0);
 }
 
 void CEnemy::SlantLeftBullet4(int j)
 {
-	m_ShotArray[10][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -2, 2, 0);
+	m_ShotArray[0][10][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -2, 2, 0);
 }
 
 void CEnemy::SlantLeftBullet5(int j)
 {
-	m_ShotArray[11][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -2.5, 1.8, 0);
+	m_ShotArray[0][11][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -2.5, 1.8, 0);
 }
 
 void CEnemy::SlantLeftBullet6(int j)
 {
-	m_ShotArray[12][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -3, 1.6, 0);
+	m_ShotArray[0][12][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -3, 1.6, 0);
 }
 
 void CEnemy::RightBullet(int j)
 {
-	m_ShotArray[13][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 3.5, 1.4,0);
+	m_ShotArray[0][13][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 3.5, 1.4,0);
 }
 
 void CEnemy::LeftBullet(int j)
 {
-	m_ShotArray[14][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -3.5, 1.4,0);
+	m_ShotArray[0][14][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), -3.5, 1.4,0);
 }
 
 void CEnemy::WallBullet(int j)
 {
-	m_ShotArray[16][0].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 1.5, 1);
+	m_ShotArray[0][16][0].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 1.5, 1);
 }

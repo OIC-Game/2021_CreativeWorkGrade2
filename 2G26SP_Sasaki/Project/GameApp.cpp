@@ -66,7 +66,7 @@ MofBool CGameApp::Initialize(void){
 
 	//デバック用
 	//ステージのスクロール値
-	//g_Stage.MoveScroll(4800);
+	g_Stage.MoveScroll(4800);
 
 	return TRUE;
 }
@@ -111,6 +111,7 @@ MofBool CGameApp::Update(void){
 		//敵が一体も出ていなければtrue,一体でも出ていればfalse
 		g_bclear = btmp;
 
+		//ステージクリアすると敵がすべて死ぬ
 		if (g_bclear)
 		{
 			for (int i = 0; i < ENEMY_COUNT; i++)

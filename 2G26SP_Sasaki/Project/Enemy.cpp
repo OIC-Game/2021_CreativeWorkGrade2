@@ -1,4 +1,5 @@
 #include	"Enemy.h"
+#include	"Player.h"
 
 /**
  * コンストラクタ
@@ -57,6 +58,7 @@ void CEnemy::Start(float px,float py ,int encol,int type,int hp){
 	m_PosX = px - m_pTexture->GetWidth() * 0.5f;
 	m_PosY = py - m_pTexture->GetHeight();
 	m_EnemyColor = encol;
+	m_EnemyShotColor = encol;
 	m_SpeedX = 0;
 	m_SpeedY = ENEMY_MOVESPEED;
 	ShotScaleX = 1;
@@ -67,6 +69,7 @@ void CEnemy::Start(float px,float py ,int encol,int type,int hp){
 	m_ShotWait = m_ShotWaitSet;
 	Secondcount = 0;
 	second = 60;
+	m_Alpha = 255;
 	for (int t = 0; t < ENEMYSHOT_TYPE; t++)
 	{
 		for (int i = 0; i < ENEMYSHOT_LINE; i++)
@@ -86,9 +89,13 @@ void CEnemy::Start(float px,float py ,int encol,int type,int hp){
  */
 void CEnemy::Update(void){
 
+	//非表示
+	if(!m_bShow && m_Alpha <= ENEMY_DEADALPHA)
+	{
+		return;	//早期リターン
+	}
 	for (int t = 0; t < ENEMYSHOT_TYPE; t++)
 	{
-		//死んでも画面外に行くまで弾は消えない
 		for (int i = 0; i < ENEMYSHOT_LINE; i++)
 		{
 			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
@@ -98,10 +105,12 @@ void CEnemy::Update(void){
 		}
 	}
 
-	//非表示
-	if(!m_bShow)
+	if (!m_bShow)
 	{
-		return;	//早期リターン
+		if (m_Alpha >= ENEMY_DEADALPHASPEED)
+			m_Alpha -= ENEMY_DEADALPHASPEED;
+		else
+			m_Alpha = 0;
 	}
 
 
@@ -201,8 +210,8 @@ void CEnemy::Update(void){
 					{
 						continue;
 					}
-					ShotSelect(j);
 					m_ShotWait = m_ShotWaitSet;
+					ShotSelect(j);
 
 					break;
 				}
@@ -220,26 +229,26 @@ void CEnemy::Update(void){
  *
  */
 void CEnemy::Render(void){
-	for (int t = 0; t < ENEMYSHOT_TYPE; t++)
-	{
-		//死んでも弾は消えない
-		for (int i = 0; i < ENEMYSHOT_LINE; i++)
-		{
-			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
-			{
-				m_ShotArray[t][i][j].Render(ShotScaleX, ShotScaleY);
-			}
-		}
-	}
-
 	//非表示
-	if(!m_bShow)
+	if (!m_bShow && m_Alpha <= ENEMY_DEADALPHA)
 	{
 		return;
 	}
 
+	for (int t = 0; t < ENEMYSHOT_TYPE; t++)
+	{
+		for (int i = 0; i < ENEMYSHOT_LINE; i++)
+		{
+			for (int j = 0; j < ENEMYSHOT_COUNT; j++)
+			{
+				g_pGraphics->SetBlending(BLEND_NORMAL);
+				m_ShotArray[t][i][j].Render(ShotScaleX, ShotScaleY,m_Alpha);
+			}
+		}
+	}
 	//テクスチャの描画
-	m_pTexture->RenderScale(m_PosX,m_PosY,1);
+	g_pGraphics->SetBlending(BLEND_NORMAL);
+	m_pTexture->Render(m_PosX,m_PosY,MOF_ARGB(m_Alpha,255,255,255));
 
 }
 
@@ -355,7 +364,7 @@ void CEnemy::BossMoveBlackLeft()
 	}
 	else if (count < 3)
 	{
-		m_SpeedX = -ENEMY_MOVESPEED * 0.5;
+		m_SpeedX = ENEMY_MOVESPEED * 2;
 		m_SpeedY = 0;
 	}
 	else if (count < 5)
@@ -365,7 +374,7 @@ void CEnemy::BossMoveBlackLeft()
 	}
 	else if (count < 7)
 	{
-		m_SpeedX = ENEMY_MOVESPEED * 0.5;
+		m_SpeedX = -ENEMY_MOVESPEED * 2;
 		m_SpeedY = 0;
 	}
 	else if (count < 8)
@@ -383,6 +392,11 @@ void CEnemy::BossMoveBlackRight()
 		m_SpeedX = 0;
 		m_SpeedY = -ENEMY_MOVESPEED * 0.5;
 	}
+	else if (count < 6)
+	{
+		m_SpeedX = -ENEMY_MOVESPEED;
+		m_SpeedY = ENEMY_MOVESPEED * 0.5;
+	}
 	else if (count < 8)
 	{
 		m_SpeedX = 0;
@@ -390,12 +404,11 @@ void CEnemy::BossMoveBlackRight()
 	}
 	else if (count < 12)
 	{
-		m_SpeedX = 0;
+		m_SpeedX = ENEMY_MOVESPEED;
 		m_SpeedY = -ENEMY_MOVESPEED * 0.5;
 	}
-
 	//壁弾の大きさ
-	ShotScaleX += freeSecond;
+	ShotScaleX += freeSecond+0.2;
 	if (ShotScaleY < 0.7)
 		ShotScaleY -= Secondcount * 0.2;
 }
@@ -417,6 +430,15 @@ void CEnemy::BossMoveWhite()
 	{
 		m_SpeedX = ENEMY_MOVESPEED * 0.5;
 		m_SpeedY = 0;
+	}
+
+	if (Secondcount % 4 < 2)
+	{
+		m_PosY += -ENEMY_MOVESPEED * 0.8;
+	}
+	else if (Secondcount % 4 < 4)
+	{
+		m_PosY += ENEMY_MOVESPEED * 0.8;
 	}
 }
 
@@ -451,7 +473,6 @@ void CEnemy::ShotSelect(int j)
 	if (m_EnemyType == 0)
 	{
 		DownBullet(j);
-		SlantRightBullet1(j);
 	}
 
 	if (m_EnemyType == 1)
@@ -531,13 +552,14 @@ void CEnemy::ShotSelect(int j)
 			SlantLeftBullet6(j);
 			RightBullet(j);
 			LeftBullet(j);
+			m_ShotWait = 45;
 		}
 	}
 }
 
 void CEnemy::DownBullet(int j)
 {
-	m_ShotArray[0][0][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 2.8,0);
+	m_ShotArray[0][17][j].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 2.8,0);
 }
 
 void CEnemy::SlantRightBullet1(int j)
@@ -617,5 +639,5 @@ void CEnemy::LeftBullet(int j)
 
 void CEnemy::WallBullet(int j)
 {
-	m_ShotArray[0][16][0].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 1.5, 1);
+	m_ShotArray[0][16][0].Fire(m_PosX + m_pTexture->GetWidth() * 0.5f, m_PosY + m_pTexture->GetHeight(), 0, 2, 1);
 }

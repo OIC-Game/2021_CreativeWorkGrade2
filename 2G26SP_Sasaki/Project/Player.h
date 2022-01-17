@@ -18,6 +18,9 @@
 
 #define		 PLAYERCOLOR_WAIT 15
 
+#define		PLAYER_DEADALPHA		0
+#define		PLAYER_DEADALPHASPEED	5
+
 class CPlayer
 {
 private:
@@ -35,6 +38,8 @@ private:
 
 	int		m_PlayerColor;
 	int		m_PlayerShotColor;
+
+	BYTE	m_Alpha;
 
 	bool  m_bDead;
 public:
@@ -64,6 +69,8 @@ public:
 		return CRectangle(m_PosX, m_PosY, m_PosX + m_Texture.GetWidth(), m_PosY + m_Texture.GetHeight());
 	}*/
 
+	int GetPlayerPosX() { return m_PosX; }
+	int GetPlayerPosY() { return m_PosY; }
 
 	CRectangle GetRect()
 	{

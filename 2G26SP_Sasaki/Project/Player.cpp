@@ -27,6 +27,7 @@ CPlayer::~CPlayer()
 //読み込み成功ならTURU失敗ならFALSE
 bool CPlayer::Load(void)
 {
+	CUtilities::SetCurrentDirectory("Resource");
 	if (!m_pTextureBlack.Load("PlayerBlack.png"))
 	{
 		return false;
@@ -61,6 +62,7 @@ bool CPlayer::Load(void)
 	{
 		m_ShotArray[i].SetTexture(&m_ShotTexture);
 	}
+
 	return true;
 }
 
@@ -80,33 +82,42 @@ void CPlayer::Initialize(void)
 	m_PlayerColor = 1;
 	m_PlayerShotColor = 0;
 	m_Texture = m_pTextureBlack;
+	m_Alpha = 255;
 }
 
 //更新
 void CPlayer::Update(void)
 {
-	if (m_bDead)
+	if (m_bDead && m_Alpha <= 0)
 	{
 		return;
+	}
+
+	if (m_bDead)
+	{
+		if (m_Alpha >= PLAYER_DEADALPHA)
+			m_Alpha -= PLAYER_DEADALPHASPEED;
+		else
+			m_Alpha = 0;
 	}
 
 	//Zキーで色変更
 	PlayerColorChange();
 
 	//キーボードでの移動
-	if (g_pInput->IsKeyHold(MOFKEY_LEFT))
+	if (g_pInput->IsKeyHold(MOFKEY_LEFT)&&m_PosX >0)
 	{
 		m_PosX -= PLAYER_SPEED;
 	}
-	else if (g_pInput->IsKeyHold(MOFKEY_RIGHT))
+	else if (g_pInput->IsKeyHold(MOFKEY_RIGHT)&&m_PosX + m_Texture.GetWidth() < g_pGraphics->GetTargetWidth())
 	{
 		m_PosX += PLAYER_SPEED;
 	}
-	if (g_pInput->IsKeyHold(MOFKEY_UP))
+	if (g_pInput->IsKeyHold(MOFKEY_UP)&&m_PosY > 0)
 	{
 		m_PosY -= PLAYER_SPEED;
 	}
-	else if (g_pInput->IsKeyHold(MOFKEY_DOWN))
+	else if (g_pInput->IsKeyHold(MOFKEY_DOWN)&& m_PosY+m_Texture.GetHeight() < g_pGraphics->GetTargetHeight())
 	{
 		m_PosY += PLAYER_SPEED;
 	}
@@ -152,11 +163,12 @@ void CPlayer::Update(void)
 //描画
 void CPlayer::Render(void)
 {
-	if (m_bDead)
+	if (m_bDead && m_Alpha <= 0)
 	{
 		return;
 	}
-	m_Texture.Render(m_PosX, m_PosY);
+	g_pGraphics->SetBlending(BLEND_NORMAL);
+	m_Texture.Render(m_PosX, m_PosY,MOF_ARGB(m_Alpha,255, 255, 255));
 
 	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
 	{
@@ -256,7 +268,7 @@ bool CPlayer::Collision(CEnemy& ene)
 				//	if (srec.CollisionRect(prec))
 				//	{
 				//		m_bDead = true;
-				//		ene.GetShot(i,j).SetShow(false);
+				//		ene.GetShot(t,i,j).SetShow(false);
 				//		return true;
 				//	}
 				//}
@@ -273,16 +285,16 @@ void CPlayer::PlayerColorChange(void)
 		m_ColorChangeWait--;
 
 	//Zキーで色変更　黒⇔白 0→白 1→黒
-	if (g_pInput->IsKeyPush(MOFKEY_Z) && (m_PlayerColor == 0) && (m_ColorChangeWait == 0))
+	if (g_pInput->IsKeyHold(MOFKEY_Z) && (m_PlayerColor == 0) && (m_ColorChangeWait == 0))
 	{
 		m_PlayerColor = 1;
 		m_PlayerShotColor = 0;
 		m_Texture = m_pTextureBlack;
 		m_ColorChangeWait = PLAYERCOLOR_WAIT;
 	}
-	if (g_pInput->IsKeyPush(MOFKEY_Z) && (m_PlayerColor == 1) && (m_ColorChangeWait == 0))
+	if (g_pInput->IsKeyHold(MOFKEY_Z) && (m_PlayerColor == 1) && (m_ColorChangeWait == 0))
 	{
-		m_PlayerColor = 0; 
+  		m_PlayerColor = 0; 
 		m_PlayerShotColor = 1;
 		m_Texture = m_pTextureWhite;
 		m_ColorChangeWait = PLAYERCOLOR_WAIT;

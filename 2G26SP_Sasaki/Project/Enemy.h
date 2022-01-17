@@ -8,7 +8,10 @@
 #define		ENEMYSHOT_TYPE		2
 //“G‚ÌËŒ‚–{”
 #define		ENEMYSHOT_LINE		20
-#define     ENEMYSHOT_COUNT		20
+#define     ENEMYSHOT_COUNT		80
+
+#define		ENEMY_DEADALPHA		0
+#define		ENEMY_DEADALPHASPEED		40
 
 //“G‚P‘Ì•ª‚Ìî•ñ‚ğŠÇ—‚·‚éƒNƒ‰ƒX
 class CEnemy {
@@ -24,12 +27,15 @@ private:
 	int                     m_ShotWait;
 	int                     m_ShotWaitSet;
 	int						m_EnemyColor;
+	int						m_EnemyShotColor;
 	int						m_EnemyType;
 
 	int						Secondcount;
 	int						freeSecond;
 	int						second;
 	bool					m_bStart;
+
+	BYTE					m_Alpha;
 
 	float					ShotScaleX;
 	float					ShotScaleY;
@@ -46,6 +52,7 @@ public:
 	bool GetShow(void){ return m_bShow; }				//•\¦ó‘Ô‚Ìæ“¾
 	int	 GetEnemyType(void) { return m_EnemyType; }
 	void EnemyDead();
+	void EnemyDeadAlpha() { m_Alpha = 0; }
 
 	CRectangle GetRect()
 	{
@@ -54,6 +61,7 @@ public:
 
 	//“G‚ÌF‚ğ•Ô‚·
 	int GetEnemyColor(void) { return m_EnemyColor; }
+	int GetEnemyShotColor(void) { return m_EnemyShotColor; }
 
 	void Damage(int dmg);
 

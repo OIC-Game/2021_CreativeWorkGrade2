@@ -1,5 +1,9 @@
 #include "Game.h"
 #include    "Stage1.h"
+#include    "GameApp.h"
+
+//変更するシーン(外部参照、実体はGameApp.cpp)
+extern int						gChangeScene;
 
 //ステージ
 CStage     g_Stage;
@@ -17,6 +21,11 @@ void CGame::Load()
 	//リソース配置ディレクトリの設定
 	CUtilities::SetCurrentDirectory("Resource");
 
+	zButtonBlack.Load("ZButtonBlack.png");
+	zButtonWhite.Load("ZButtonWhite.png");
+	zChangeCircleBlack.Load("ChangeCircleBlack.png");
+	zChangeCircleWhite.Load("ChangeCircleWhite.png");
+		
 	//プレイヤー素材の読み込み
 	g_Player.Load();
 
@@ -42,13 +51,23 @@ void CGame::Initialize(void) {
 	{
 		g_EnemyArray[i].Initialize();
 	}
+	g_bclear = false;
 
+	cnt = 0;
 	//デバック用
 	//ステージのスクロール値
-	//g_Stage.MoveScroll(4800);
+	g_Stage.MoveScroll(4800);
 }
 
 void CGame::Update(void) {
+	if (g_pInput->IsKeyHold(MOFKEY_0))
+	{
+		for (int i = 0; i < ENEMY_COUNT; i++)
+		{
+			g_EnemyArray[i].EnemyDead();
+		}
+
+	}
 	//キーの更新
 	g_pInput->RefreshKey();
 
@@ -93,17 +112,27 @@ void CGame::Update(void) {
 	}
 
 	//ゲームオーバー表示またはゲームクリアの時にEnterで初期値
-	if (g_pInput->IsKeyPush(MOFKEY_RETURN) && (g_Player.IsDead() || g_bclear))
+	if(g_Player.IsDead())
 	{
-		g_bclear = false;
-		//ゲーム内のオブジェクトを全て初期値
-		g_Player.Initialize();
-		g_Stage.Initialize(g_Stg1EnemyStart, g_Stg1EnemyCount);
-		for (int i = 0; i < ENEMY_COUNT; i++)
+		cnt++;
+		if (cnt > 70)
 		{
-			g_EnemyArray[i].Initialize();
+			gChangeScene = SCENENO_GAMEOVER;
+			for (int i = 0; i < ENEMY_COUNT; i++)
+			{
+				g_EnemyArray[i].EnemyDead();
+				g_EnemyArray[i].EnemyDeadAlpha();
+			}
 		}
 	}
+
+	if (g_bclear)
+	{
+		cnt++;
+		if (cnt > 70)
+			gChangeScene = SCENENO_GAMECLEAR;
+	}
+
 }
 
 void CGame::Render(void) {
@@ -125,11 +154,13 @@ void CGame::Render(void) {
 
 	if (g_Player.IsPlayerColor() == 1)
 	{
-		CGraphicsUtilities::RenderString(0, 0, MOF_COLOR_BLACK, "Zキーで色変換");
+		zButtonBlack.Render(g_pGraphics->GetTargetWidth() - zButtonBlack.GetWidth(), g_pGraphics->GetTargetHeight() - zButtonBlack.GetHeight());
+		zChangeCircleBlack.RenderRotate(g_pGraphics->GetTargetWidth() - zChangeCircleBlack.GetWidth(), g_pGraphics->GetTargetHeight() - zChangeCircleBlack.GetHeight(),0);
 	}
 	else
 	{
-		CGraphicsUtilities::RenderString(0, 0, MOF_COLOR_WHITE, "Zキーで色変換");
+		zButtonWhite.Render(g_pGraphics->GetTargetWidth() - zButtonWhite.GetWidth(), g_pGraphics->GetTargetHeight() - zButtonWhite.GetHeight());
+		zChangeCircleWhite.RenderRotate(g_pGraphics->GetTargetWidth() - zChangeCircleWhite.GetWidth(), g_pGraphics->GetTargetHeight() - zChangeCircleWhite.GetHeight(), 0);
 	}
 
 	/*if (g_pInput->IsKeyPush(MOFKEY_E))
@@ -147,14 +178,14 @@ void CGame::Render(void) {
 		g_Player.Collision(g_EnemyArray[i]);
 	}
 
-	if (g_Player.IsDead())
-	{
-		CGraphicsUtilities::RenderString(240, 350, MOF_COLOR_RED, "ゲームオーバー  :  Enterキーでもう一度最初から");
-	}
-	else if (g_bclear)
-	{
-		CGraphicsUtilities::RenderString(240, 350, MOF_COLOR_RED, "ゲームクリア: ENTERキーでもう一度最初から");
-	}
+	//if (g_Player.IsDead())
+	//{
+	//	CGraphicsUtilities::RenderString(240, 350, MOF_COLOR_RED, "ゲームオーバー  :  Enterキーでもう一度最初から");
+	//}
+	//else if (g_bclear)
+	//{
+	//	CGraphicsUtilities::RenderString(240, 350, MOF_COLOR_RED, "ゲームクリア: ENTERキーでもう一度最初から");
+	//}
 
 
 	//描画の終了
@@ -162,6 +193,11 @@ void CGame::Render(void) {
 }
 
 void CGame::Release(void) {
+
+	zButtonBlack.Release();
+	zButtonWhite.Release();
+	zChangeCircleBlack.Release();
+	zChangeCircleWhite.Release();
 	//プレイヤーの解放
 	g_Player.Release();
 

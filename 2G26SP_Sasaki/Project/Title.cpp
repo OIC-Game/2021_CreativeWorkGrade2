@@ -26,7 +26,7 @@ CTitle::~CTitle() {
  */
 bool CTitle::Load(void) {
 	//テクスチャの読み込み
-	if (!m_BackImage.Load(""))
+	if (!m_BackImage.Load("Title.png"))
 	{
 		return false;
 	}
@@ -59,8 +59,7 @@ void CTitle::Update(void) {
  */
 void CTitle::Render(void) {
 	CGraphicsUtilities::RenderFillRect(0, 0, 1024, 768, MOF_COLOR_WHITE);
-	m_BackImage.Render(0, 200);
-	CGraphicsUtilities::RenderString(400, 250, MOF_COLOR_BLACK, "強くなったクリボー");
+	m_BackImage.Render(0, 0);
 	CGraphicsUtilities::RenderString(400, 500, MOF_COLOR_BLACK, "Press Enter Key");
 }
 

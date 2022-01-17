@@ -19,7 +19,6 @@ private:
 	float					m_SpeedX;
 	float					m_SpeedY;
 	bool					m_bShow;
-	int						m_EnemyShotColor;
 	int						m_EnemyShotType;
 
 	float					m_CenterPosX;
@@ -33,7 +32,7 @@ public:
 	void Initialize(void);
 	void Fire(float px,float py,float sx,float sy,int type);
 	void Update();
-	void Render(float xscal,float yscal);
+	void Render(float xscal,float yscal,BYTE alp);
 	void RenderDebug(void);
 	void SetTexture(CTexture* pt){ m_pTexture = pt; }
 	bool GetShow(void){ return m_bShow; }

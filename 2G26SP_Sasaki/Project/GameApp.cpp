@@ -15,9 +15,9 @@
 #include    "GameOver.h"
 
 //現在のシーン
-int						gScene = SCENENO_GAME;
+int						gScene = SCENENO_TITLE;
 //変更するシーン
-int						gChangeScene = SCENENO_GAME;
+int						gChangeScene = SCENENO_TITLE;
 
 //各シーンクラス
 CTitle					gTitleScene;
@@ -43,7 +43,7 @@ MofBool CGameApp::Initialize(void){
 	gGameClearScene.Load();
 	gGameOverScene.Load();
 	//最初に実行されるシーンの初期化
-	gGameScene.Initialize();
+	gTitleScene.Initialize();
 
 	return TRUE;
 }

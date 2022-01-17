@@ -92,7 +92,7 @@ void CEnemyShot::Update(){
  * 描画
  *
  */
-void CEnemyShot::Render(float xscal,float yscal) {
+void CEnemyShot::Render(float xscal,float yscal,BYTE alp) {
 	//非表示
 	if (!m_bShow)
 	{
@@ -102,7 +102,7 @@ void CEnemyShot::Render(float xscal,float yscal) {
 	m_ScaleX = xscal;
 	m_ScaleY = yscal;
 	//テクスチャの描画
-	m_pTexture->RenderScale(m_PosX, m_PosY, xscal,yscal);
+	m_pTexture->RenderScale(m_PosX, m_PosY, xscal,yscal,MOF_ARGB(alp,255,255,255));
 }
 
 /**

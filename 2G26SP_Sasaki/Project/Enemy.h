@@ -8,7 +8,7 @@
 #define		ENEMYSHOT_TYPE		2
 //“G‚ÌËŒ‚–{”
 #define		ENEMYSHOT_LINE		20
-#define     ENEMYSHOT_COUNT		60
+#define     ENEMYSHOT_COUNT		20
 
 //“G‚P‘Ì•ª‚Ìî•ñ‚ğŠÇ—‚·‚éƒNƒ‰ƒX
 class CEnemy {

@@ -1,11 +1,11 @@
 #pragma once
 
-class CTitle {
+class CGameClear {
 private:
 	CTexture				m_BackImage;
 public:
-	CTitle();
-	~CTitle();
+	CGameClear();
+	~CGameClear();
 	bool Load(void);
 	void Initialize(void);
 	void Update(void);
@@ -13,4 +13,3 @@ public:
 	void RenderDebug(void);
 	void Release(void);
 };
-

@@ -201,8 +201,8 @@ void CEnemy::Update(void){
 					{
 						continue;
 					}
-					m_ShotWait = m_ShotWaitSet;
 					ShotSelect(j);
+					m_ShotWait = m_ShotWaitSet;
 
 					break;
 				}
@@ -451,6 +451,7 @@ void CEnemy::ShotSelect(int j)
 	if (m_EnemyType == 0)
 	{
 		DownBullet(j);
+		SlantRightBullet1(j);
 	}
 
 	if (m_EnemyType == 1)

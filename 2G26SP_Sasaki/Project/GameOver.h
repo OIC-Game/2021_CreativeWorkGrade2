@@ -1,11 +1,14 @@
 #pragma once
 
-class CTitle {
+#include "Mof.h"
+
+class CGameOver
+{
 private:
 	CTexture				m_BackImage;
 public:
-	CTitle();
-	~CTitle();
+	CGameOver();
+	~CGameOver();
 	bool Load(void);
 	void Initialize(void);
 	void Update(void);

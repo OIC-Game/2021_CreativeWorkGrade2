@@ -1,0 +1,13 @@
+#pragma once
+#include "mof.h"
+enum tag_SCENENO {
+	SCENENO_TITLE,
+	SCENENO_GAME,
+	SCENENO_INFORMATION,
+	SCENENO_GAMEOVER,
+	SCENENO_TIMEUP,
+};
+#define GRAVITY 0.60f
+#define JUMP_GRAVITY 0.30f
+#define DEAD_GRAVITY 0.30f
+

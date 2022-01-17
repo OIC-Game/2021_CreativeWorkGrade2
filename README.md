@@ -1,2 +1,0 @@
-# 2021_CreativeWorkGrade2
-2021年度 クリエイティブワークGamePG

@@ -6,6 +6,7 @@ enum tag_ITEMTYPE{
 	ITEM_KINOKO,
 	ITEM_COIN,
 	ITEM_1UPKINOKO,
+	ITEM_FIRE,
 
 	ITEM_TYPECOUNT,
 };
@@ -20,6 +21,7 @@ private:
 	float						m_MoveX;
 	float						m_MoveY;
 	bool						m_bShow;
+	bool						m_bPop;
 	float						m_ShowTime;
 	CRectangle					m_SrcRect;
 	
@@ -46,5 +48,7 @@ public:
 		return CRectangle(m_PosX, m_PosY, m_PosX + m_SrcRect.GetWidth(), m_PosY + m_SrcRect.GetHeight());
 	}
 	void PoPItem(int popItemNo);
+
+	void Pop(float wx, float wy);
 };
 

@@ -9,16 +9,24 @@
 #define		FLAG1			2
 #define		FLAG2			3
 #define		FLAG3			14
-#define		KINOKOBLOCK		22
+#define		ITEMBLOCK		22
 #define		GOALPOOL		25
 #define		CCOINBLOCK		33
 #define		HIDENBLOCK		34
+#define		HIDECOINBLOCK	35
+#define		HIDEITEMBLOCK	36
 #define		CASTE			41
 #define		CASLE			52
 #define		WALL1			39
 #define		WALL2			40
 #define		WALL3			50
 #define		WALL4			51
+#define		WALL5			54
+#define		WALL6			69
+#define		LASTGOAL		70
+#define		MAGUMA1			55
+#define		MAGUMA2			66
+#define		Trap			67
 
 class CStage{
 private:
@@ -65,5 +73,7 @@ public:
 	int GetEnemyCount() { return m_EnemyCount; }
 	int GetItemCount() { return m_ItemCount; }
 	void SetPoPItemManager(CPoPItemManager* pmng) { m_pPoPItemManager = pmng; }
+
+	bool IsGround(float px, float py);
 };
 

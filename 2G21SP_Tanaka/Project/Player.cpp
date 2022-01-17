@@ -70,7 +70,7 @@ bool CPlayer::Load(void){
 	}
 
 	//弾のテクスチャ
-	if (!m_FireTexture.Load("UI.png"))
+	if (!m_FireTexture.Load("fire.png"))
 	{
 		return false;
 	}
@@ -112,7 +112,7 @@ bool CPlayer::Load(void){
 
 void CPlayer::Initialize(void){
 	m_PosX = 200;
-	m_PosY = 645;
+	m_PosY = 620;
 	m_bMove = false;
 	m_MoveX = 0.0f;
 	m_MoveY = 0.0f;
@@ -144,7 +144,14 @@ void CPlayer::Initialize(void){
 		m_FireArray[i].Initialize();
 	}
 	m_BGM.SetLoop(TRUE);
-	m_BGM.Play();
+	if (gStage == STAGENO_03)
+	{
+		
+	}
+	else
+	{
+		m_BGM.Play();
+	}
 }
 
 void CPlayer::Update(float wx, float wy){
@@ -198,6 +205,16 @@ void CPlayer::Update(float wx, float wy){
 		}
 		return;
 	}
+
+	m_Time -= CUtilities::GetFrameSecond();
+	if (m_Time <= 0)
+	{
+		m_bEnd = true;
+		m_bEndTime = 5;
+		m_BGM.Stop();
+		m_endSound.Play();
+	}
+
 	m_bMove = false;
 	if (m_Motion.GetMotionNo() == MOTION_JUMPEND)
 	{
@@ -241,10 +258,7 @@ void CPlayer::Update(float wx, float wy){
 	//画面下で死亡
 	if (m_PosY >= g_pGraphics->GetTargetHeight() - m_SrcRect.GetHeight())
 	{
-		m_bDead = true;
-		m_Life = m_Life - 1;
-		m_BGM.Stop();
-		m_endSound.Play();
+		Drop();
 		return;
 	}
 	
@@ -261,6 +275,7 @@ void CPlayer::Update(float wx, float wy){
 	for (int i = 0; i < PLAYERFIRE_COUNT; i++)
 	{
 		m_FireArray[i].Update();
+
 	}
 }
 
@@ -346,7 +361,7 @@ void CPlayer::UpdateKey(){
 	}
 
 	// 弾の発射
-	if (m_Stat = 2)
+	if (m_Stat == 2)
 	{
 		if (m_FireWait <= 0)
 		{
@@ -358,17 +373,17 @@ void CPlayer::UpdateKey(){
 					{
 						continue;
 					}
-						m_FireWait = PLAYERFIRE_WAIT;
-						m_FireArray[i].Fire(m_PosX, m_PosY, m_bReverse);
-						break;
-					}
+					m_FireWait = PLAYERFIRE_WAIT;
+					m_FireArray[i].Fire(m_PosX, m_PosY, m_bReverse);
+					break;
 				}
 			}
-			else
-			{
-				m_FireWait--;
-			}
 		}
+		else
+		{
+			m_FireWait--;
+		}
+	}
 }
 
 void CPlayer::UpdateMove(void){
@@ -406,7 +421,18 @@ void CPlayer::UpdateMove(void){
 
 void CPlayer::Render(float wx, float wy){
 	//現在のステータスを表示
-	CGraphicsUtilities::RenderString(560, 30, "0%0i",m_Stat);
+	if (m_Stat == 0)
+	{
+		CGraphicsUtilities::RenderString(560, 30, "NORMAL");
+	}
+	else if (m_Stat == 1)
+	{
+		CGraphicsUtilities::RenderString(560, 30, "SUPER");
+	}
+	else if (m_Stat == 2)
+	{
+		CGraphicsUtilities::RenderString(560, 30, "FIRE");
+	}
 	//現在のスコアを表示
 	CGraphicsUtilities::RenderString(220, 30, "%0i", m_Score);
 	//現在のコイン所持数を表示
@@ -414,7 +440,9 @@ void CPlayer::Render(float wx, float wy){
 	//現在のライフの数を表示
 	CGraphicsUtilities::RenderString(720, 30, "%0i", m_Life);
 	//現在のコンボの数を表示
-	CGraphicsUtilities::RenderString(740, 30, "%0i", m_Comb);
+	CGraphicsUtilities::RenderString(850, 30, "%0i", m_Comb);
+
+	CGraphicsUtilities::RenderString(950, 30, "%5.0f", m_Time);
 	
 	if (!m_bShow)
 	{
@@ -521,6 +549,22 @@ void CPlayer::IsGoal(void){
 	m_bGoal = true;
 }
 
+void CPlayer::Drop(void){
+	m_bDead = true;
+	m_Life = m_Life - 1;
+	m_BGM.Stop();
+	m_endSound.Play();
+}
+
+void CPlayer::LastClear(void){
+	if (!m_clearSound.IsPlay())
+	{
+		m_clearSound.Play();
+	}
+	m_bClear = true;
+	m_bShow = false;
+}
+
 bool CPlayer::CollisionEnemy(CEnemy& ene){
 	if (m_bEnd)
 	{
@@ -534,8 +578,9 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 	{
 		return false;
 	}
+	
 	//ダメージ中のため当たり判定を行わない
-	if (m_DamageWait > 0)
+	if (m_DamageWait > 0 || ene.GetDamageWait() > 0)
 	{
 		return false;
 	}
@@ -565,9 +610,15 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 	{
 		if (er.CollisionRect(erec))
 		{
+			switch (ene.GetType())
+			{
+			case ENEMY_FIRE:
+				return false;
+			}
 			m_MoveY = -6.0f;
 			m_enemySound.Play();
 			ene.Damege();
+			ene.BOSSDamege();
 			EnemyScore();
 			return true;
 		}
@@ -598,10 +649,17 @@ bool CPlayer::CollisionEnemy(CEnemy& ene){
 		{
 			continue;
 		}
+		switch (ene.GetType())
+		{
+		case ENEMY_FIRE:
+			return false;
+		}
 		CRectangle srec = m_FireArray[i].GetRect();
 		if (srec.CollisionRect(erec))
 		{
 			ene.EnemyDamege();
+			ene.BOSSFireDamege();
+			m_enemySound.Play();
 			PlusScore();
 			m_FireArray[i].SetShow(false);
 			return true;
@@ -632,12 +690,22 @@ bool CPlayer::CollisionItem(CItem& itm){
 					m_Stat = 1;
 					m_Score = m_Score + 1000;
 				}
+				else
+				{
+					m_upSound.Play();
+					m_Score = m_Score + 1000;
+				}
 				break;
 			case ITEM_COIN:
 				CoinGet();
 				break;
 			case ITEM_1UPKINOKO:
 				m_Life = m_Life + 1;
+				break;
+			case ITEM_FIRE:
+				m_upSound.Play();
+				m_Stat = 2;
+				m_Score = m_Score + 1000;
 				break;
 		}
 		return true;

@@ -24,7 +24,7 @@ void CPlayerFire::Initialize(void){
 
 void CPlayerFire::Fire(float px, float py, bool reverse){
 	m_PosX = px + m_pTexture->GetWidth() * 1.0f;
-	m_PosY = py + 48;
+	m_PosY = py + 38;
 	m_bShow = true;
 	m_bReverse = reverse;
 }

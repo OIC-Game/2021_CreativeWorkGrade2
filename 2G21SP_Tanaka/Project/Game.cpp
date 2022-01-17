@@ -23,6 +23,9 @@ bool CGame::Load(void){
 		case STAGENO_02:
 		m_Stage.Load("Stage02.txt");
 		break;
+		case STAGENO_03:
+		m_Stage.Load("Stage03.txt");
+		break;
 	}
 	//敵メモリ確保
 	m_EnemyArray = new CEnemy[m_Stage.GetEnemyCount()];
@@ -47,6 +50,9 @@ void CGame::Initialize(void){
 		case STAGENO_02:
 			m_Stage.Initialize("Stage02.txt", m_EnemyArray, m_ItemArray);
 			break;
+		case STAGENO_03:
+			m_Stage.Initialize("Stage03.txt", m_EnemyArray, m_ItemArray);
+			break;
 	}
 	m_PoPItemManager.Initialize();
 	m_Stage.SetPoPItemManager(&m_PoPItemManager);
@@ -55,6 +61,7 @@ void CGame::Initialize(void){
 void CGame::Update(void){
 	//プレイヤーの更新
 	m_Player.Update(m_Stage.GetScrollX(), m_Stage.GetScrollY());
+	
 	//ステージとプレイヤーの当たり判定
 	float ox = 0, oy = 0;
 	int popItemNo = 0;
@@ -102,6 +109,21 @@ void CGame::Update(void){
 				}
 			}
 		}
+
+		if (gStage == STAGENO_03)
+		{
+			CRectangle r = m_EnemyArray[i].GetRect();
+			r.Bottom += 10;
+			if (m_EnemyArray[i].GetMoveX() < 0 && !m_Stage.IsGround(r.Left - 5, r.Bottom))
+			{
+				m_EnemyArray[i].SetMoveDir(false);
+			}
+			if (m_EnemyArray[i].GetMoveX() > 0 && !m_Stage.IsGround(r.Right + 5, r.Bottom))
+			{
+				m_EnemyArray[i].SetMoveDir(true);
+			}
+		}
+		
 		float ox = 0, oy = 0;
 		int popItemNo = 0;
 		if (m_Stage.Collision(m_EnemyArray[i].GetRect(), m_Player, ox, oy,popItemNo))
@@ -112,6 +134,7 @@ void CGame::Update(void){
 	//アイテムの更新
 	for (int i = 0; i < m_Stage.GetItemCount(); i++)
 	{
+		m_ItemArray[i].Pop(m_Stage.GetScrollX(), m_Stage.GetScrollY());
 		if (!m_ItemArray[i].GetShow())
 		{
 			continue;
@@ -151,7 +174,9 @@ void CGame::Update(void){
 
 	//ステージの更新
 	m_Stage.Update(m_Player);
+
 	//ポップアイテムの更新
+	//for(int i=0;i<)
 	m_PoPItemManager.Update();
 
 	//プレイヤーのフラグでリトライ画面、ゲームオーバー画面へ
@@ -169,14 +194,15 @@ void CGame::Update(void){
 	//ゴールフラグでクリア画面に
 	if (m_Player.IsClear())
 	{
-		if (!gStage == STAGENO_02)
+		if (gStage == STAGENO_03)
 		{
-			gStage++;
-			gChangeScene = SCENENO_GAMERETRY;
+			gStage = STAGENO_01;
+			gChangeScene = SCENENO_GAMECLEAR;
 		}
 		else
 		{
-			gChangeScene = SCENENO_GAMECLEAR;
+			gStage++;
+			gChangeScene = SCENENO_GAMERETRY;
 		}
 	}
 }

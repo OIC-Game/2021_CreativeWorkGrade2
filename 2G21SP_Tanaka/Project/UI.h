@@ -5,6 +5,7 @@
 class CUI{
 private:
 	CTexture	m_Texture;
+	CTexture	m_LifeTexture;
 
 public:
 	CUI();

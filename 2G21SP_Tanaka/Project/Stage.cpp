@@ -129,6 +129,7 @@ bool CStage::Load(char* pName){
 	{
 		return false;
 	}
+	
 	//ファイルを閉じる
 	fclose(fp);
 	free(pBuffer);
@@ -394,7 +395,7 @@ bool CStage::Collision(CRectangle r, CPlayer& pl, float& ox, float& oy,int& popI
 			{
 				continue;
 			}
-			if (cn == WALL1 || cn == WALL2 || cn == WALL3 || cn == WALL4)
+			if (cn == WALL1 || cn == WALL2 || cn == WALL3 || cn == WALL4 || cn == WALL5 || cn == WALL6)
 			{
 				continue;
 			}
@@ -412,15 +413,48 @@ bool CStage::Collision(CRectangle r, CPlayer& pl, float& ox, float& oy,int& popI
 				{
 					continue;
 				}
-				if (cn == KINOKOBLOCK)
+				if (cn == MAGUMA1)
+				{
+					continue;
+				}
+				if (cn == MAGUMA2)
+				{
+					continue;
+				}
+				if (cn == ITEMBLOCK)
 				{
 					m_pChipData[y * m_XCount + x] = 23 + 1;
-					popItemNo = 1;
+					if (pl.GetStat() >= 1)
+					{
+						popItemNo = 3;
+					}
+					else
+					{
+						popItemNo = 1;
+					}
 				}
 				if (cn == HIDENBLOCK)
 				{
 					m_pChipData[y * m_XCount + x] = 23 + 1;
 					popItemNo = 2;
+				}
+				if (cn == HIDECOINBLOCK)
+				{
+					pl.BlockCoinGet();
+					m_pPoPItemManager->Start(cr.Left, cr.Top - m_ChipSize, POP_COIN);
+					m_pChipData[y * m_XCount + x] = 23 + 1;
+				}
+				if (cn == HIDEITEMBLOCK)
+				{
+					m_pChipData[y * m_XCount + x] = 23 + 1;
+					if (pl.GetStat() >= 1)
+					{
+						popItemNo = 3;
+					}
+					else
+					{
+						popItemNo = 1;
+					}
 				}
 				if (cn == COINBLOCK)
 				{
@@ -472,6 +506,26 @@ bool CStage::Collision(CRectangle r, CPlayer& pl, float& ox, float& oy,int& popI
 				{
 					continue;
 				}
+				if (cn == HIDECOINBLOCK)
+				{
+					continue;
+				}
+				if (cn == HIDEITEMBLOCK)
+				{
+					continue;
+				}
+				if (cn == MAGUMA1)
+				{
+					continue;
+				}
+				if (cn == MAGUMA2)
+				{
+					continue;
+				}
+				if (cn == Trap)
+				{
+					m_pChipData[y * m_XCount + x] = 0;
+				}
 				re = true;
 				//下の埋まりなのでチップ上端から矩形の下端の値を引いた値が埋まりの値
 				oy += cr.Top - brec.Bottom;
@@ -493,6 +547,22 @@ bool CStage::Collision(CRectangle r, CPlayer& pl, float& ox, float& oy,int& popI
 				{
 					continue;
 				}
+				if (cn == HIDECOINBLOCK)
+				{
+					continue;
+				}
+				if (cn == HIDEITEMBLOCK)
+				{
+					continue;
+				}
+				if (cn == MAGUMA1)
+				{
+					continue;
+				}
+				if (cn == MAGUMA2)
+				{
+					continue;
+				}
 				re = true;
 				//左の埋まりなのでチップ右側から矩形の左端の値を引いた値が埋まりの値
 				ox += cr.Right - lrec.Left;
@@ -506,6 +576,22 @@ bool CStage::Collision(CRectangle r, CPlayer& pl, float& ox, float& oy,int& popI
 				{
 					continue;
 				}
+				if (cn == MAGUMA1)
+				{
+					continue;
+				}
+				if (cn == MAGUMA2)
+				{
+					continue;
+				}
+				if (cn == HIDECOINBLOCK)
+				{
+					continue;
+				}
+				if (cn == HIDEITEMBLOCK)
+				{
+					continue;
+				}
 				if (cn == GOALPOOL || cn == FLAG2 || cn == FLAG3)
 				{
 					pl.IsGoal();
@@ -513,6 +599,10 @@ bool CStage::Collision(CRectangle r, CPlayer& pl, float& ox, float& oy,int& popI
 				else if (cn == CASLE)
 				{
 					pl.Clear();
+				}
+				else if (cn == LASTGOAL)
+				{
+					pl.LastClear();
 				}
 				else
 				{
@@ -606,4 +696,29 @@ bool CStage::CollisionPlayerFire(CRectangle r){
 		}
 	}
 	return re;
+}
+
+bool CStage::IsGround(float px, float py)
+{
+	bool re = false;
+
+	//当たり判定する矩形の左上と右下のチップ位置を求める
+	int x = px / m_ChipSize;
+	int y = py / m_ChipSize;
+
+	//ステージの範囲外にはならないようにする
+	if (x < 0 || x >= m_XCount || y < 0 || y >= m_YCount)
+	{
+		return false;
+	}
+
+	//描画するチップ番号
+	//チップ番号０は当たり判定しない
+	char cn = m_pChipData[y * m_XCount + x] - 1;
+	if (cn < 0)
+	{
+		return false;
+	}
+
+	return true;
 }

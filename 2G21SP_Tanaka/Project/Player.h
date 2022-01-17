@@ -21,10 +21,10 @@
 #define			PLAYER_JUMP				-11.0f
 
 //’e‚Ì”­ËŒÀŠE”
-#define			PLAYERFIRE_COUNT		3
+#define			PLAYERFIRE_COUNT		5
 
 //’e‚Ì”­ËŠÔŠu
-#define			PLAYERFIRE_WAIT			50
+#define			PLAYERFIRE_WAIT			20
 
 //“–‚½‚è”»’èŒ¸Š•
 #define			PLAYER_RECTDECREASE		12
@@ -56,7 +56,7 @@ private:
 	int						m_DamageWait;
 	CRectangle				m_SrcRect;
 
-	int						m_Time;
+	float					m_Time;
 	int						m_Score;
 
 	CTexture				m_FireTexture;
@@ -101,10 +101,11 @@ public:
 	void CollisionStage(float ox, float oy);
 	void CollisionStageFire(int i);
 	void IsGoal(void);
+	void Drop(void);
+	void LastClear(void);
 	bool CollisionEnemy(CEnemy& ene);
 	bool CollisionItem(CItem& itm);
 	bool GetStat(void) { return m_Stat; }
-	bool GetLife(void) { return m_Life; }
 	bool IsEnd(void) { return m_bEnd; }
 	bool Retry()
 	{

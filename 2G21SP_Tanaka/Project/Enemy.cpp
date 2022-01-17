@@ -22,6 +22,8 @@ void CEnemy::Initialize(float px, float py, int type){
 	m_PosY = py;
 	m_MoveX = -1.0f;
 	m_MoveY = 0.0f;
+	m_BossMoveX = -3.0f;
+	m_JumpTime = 4.0f;
 	m_MoveKameX = 0.0f;
 	m_bShow = true;
 	m_bMove = false;
@@ -29,7 +31,10 @@ void CEnemy::Initialize(float px, float py, int type){
 	m_bKame = false;
 	m_Kame = 0;
 	m_bDead = false;
-	m_DamageWait = 10;
+	m_ShowWait = 10;
+	m_DamageWait = 0;
+	m_BOSSDamege = 0;
+	m_BOSSFireDamege = 0;
 	switch (GetType())
 	{
 		case ENEMY_01:
@@ -79,6 +84,37 @@ void CEnemy::Initialize(float px, float py, int type){
 		m_Motion.Create(anim2, MOTION2_COUNT);
 		break;
 	}
+
+	switch (GetType())
+	{
+	case ENEMY_BOSS:
+		//アニメーションを作成
+		SpriteAnimationCreate anim3[] = {
+			{
+				"移動",
+				0,0,
+				144,120,
+				TRUE,{{5,0,0},{5,1,0},{5,2,0},{5,3,0}}
+			},
+		};
+		m_Motion.Create(anim3, MOTIONBOSS_COUNT);
+		break;
+	}
+
+	switch (GetType())
+	{
+	case ENEMY_FIRE:
+		SpriteAnimationCreate anim4[] = {
+			{
+				"移動",
+				0,0,
+				53,37,
+				TRUE,{{5,0,0}}
+			},
+		};
+		m_Motion.Create(anim4, MOTIONFIRE_COUNT);
+		break;
+	}
 }
 
 void CEnemy::Update(float wx, float wy){
@@ -89,8 +125,8 @@ void CEnemy::Update(float wx, float wy){
 	}
 	if (m_bDead)
 	{
-		m_DamageWait--;
-		if (m_DamageWait == 0)
+		m_ShowWait--;
+		if (m_ShowWait == 0)
 		{
 			m_bShow = false;
 		}
@@ -112,24 +148,58 @@ void CEnemy::Update(float wx, float wy){
 	//実際に座標を移動させる
 	if (m_bMove)
 	{
-		if (m_bKame)
+		switch (GetType())
 		{
-			m_PosX += m_MoveKameX;
-		}
-		else
-		{
+		case ENEMY_01:
 			m_PosX += m_MoveX;
+			m_PosY += m_MoveY;
+			break;
+		case ENEMY_02:
+			if (m_bKame)
+			{
+				m_PosX += m_MoveKameX;
+			}
+			else
+			{
+				m_PosX += m_MoveX;
+			}
+			m_PosY += m_MoveY;
+			break;
+		case ENEMY_BOSS:
+			m_PosX += m_BossMoveX;
+			m_PosY += m_MoveY;
+			if (m_JumpTime <= 0)
+			{
+				m_MoveY = -12.0f;
+				m_JumpTime = 4.0f;
+			}
+			else
+			{
+				m_JumpTime -= CUtilities::GetFrameSecond();
+			}
+			break;
+		case ENEMY_FIRE:
+			m_PosX += -4.0f;
+			break;
 		}
-		m_PosY += m_MoveY;
 	}
 	//アニメーションの更新
 	m_Motion.AddTimer(CUtilities::GetFrameSecond());
 	m_SrcRect = m_Motion.GetSrcRect();
+	if (m_DamageWait > 0)
+	{
+		m_DamageWait--;
+	}
 }
 
 void CEnemy::Render(float wx, float wy){
 	//非表示
 	if (!m_bShow)
+	{
+		return;
+	}
+	//インターバル2フレームごとに描画をしない
+	if (m_DamageWait % 4 >= 2)
 	{
 		return;
 	}
@@ -168,6 +238,13 @@ void CEnemy::Release(){
 }
 
 void CEnemy::CollisionStage(float ox, float oy){
+	switch (GetType())
+	{
+	case ENEMY_FIRE:
+		m_bShow = false;
+		m_bDead = true;
+		break;
+	}
 	m_PosX += ox;
 	m_PosY += oy;
 	//落下中の下埋まり、ジャンプ中の上埋まりの場合は移動を初期化する。
@@ -199,11 +276,13 @@ void CEnemy::CollisionStage(float ox, float oy){
 		if (ox < 0 && m_MoveX > 0)
 		{
 			m_MoveX *= -1;
+			m_BossMoveX *= -1;
 			m_bReverse = false;
 		}
 		else if (ox > 0 && m_MoveX < 0)
 		{
 			m_MoveX *= -1;
+			m_BossMoveX *= -1;
 			m_bReverse = true;
 		}
 
@@ -211,8 +290,26 @@ void CEnemy::CollisionStage(float ox, float oy){
 }
 
 void CEnemy::CollisionEnemy(){
-	m_bReverse = !m_bReverse;
-	m_MoveX *= -1;
+	if (!m_bShow)
+	{
+		return;
+	}
+	if (m_bDead)
+	{
+		return;
+	}
+	switch(GetType())
+	{
+	case ENEMY_01:
+		m_bReverse = !m_bReverse;
+		m_MoveX *= -1;
+		break;
+	case ENEMY_02:
+		m_bReverse = !m_bReverse;
+		m_MoveX *= -1;
+		break;
+	}
+	
 }
 
 void CEnemy::Damege(void){
@@ -248,6 +345,34 @@ void CEnemy::EnemyDamege(void){
 	}
 }
 
+void CEnemy::BOSSDamege(void){
+	switch (GetType())
+	{
+	case ENEMY_BOSS:
+		m_BOSSDamege = m_BOSSDamege + 1;
+		m_DamageWait = 60;
+		if (m_BOSSDamege >= 3)
+		{
+			m_bDead = true;
+		}
+		break;
+	}
+}
+
+void CEnemy::BOSSFireDamege(void){
+	switch (GetType())
+	{
+	case ENEMY_BOSS:
+		m_BOSSFireDamege = m_BOSSFireDamege + 1;
+
+		if (m_BOSSFireDamege >= 30)
+		{
+			m_bDead = true;
+		}
+		break;
+	}
+}
+
 void CEnemy::KameLeftMove(void){
 	m_bMove = true;
 	m_MoveKameX = 6.0f;
@@ -262,3 +387,23 @@ void CEnemy::KameStop(void){
 	m_bMove = false;
 }
 
+void CEnemy::SetMoveDir(bool isRight)
+{
+	switch (GetType())
+	{
+	case ENEMY_01:
+		m_bReverse = !isRight;
+		m_PosX -= m_MoveX;
+		m_MoveX = 5.0f * m_bReverse ? 1 : -1;
+		break;
+	case ENEMY_02:
+		m_bReverse = !isRight;
+		m_PosX -= m_MoveX;
+		m_MoveX = 5.0f * m_bReverse ? 1 : -1;
+		break;
+	case ENEMY_BOSS:
+		break;
+	case ENEMY_FIRE:
+		break;
+	}
+}

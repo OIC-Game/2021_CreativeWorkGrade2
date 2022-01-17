@@ -18,6 +18,7 @@ CItem::~CItem(){
 
 void CItem::Initialize(float px, float py, int type){
 	m_Type = type;
+	m_bPop = false;
 	m_PosX = px;
 	m_PosY = py;
 	m_MoveX = 0.0f;
@@ -34,6 +35,10 @@ void CItem::Initialize(float px, float py, int type){
 		case ITEM_1UPKINOKO:
 			m_MoveX = 2.0f;
 			m_bShow = false;
+			break;
+		case ITEM_FIRE:
+			m_bShow = false;
+			break;
 	}
 	//アニメーションを作成
 	SpriteAnimationCreate anim = {
@@ -65,6 +70,11 @@ void CItem::Update(void){
 			 m_PosY += m_MoveY;
 			 break;
 		case ITEM_1UPKINOKO:
+			//実際に座標を移動させる
+			m_PosX += m_MoveX;
+			m_PosY += m_MoveY;
+			break;
+		case ITEM_FIRE:
 			//実際に座標を移動させる
 			m_PosX += m_MoveX;
 			m_PosY += m_MoveY;
@@ -126,6 +136,10 @@ void CItem::CollisionStage(float ox, float oy){
 
 
 void CItem::PoPItem(int popItemNo){
+	if (!m_bPop)
+	{
+		return;
+	}
 	if (popItemNo == 1)
 	{
 		switch (GetType())
@@ -143,5 +157,21 @@ void CItem::PoPItem(int popItemNo){
 				m_bShow = true;
 				break;
 		}
+	}
+	else if (popItemNo == 3)
+	{
+		switch (GetType())
+		{
+		case ITEM_FIRE:
+			m_bShow = true;
+			break;
+		}
+	}
+}
+
+void CItem::Pop(float wx, float wy){
+	if (m_PosX - wx < 1100)
+	{
+		m_bPop = true;
 	}
 }

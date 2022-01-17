@@ -1,10 +1,10 @@
 #include "Player.h"
 
-//変更するシーン(外部参照)
-extern int		gChangeScene;
 
-CPlayer::CPlayer()
+CPlayer::CPlayer():
+	m_deadFlg(false)
 {
+	
 }
 
 CPlayer::~CPlayer()
@@ -22,13 +22,10 @@ void CPlayer::Load(void)
 
 	m_GreenPuyoTexture.Load("GreenPuyo.png");
 
-	m_BackTexture.Load("GameBack.png");
+	m_ObstaclePuyoTexture.Load("ObstaclePuyo.png");
 
 	m_CrossMarkTexture.Load("Batu.png");
 
-	m_GameOverTexture.Load("GameOverBack.png");
-
-	m_PauseTexture.Load("Pause.png");
 
 	//音の読み込み
 	m_chainSound.Load("ChainSound.mp3");
@@ -39,14 +36,7 @@ void CPlayer::Load(void)
 
 	m_rotateSound.Load("RotateSound.mp3");
 
-	m_gameBGM.Load("GameBGM.mp3");
 
-	m_pauseSound.Load("PauseSound.mp3");
-
-	m_gameOverSound.Load("GameOverSound.mp3");
-
-	//ループ設定
-	m_gameBGM.SetLoop(TRUE);
 
 }
 
@@ -67,6 +57,7 @@ void CPlayer::Initialize(bool vsAiFlg)
 	}
 
 	m_random.SetSeed(time(NULL));
+	m_obstaSetPosRandom.SetSeed(time(NULL));
 
 	//ぷよの色をランダムで決める
 	//todo: 降るぷよの色が右と左で違うのを防ぐために、タイプを格納し続ける配列を作る
@@ -74,7 +65,7 @@ void CPlayer::Initialize(bool vsAiFlg)
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			m_type[i][j] = m_random.Random(Red, TypeCount);
+			m_type[i][j] = m_random.Random(Red, Obstacle);
 		}
 	}
 
@@ -84,28 +75,27 @@ void CPlayer::Initialize(bool vsAiFlg)
 	m_moveSound.SetVolume(0.54f);
 	m_setSound.SetVolume(0.5f);
 	m_rotateSound.SetVolume(0.3f);
-	m_pauseSound.SetVolume(0.5f);
-	m_gameOverSound.SetVolume(0.3f);
-	m_gameBGM.SetVolume(0.05f);
 
 	//色々初期値
 	m_dropTimeCnt = DROP_SPEED;
 	m_chainCnt = 0;
 	m_maxChainCnt = 0;
 	m_score = 0;
-	m_readyTimeCnt = READY_TIME;
+
+	m_sendObstacleCnt = 0;
+	m_sendObstacleCntTemp = 0;
+	m_receiveFlg = false;
+	
 	m_waitTimeCnt = WAIT_TIME;
 	m_downHoldTimeCnt = INIT_HOLD_TIME;
 	m_leftHoldTimeCnt = INIT_HOLD_TIME;
 	m_rightHoldTimeCnt = INIT_HOLD_TIME;
-	m_eFlow = Flow::Ready;
+	m_eFlow = Flow::Drop;
 
 	if (!vsAiFlg)
 	{
 		m_pos.x = INIT_POSITION_X;
 		m_pos.y = INIT_POSITION_Y;
-		//再生
-		m_gameBGM.Play();
 	}
 	else
 	{
@@ -121,9 +111,8 @@ void CPlayer::Initialize(bool vsAiFlg)
 	m_eRotation = Rotation::Top;
 	m_rotateTimeCnt = QUICKTURN_RECEIPTION_TIME;
 	m_rotateCnt = 0;
-	m_endFlg = false;
 
-	fade.FadeIn();
+	m_deadFlg = false;
 }
 
 void CPlayer::ChainCheck(int y, int x)
@@ -132,41 +121,60 @@ void CPlayer::ChainCheck(int y, int x)
 		!m_puyoCheckFlg[y][x])
 	{
 		m_puyoCheckFlg[y][x] = true;
-		m_bondCnt++;
-		if (m_field[y][x] == m_field[y - 1][x])
+
+		int topObstaFlg = false;
+		int bottomObstaFlg = false;
+		int leftObstaFlg = false;
+		int rightObstaFlg = false;
+
+		if (m_field[y - 1][x] == Obstacle)
+		{
+			topObstaFlg = true;
+			m_puyoCheckFlg[y - 1][x] = true;
+		}
+		if (m_field[y][x + 1] == Obstacle)
+		{
+			rightObstaFlg = true;
+			m_puyoCheckFlg[y][x + 1] = true;
+		}
+		if (m_field[y + 1][x] == Obstacle)
+		{
+			bottomObstaFlg = true;
+			m_puyoCheckFlg[y + 1][x] = true;
+		}
+		if (m_field[y][x - 1] == Obstacle)
+		{
+			leftObstaFlg = true;
+			m_puyoCheckFlg[y][x - 1] = true;
+		}
+
+
+		//連結数 + 1
+		//if(!topObstaFlg && !rightObstaFlg && !bottomObstaFlg && !leftObstaFlg)
+			m_bondCnt++;
+
+
+		if (m_field[y][x] == m_field[y - 1][x] && !topObstaFlg)
 		{
 			ChainCheck(y - 1, x);
 		}
-		if (m_field[y][x] == m_field[y][x + 1])
+		if (m_field[y][x] == m_field[y][x + 1] && !rightObstaFlg)
 		{
 			ChainCheck(y, x + 1);
 		}
-		if (m_field[y][x] == m_field[y + 1][x])
+		if (m_field[y][x] == m_field[y + 1][x] && !bottomObstaFlg)
 		{
 			ChainCheck(y + 1, x);
 		}
-		if (m_field[y][x] == m_field[y][x - 1])
+		if (m_field[y][x] == m_field[y][x - 1] && !leftObstaFlg)
 		{
 			ChainCheck(y, x - 1);
 		}
 	}
 }
 
-void CPlayer::Update(bool vsAiFlg)
+void CPlayer::Update(bool vsAiFlg, int receiveObstacleCnt)
 {
-	//フェードの処理
-	fade.Update();
-	if (fade.GetFadeIn() || fade.GetFadeOut())
-	{
-		return;
-	}
-	else if (m_endFlg)
-	{
-		m_gameBGM.Stop();
-		m_gameOverSound.Stop();
-		gChangeScene = SCENENO_TITLE;
-	}
-
 	if (vsAiFlg)
 	{
 		m_AI.Update();
@@ -175,12 +183,6 @@ void CPlayer::Update(bool vsAiFlg)
 	//処理全体の流れ
 	switch (m_eFlow)
 	{
-	case Flow::Ready:
-		ReadyUpdate();
-		break;
-	case Flow::Pause:
-		PauseUpdate();
-		break;
 	case Flow::Drop:
 		DropUpdate(vsAiFlg);
 		break;
@@ -188,56 +190,18 @@ void CPlayer::Update(bool vsAiFlg)
 		TearUpdate();
 		break;
 	case Flow::Chain:
-		ChainUpdate();
+		ChainUpdate(receiveObstacleCnt);
 		break;
 	case Flow::ReStart:
 		ReStartUpdate(vsAiFlg);
 		break;
-	case Flow::GameOver:
-		GameOverUpdate();
-		break;
 	}
 
 }
 
-void CPlayer::ReadyUpdate()
-{
-	if (m_readyTimeCnt <= 0)
-	{
-		m_eFlow = Drop;
-	}
-	else
-	{
-		m_readyTimeCnt--;
-	}
-}
-
-void CPlayer::PauseUpdate()
-{
-	if (g_pInput->IsKeyPush(MOFKEY_ESCAPE))
-	{
-		m_pauseSound.Play();
-		m_gameBGM.SetVolume(0.05f);
-		m_eFlow = Drop;
-	}
-	if (g_pInput->IsKeyPush(MOFKEY_RETURN))
-	{
-		fade.FadeOut();
-		m_endFlg = true;
-
-	}
-}
 
 void CPlayer::DropUpdate(bool vsAiFlg)
 {
-	//ポーズ
-	if (g_pInput->IsKeyPush(MOFKEY_ESCAPE))
-	{
-		m_pauseSound.Play();
-		m_gameBGM.SetVolume(0.01f);
-		m_eFlow = Pause;
-	}
-
 	//自由落下
 	if (m_dropTimeCnt < 0)
 	{
@@ -282,6 +246,11 @@ void CPlayer::DropUpdate(bool vsAiFlg)
 		m_dropTimeCnt--;
 	}
 
+	if (m_field[1][3] != Empty)
+	{
+		return;
+	}
+
 	Movement(vsAiFlg);
 
 	Rotate(vsAiFlg);
@@ -323,7 +292,7 @@ void CPlayer::TearUpdate()
 	}
 }
 
-void CPlayer::ChainUpdate()
+void CPlayer::ChainUpdate(int receiveObstacleCnt)
 {
 	if (m_waitTimeCnt < 0) {
 		//連鎖のチェック
@@ -398,11 +367,10 @@ void CPlayer::ChainUpdate()
 			if (m_field[0][3] == Red ||
 				m_field[0][3] == Blue ||
 				m_field[0][3] == Yellow ||
-				m_field[0][3] == Green)
+				m_field[0][3] == Green ||
+				m_field[0][3] == Obstacle)
 			{
-				m_gameBGM.Stop();
-				m_gameOverSound.Play();
-				m_eFlow = GameOver;
+				m_deadFlg = true;
 			}
 			else
 			{
@@ -418,6 +386,41 @@ void CPlayer::ChainUpdate()
 					m_score += m_chainCnt * 100;
 				}
 
+				if (m_chainCnt >= 2)
+				{
+					m_sendObstacleCnt += (m_chainCnt - 1) * 3;
+				}		
+				m_chainCnt = 0;
+
+				//todo: おじゃまぷよ降らせる
+				if (receiveObstacleCnt - m_sendObstacleCnt > 0)
+				{
+					
+					//こんなかんじ,乱数でお邪魔ぷよの数分
+					for (int i = receiveObstacleCnt; i > 0; i--)
+					{
+						for (int a = 0; a < 9999; a++)
+						{
+							int setPosX = m_obstaSetPosRandom.Random(1, 7);
+							int setPosY = m_obstaSetPosRandom.Random(0, 5);
+
+							if (m_field[setPosY][setPosX] == Empty)
+							{
+								m_field[setPosY][setPosX] = Obstacle;
+								break;
+							}
+						}
+					}
+
+					m_receiveFlg = true;
+
+					//おじゃまぷよを降らすため、ちぎりに移る
+					m_eFlow = Tear;
+
+					return;
+				}
+
+				//再度ぷよを降らせるの準備工程に移る
 				m_eFlow = ReStart;
 			}
 		}
@@ -436,17 +439,17 @@ void CPlayer::ReStartUpdate(bool vsAiFlg)
 
 	//次回のぷよを格納しておくため
 	//ぷよの色をランダムで決める
-	m_type[1][0] = m_random.Random(Red, TypeCount);
-	m_type[1][1] = m_random.Random(Red, TypeCount);
+	m_type[1][0] = m_random.Random(Red, Obstacle);
+	m_type[1][1] = m_random.Random(Red, Obstacle);
 
 	//色々初期値
 	m_dropTimeCnt = DROP_SPEED;
 	m_chainCnt = 0;
+	m_receiveFlg = false;
 
 	//連鎖音のピッチのリセット
 	m_chainSound.SetPitch(1.0f);
 
-	m_eFlow = Flow::Drop;
 	if (!vsAiFlg)
 	{
 		m_pos.x = INIT_POSITION_X;
@@ -462,17 +465,11 @@ void CPlayer::ReStartUpdate(bool vsAiFlg)
 	m_sFldPos.x = INIT_FIELD_POSITION_X;
 	m_sFldPos.y = INIT_FIELD_POSITION_Y;
 	m_eRotation = Rotation::Top;
+
+	//落とす工程に移る
+	m_eFlow = Flow::Drop;
 }
 
-void CPlayer::GameOverUpdate()
-{
-	if (g_pInput->IsKeyPush(MOFKEY_RETURN))
-	{
-		fade.FadeOut();
-		m_endFlg = true;
-
-	}
-}
 
 void CPlayer::Movement(bool vsAiFlg)
 {
@@ -732,12 +729,8 @@ void CPlayer::Rotate(bool vsAiFlg)
 	}
 }
 
-void CPlayer::Render(bool vsAiFlg)
-{
-	//背景
-	//m_BackTexture.Render(0, 0);
-	
-
+void CPlayer::Render(bool vsAiFlg, bool readyFlg, int receiveObstacleCnt)
+{	
 	if (!vsAiFlg)
 	{
 		//パズル部分の背景
@@ -751,12 +744,8 @@ void CPlayer::Render(bool vsAiFlg)
 		CGraphicsUtilities::RenderFillRect(455, 130, 495, 200, MOF_COLOR_CBLACK);
 		NextPuyoRender(460, 135);
 		//操作中のぷよの描画
-		MovingPuyoRender();
-		// ゲームオーバーメッセージ
-		if (m_eFlow == GameOver)
-		{
-			m_GameOverTexture.Render(100, 100);
-		}
+		MovingPuyoRender(readyFlg);
+
 		//連鎖表示
 		if (m_chainCnt >= 1)
 		{
@@ -766,6 +755,16 @@ void CPlayer::Render(bool vsAiFlg)
 		//開幕にブロックが見えないように、画面上部を隠す
 		CGraphicsUtilities::RenderFillRect(BL, 50, BL * 9, BL * 2, MOF_COLOR_BLACK);
 
+		//蓄積おじゃまぷよ	
+		CGraphicsUtilities::RenderFillRect(68, 13, 102, 47, MOF_COLOR_WHITE);
+		CGraphicsUtilities::RenderRect(68, 13, 102, 47, MOF_COLOR_BLACK);
+		m_ObstaclePuyoTexture.RenderScale(70, 15, 0.6f);
+		CGraphicsUtilities::RenderString(110, 17, MOF_COLOR_BLACK, "×");
+		CGraphicsUtilities::RenderString(140, 17, MOF_COLOR_BLACK, "%d", receiveObstacleCnt);
+
+		//you
+		CGraphicsUtilities::RenderString(220, 17, MOF_COLOR_BLACK, "YOU");
+		CGraphicsUtilities::RenderLine(220, 40, 260, 40, MOF_COLOR_RED);
 	}
 	else
 	{
@@ -780,12 +779,8 @@ void CPlayer::Render(bool vsAiFlg)
 		CGraphicsUtilities::RenderFillRect(530, 130, 570, 200, MOF_COLOR_CBLACK);
 		NextPuyoRender(535, 135);
 		//操作中のぷよの描画
-		MovingPuyoRender();
-		// ゲームオーバーメッセージ
-		if (m_eFlow == GameOver)
-		{
-			m_GameOverTexture.Render(SW - 400, 100);
-		}
+		MovingPuyoRender(readyFlg);
+
 		//連鎖表示
 		if (m_chainCnt >= 1)
 		{
@@ -794,43 +789,20 @@ void CPlayer::Render(bool vsAiFlg)
 		}
 		//開幕にブロックが見えないように、画面上部を隠す
 		CGraphicsUtilities::RenderFillRect((SW - 500) + BL, 50, (SW - 500) + BL * 9, BL * 2, MOF_COLOR_BLACK);
+
+		//蓄積おじゃまぷよ
+		CGraphicsUtilities::RenderFillRect(SW - 500 + 66, 13, SW - 500 + 100, 47, MOF_COLOR_WHITE);
+		CGraphicsUtilities::RenderRect(SW - 500 + 66, 13, SW - 500 + 100, 47, MOF_COLOR_BLACK);
+		m_ObstaclePuyoTexture.RenderScale(SW - 500 + 68, 15, 0.6f);
+		CGraphicsUtilities::RenderString(SW - 500 + 108, 17, MOF_COLOR_BLACK, "×");
+		CGraphicsUtilities::RenderString(SW - 500 + 138, 17, MOF_COLOR_BLACK, "%d", receiveObstacleCnt);
+
+		//cpu
+		CGraphicsUtilities::RenderString(SW - 500 + 218, 17, MOF_COLOR_BLACK, "CPU");
+		CGraphicsUtilities::RenderLine(SW - 500 + 218, 40, SW - 500 + 258, 40, MOF_COLOR_RED);
 	}
 
 
-	//カウントダウン表示
-	if (m_eFlow == Ready)
-	{
-		if (m_readyTimeCnt >= 110)
-			CGraphicsUtilities::RenderString(470, 350, MOF_COLOR_BLACK, "Ready");
-		else if (m_readyTimeCnt >= 20)
-			CGraphicsUtilities::RenderString(480, 350, MOF_COLOR_BLACK, "Go");
-	}
-
-	
-
-	////スコア
-	//if (!vsAiFlg)
-	//	CGraphicsUtilities::RenderString(800, 138, MOF_COLOR_BLACK, "%d", m_score);
-
-	////最大連鎖数
-	//if (!vsAiFlg)
-	//	CGraphicsUtilities::RenderString(900, 210, MOF_COLOR_BLACK, "%d", m_maxChainCnt);
-
-	
-
-	////escでポーズ
-	//CGraphicsUtilities::RenderString(885, 12, MOF_COLOR_BLACK, "Pause[Esc]");
-
-	////ポーズ
-	//if (m_eFlow == Pause)
-	//{
-	//	//後ろを暗くする
-	//	CGraphicsUtilities::RenderFillRect(0, 0, 1024, 768, MOF_ARGB(150, 0, 0, 0));
-	//	//ポーズ画面の描画
-	//	m_PauseTexture.Render(256, 167);
-	//}
-
-	fade.Render();
 }
 
 void CPlayer::Release(void)
@@ -840,19 +812,15 @@ void CPlayer::Release(void)
 	m_BluePuyoTexture.Release();
 	m_YellowPuyoTexture.Release();
 	m_GreenPuyoTexture.Release();
-	m_BackTexture.Release();
+	m_ObstaclePuyoTexture.Release();
 	m_CrossMarkTexture.Release();
-	m_GameOverTexture.Release();
-	m_PauseTexture.Release();
 
 	//音の解放
 	m_chainSound.Release();
 	m_moveSound.Release();
 	m_setSound.Release();
 	m_rotateSound.Release();
-	m_gameBGM.Release();
-	m_pauseSound.Release();
-	m_gameOverSound.Release();
+
 }
 
 void CPlayer::FieldRender(int initPosX)
@@ -877,6 +845,10 @@ void CPlayer::FieldRender(int initPosX)
 			if (m_field[y][x] == Red)
 			{
 				m_RedPuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
+			}
+			if (m_field[y][x] == Obstacle)
+			{
+				m_ObstaclePuyoTexture.Render(initPosX + x * BL, BL * 2 + y * BL);
 			}
 			if (m_field[y][x] == Wall)
 			{
@@ -914,9 +886,9 @@ void CPlayer::NextPuyoRender(int x, int y)
 		m_GreenPuyoTexture.RenderScale(x, y + 30, 0.6f);
 }
 
-void CPlayer::MovingPuyoRender()
+void CPlayer::MovingPuyoRender(bool readyFlg)
 {
-	if (m_eFlow == Drop || m_eFlow == Pause) {
+	if (m_eFlow == Drop && readyFlg) {
 		//本体
 		if (m_type[0][0] == Red)
 			m_RedPuyoTexture.Render(m_pos.x, m_pos.y);

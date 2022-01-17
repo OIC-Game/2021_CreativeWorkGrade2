@@ -22,8 +22,7 @@
 //スピン初期値
 #define		INIT_SPIN_X				0
 #define		INIT_SPIN_Y				-50.0f
-//レディカウントが表示される時間
-#define		READY_TIME				200
+
 //ぷよが長押しによってすばやく移動するようになるまでにかかる時間
 #define		INIT_HOLD_TIME			10
 //操作不能待ち時間
@@ -39,6 +38,7 @@ enum Type
 	Blue,
 	Yellow,
 	Green,
+	Obstacle,
 
 	TypeCount,
 };
@@ -55,13 +55,10 @@ enum Rotation
 //全体の流れ
 enum Flow
 {
-	Ready,
-	Pause,
 	Drop,
 	Tear,
 	Chain,
 	ReStart,
-	GameOver,
 };
 
 struct FieldPos
@@ -87,8 +84,7 @@ private:
 	int			m_rotateTimeCnt;
 	//また後で名前変える　　間を生み出すためタイム変数
 	int			m_waitTimeCnt;
-	//readyカウント
-	int			m_readyTimeCnt;
+
 	//ぷよを長押しによって移動させる際に動くを抑制するためのタイム
 	int			m_downHoldTimeCnt;
 	int			m_leftHoldTimeCnt;
@@ -114,7 +110,12 @@ private:
 	//連鎖数
 	int			m_chainCnt;
 
-	bool		m_endFlg;
+	//おじゃまぷよ
+	int			m_sendObstacleCnt;
+	int			m_sendObstacleCntTemp;
+	bool		m_receiveFlg;
+
+	bool		m_deadFlg;
 
 	//操作するぷよ座標
 	Vector2		m_pos;
@@ -128,32 +129,23 @@ private:
 	Flow		m_eFlow;
 	//乱数
 	CRandom		m_random;
+	CRandom		m_obstaSetPosRandom;
 
 	//ぷよ素材
 	CTexture    m_RedPuyoTexture;
 	CTexture    m_BluePuyoTexture;
 	CTexture    m_YellowPuyoTexture;
 	CTexture    m_GreenPuyoTexture;
-	//背景
-	CTexture	m_BackTexture;
+	CTexture	m_ObstaclePuyoTexture;
 	//ゲームオーバーのバツ部分
 	CTexture	m_CrossMarkTexture;
-	//ゲームオーバー時の背景
-	CTexture	m_GameOverTexture;
-	//ポーズ画面
-	CTexture    m_PauseTexture;
 
 	//音素材
 	CSoundBuffer	m_chainSound;
 	CSoundBuffer	m_moveSound;
 	CSoundBuffer	m_setSound;
 	CSoundBuffer	m_rotateSound;
-	CSoundBuffer	m_gameBGM;
-	CSoundBuffer	m_pauseSound;
-	CSoundBuffer	m_gameOverSound;
 
-	//フェード用
-	CFade			fade;
 
 public:
 	CPlayer();
@@ -161,21 +153,18 @@ public:
 	void Load(void);
 	void Initialize(bool vsAiFlg);
 	void ChainCheck(int y, int x);
-	void Update(bool vsAiFlg);
-	void ReadyUpdate();
-	void PauseUpdate();
+	void Update(bool vsAiFlg, int receiveObstacleCnt);
 	void DropUpdate(bool vsAiFlg);
 	void TearUpdate();
-	void ChainUpdate();
+	void ChainUpdate(int receiveObstacleCnt);
 	void ReStartUpdate(bool vsAiFlg);
-	void GameOverUpdate();
 	void Movement(bool vsAiFlg);
 	void Rotate(bool vsAiFlg);
-	void Render(bool vsAiFlg);
+	void Render(bool vsAiFlg, bool readyFlg, int receiveObstacleCnt);
 	void Release(void);
 	void FieldRender(int initPosX);
 	void NextPuyoRender(int x, int y);
-	void MovingPuyoRender();
+	void MovingPuyoRender(bool readyFlg);
 	bool IsWall(int way)
 	{
 		//todo:enum作ってわかりやすくする leftwall,rightwall,てきな
@@ -232,6 +221,29 @@ public:
 		}
 
 		return false;
+	}
+	int GetScore()
+	{
+		return m_score;
+	}
+	int GetMaxChain()
+	{
+		return m_maxChainCnt;
+	}
+	bool GetDead() {
+		return m_deadFlg;
+	}
+	int GetSendObstacleCnt()
+	{
+		return m_sendObstacleCnt;
+	}
+	void SetSendObstacleCnt(int num)
+	{
+		m_sendObstacleCnt = num;
+	}
+	bool GetReceive()
+	{
+		return m_receiveFlg;
 	}
 };
 

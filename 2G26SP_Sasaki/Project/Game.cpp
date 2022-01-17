@@ -56,7 +56,7 @@ void CGame::Initialize(void) {
 	cnt = 0;
 	//デバック用
 	//ステージのスクロール値
-	g_Stage.MoveScroll(4800);
+	//g_Stage.MoveScroll(4800);
 }
 
 void CGame::Update(void) {

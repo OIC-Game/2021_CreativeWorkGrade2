@@ -32,7 +32,7 @@ public:
 
 	~CPuyo();
 
-	void Render(int x, int y, bool isInv);
+	void Render(int x, int y, bool isInv, int pos);
 
 	int GetColor() { return thisColor; }
 	void SetColor(int c) { thisColor = c; }

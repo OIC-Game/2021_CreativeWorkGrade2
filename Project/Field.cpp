@@ -41,25 +41,24 @@ void CField::Initialize(void)
 	for (int i = 0; i < 3; i++) AddPuyo();
 
 	//デバッグ用
+	/*
 	for (int i = 0; i < 3; i++) {
 		mainField[0][12 - i].SetColor(5);
 		mainField[0][12 - i].SetIsHide(false);
 	}
-	/*
 	score = 15000;
 	mainField[0][12].SetIsHide(false);
 	*/
-
 }
 
-void CField::Render(void) 
+void CField::Render(int posF, int posN1, int posN2, int posS, int posC)
 {
 	if (isInv) invCnt++;
 
 	//操作ぷよ描写
 	for (int i = 0; i < 2; i++) 
 	{
-		if (puyoCon[i][1] > 0) CGraphicsUtilities::RenderFillCircle(125 + 50 * puyoCon[i][0], 50 + 50 * (puyoCon[i][1] - 1), 25, color[puyoCon[i][2] - 1]);
+		if (puyoCon[i][1] > 0) CGraphicsUtilities::RenderFillCircle(posF + 50 * puyoCon[i][0], 50 + 50 * (puyoCon[i][1] - 1), 25, color[puyoCon[i][2] - 1]);
 	}
 
 	/*float cir = 0.0f * M_PI / 180;
@@ -72,11 +71,11 @@ void CField::Render(void)
 			//if (field[x][y] != 0 && y != 0) CGraphicsUtilities::RenderFillCircle(125 + 50 * x, 50 + 50 * (y - 1), 25, color[field[x][y] - 1]);
 			if(invCnt > 5)
 			{
-				mainField[x][y].Render(x, y, true);
+				mainField[x][y].Render(x, y, true, posF);
 			}
 			else
 			{
-				mainField[x][y].Render(x, y, false);
+				mainField[x][y].Render(x, y, false, posF);
 			}
 		}
 	}
@@ -84,20 +83,20 @@ void CField::Render(void)
 	if (invCnt == 6) invCnt = 0;
 
 	//１個先ぷよ予測
-	for (int i = 0; i < 2; i++) CGraphicsUtilities::RenderFillCircle(450, 185 - 50 * i, 25, color[next[0][i] - 1]);
+	for (int i = 0; i < 2; i++) CGraphicsUtilities::RenderFillCircle(posN1, 185 - 50 * i, 25, color[next[0][i] - 1]);
 	
 	//２個先ぷよ予測
-	for (int i = 0; i < 2; i++) CGraphicsUtilities::RenderFillCircle(495, 235 - 30 * i, 15, color[next[1][i] - 1]);
+	for (int i = 0; i < 2; i++) CGraphicsUtilities::RenderFillCircle(posN2, 235 - 30 * i, 15, color[next[1][i] - 1]);
 	
 	//ストック
-	for (int i = 0; i < 2; i++) CGraphicsUtilities::RenderFillCircle(55, 165 - 30 * i, 15, color[stock[i] - 1]);
+	for (int i = 0; i < 2; i++) CGraphicsUtilities::RenderFillCircle(posS, 165 - 30 * i, 15, color[stock[i] - 1]);
 
 	//連鎖表記
-	if (combo >= 2) CGraphicsUtilities::RenderString(250, 400, "%dChain!", combo);
+	if (combo >= 2) CGraphicsUtilities::RenderString(posC, 400, "%dChain!", combo);
 
 	if (GetNowState() == eGameover) {
-		CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() / 2, g_pGraphics->GetTargetHeight() / 2, "GameOver");
-		CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() / 2, g_pGraphics->GetTargetHeight() / 2 + 25, "Press Enter");
+		//CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() / 2, g_pGraphics->GetTargetHeight() / 2, "GameOver");
+		//CGraphicsUtilities::RenderString(g_pGraphics->GetTargetWidth() / 2, g_pGraphics->GetTargetHeight() / 2 + 25, "Press Enter");
 	}
 }
 
@@ -115,7 +114,9 @@ bool CField::Right(void) {
 	{
 		puyoCon[0][0]++;
 		puyoCon[1][0]++;
-		//gSound[0].Play();
+
+		if (!isAI)
+		gSound[0].Play();
 		return true;
 	}
 	return false;
@@ -128,19 +129,22 @@ bool CField::Left(void) {
 	{
 		puyoCon[0][0]--;
 		puyoCon[1][0]--;
-		//gSound[0].Play();
+
+		if (!isAI)
+		gSound[0].Play();
 		return true;
 	}
 	return false;
 }
 
-void CField::Down(void) {
+bool CField::Down(void) {
 	if (puyoCon[0][1] != 12 && puyoCon[1][1] != 12 &&
 		//field[drop[0][0]][drop[0][1] + 1] == 0 && field[drop[1][0]][drop[1][1] + 1] == 0)
 		mainField[puyoCon[0][0]][puyoCon[0][1] + 1].GetIsHide() && mainField[puyoCon[1][0]][puyoCon[1][1] + 1].GetIsHide())
 	{
 		puyoCon[0][1]++;
 		puyoCon[1][1]++;
+		return true;
 	}
 	else
 	{
@@ -150,9 +154,11 @@ void CField::Down(void) {
 		puyoCon[0][1] = -1;
 		puyoCon[1][1] = -1;
 
-		//gSound[2].Play();
+		if (!isAI)
+		gSound[2].Play();
 
 		nowState = eFall;
+		return false;
 	}
 }
 
@@ -167,17 +173,21 @@ bool CField::RRotate(void) {
 			{
 				puyoCon[1][0]++;
 				puyoCon[1][1]++;
-				//gSound[1].Play();
+
+				if (!isAI)
+				gSound[1].Play();
 				return true;
 			}
 		}
 		else if (puyoCon[1][0] - 1 >= 0 &&
 			//field[drop[1][0] - 1][drop[1][1] - 1] == 0)
-			mainField[puyoCon[1][0]][puyoCon[1][1] - 1].GetIsHide())
+			mainField[puyoCon[1][0] - 1][puyoCon[1][1]].GetIsHide())
 		{
 			puyoCon[1][0]--;
 			puyoCon[1][1]--;
-			//gSound[1].Play();
+
+			if (!isAI)
+			gSound[1].Play();
 			return true;
 		}
 	}
@@ -189,7 +199,9 @@ bool CField::RRotate(void) {
 		{
 			puyoCon[1][0]++;
 			puyoCon[1][1]--;
-			//gSound[1].Play();
+			
+			if (!isAI)
+			gSound[1].Play();
 			return true;
 		}
 	}
@@ -199,7 +211,9 @@ bool CField::RRotate(void) {
 	{
 		puyoCon[1][0]--;
 		puyoCon[1][1]++;
-		//gSound[1].Play();
+		
+		if(!isAI)
+		gSound[1].Play();
 		return true;
 	}
 
@@ -217,7 +231,9 @@ bool CField::LRotate(void) {
 			{
 				puyoCon[1][0]--;
 				puyoCon[1][1]++;
-				//gSound[1].Play();
+
+				if (!isAI)
+				gSound[1].Play();
 				return true;
 			}
 		}
@@ -227,7 +243,9 @@ bool CField::LRotate(void) {
 		{
 			puyoCon[1][0]++;
 			puyoCon[1][1]--;
-			//gSound[1].Play();
+			
+			if (!isAI)
+			gSound[1].Play();
 			return true;
 		}
 	}
@@ -239,7 +257,9 @@ bool CField::LRotate(void) {
 		{
 			puyoCon[1][0]++;
 			puyoCon[1][1]++;
-			//gSound[1].Play();
+			
+			if (!isAI)
+			gSound[1].Play();
 			return true;
 		}
 	}
@@ -249,7 +269,9 @@ bool CField::LRotate(void) {
 	{
 		puyoCon[1][0]--;
 		puyoCon[1][1]--;
-		//gSound[1].Play();
+		
+		if (!isAI)
+		gSound[1].Play();
 		return true;
 	}
 	return false;
@@ -268,7 +290,8 @@ void CField::Stock(void)
 		next[1][0] = random.Random(1, 6);
 		next[1][1] = random.Random(1, 6);
 
-		//gSound[3].Play();
+		if (!isAI)
+		gSound[3].Play();
 	}
 	else
 	{
@@ -282,7 +305,8 @@ void CField::Stock(void)
 		next[0][0] = a;
 		next[0][1] = b;
 
-		//gSound[3].Play();
+		if (!isAI)
+		gSound[3].Play();
 	}
 }
 
@@ -330,7 +354,9 @@ bool CField::CheckDelete(bool isCheck) {
 						didDel = true;
 
 						LinkManipulation(x, y, true);
-						//gSound[4].Play();
+						
+						if (!isAI)
+						gSound[4].Play();
 					}
 				}
 			}
@@ -488,9 +514,31 @@ void CField::CheckHollow(void) {
 
 }
 
-bool CField::CheckBottom(int x,int y){
-	for (; y < 13; y++) if (mainField[x][y].GetIsHide()) return false;
-	return true;
+int CField::CheckBottom(int x)
+{
+	for (int y = 0; y < 13; y++)
+	{
+		if (!mainField[x][y].GetIsHide()) return y;
+	}
+	return 12;
+}
+
+int CField::CheckBottomest()
+{
+	int ret = 0;
+	int rety = 0;
+	int y = 0;
+	for (int x = 0; x < 6; x++)
+	{
+		y = CheckBottom(x);
+		if (y == 12 && mainField[x][y].GetIsHide()) y++;
+		if (y >= rety)
+		{
+			ret = x;
+			rety = y;
+		}
+	}
+	return ret;
 }
 
 void CField::Set(int x,int y,int c) {

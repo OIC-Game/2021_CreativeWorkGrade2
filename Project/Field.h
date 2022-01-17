@@ -13,7 +13,7 @@ private:
 
 	//int field[6][13];						//主配列　画面描写/ぷよ保持用
 	int altField[6][13];					//副配列　連結数計算に使用
-	int puyoCon[2][3];							//操作中のぷよの座標・色を保持
+	int puyoCon[2][3];						//操作中のぷよの座標・色を保持
 	int next[2][2];							//２個先までのぷよの色を保持
 	int stock[2];							//ストック中のぷよの色を保持
 
@@ -47,7 +47,7 @@ private:
 	float waitTime = 0;
 	int invCnt = 0;
 	bool isInv = false;
-
+	bool isAI = false;
 
 	//int deletePuyo[5] = { 0 };
 	//float buffTime[5] = { 0 };
@@ -59,14 +59,14 @@ public:
 	enum tag_State { eDrop, eFall, eDelete, eBanish, eSet, eGameover };
 
 	void Initialize();
-	void Render();
+	void Render(int posF, int posN1, int posN2, int posS, int posC);
 	void Release();
 
 	bool Right();
 	bool Left();
 	bool RRotate();
 	bool LRotate();
-	void Down();
+	bool Down();
 	void Stock();
 
 	bool CheckDelete(bool isCheck);
@@ -79,10 +79,10 @@ public:
 	void AddPuyo();
 	void ScoreCheck();
 	bool CheckStop();
-	bool CheckBottom(int x, int y);
+	int CheckBottom(int x);
+	int CheckBottomest();
 	void Wait();
 	void Banish();
-
 
 	bool CheckGameOver() { return !mainField[2][1].GetIsHide(); }
 	bool CheckObstacle() { return obstacle > 0; }
@@ -96,6 +96,8 @@ public:
 	float GetObstacleTime() { return obstacleTime; }
 	int GetObstacleAmount() { return obstacleAmount; }
 	int GetScore() { return score; }
+	int GetCombo() { return combo; }
+	void SetAI() { isAI = true; }
 
 	std::array<int, 3> GetPuyoConM() { return { puyoCon[0][0],puyoCon[0][1],puyoCon[0][2] }; }
 	std::array<int, 3> GetPuyoConS() { return { puyoCon[1][0],puyoCon[1][1],puyoCon[1][2] }; }

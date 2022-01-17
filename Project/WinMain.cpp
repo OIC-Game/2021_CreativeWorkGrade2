@@ -9,7 +9,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	Mof::WINDOWSGAMEFRAMEWORKINITIALIZEINFO Info;
 	Info.WindowCreateInfo.hIcon = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	Info.pApplication = new CGameApp();
-	Info.WindowCreateInfo.Width = 540;
+	Info.WindowCreateInfo.Width = 1075;
 	Info.WindowCreateInfo.Height = 760;
 	if (pFrame->Initialize(&Info))
 	{

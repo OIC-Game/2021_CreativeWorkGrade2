@@ -157,13 +157,7 @@ bool CPlayer::Lood(void)
 			90, 64,
 			FALSE, { { 2, 0, 0 }, { 2, 1, 0 }, { 2, 2, 0 }, { 2, 3, 0 }, { 2, 4, 0 }, { 2, 5, 0 }, { 2, 6, 0 } }
 		},
-		//攻撃2
-		{
-			"攻撃2",
-			0, 420,
-			90, 64,
-			FALSE, { { 2, 0, 0 }, { 2, 1, 0 }, { 2, 2, 0 }, { 2, 3, 0 }, { 2, 4, 0 }, { 2, 5, 0 }, { 2, 6, 0 } }
-		},
+		
 		//ダメージ
 		{
 			"ダメージ",
@@ -316,7 +310,7 @@ void CPlayer::Update(void)
 		m_ItemArray[i].Update();
 	}
 
-	if (g_pInput->IsKeyPush(MOFKEY_C))
+	/*if (g_pInput->IsKeyPush(MOFKEY_C))
 	{
 		if (Characternumber == 0)
 		{
@@ -326,7 +320,7 @@ void CPlayer::Update(void)
 		{
 			Characternumber = 0;
 		}
-	}
+	}*/
 
 }
 
@@ -598,7 +592,7 @@ void CPlayer::Render(float wx, float wy)
 	}
 	else if (Characternumber == 1)
 	{
-		if (m_Motion.GetMotionNo() == MOTION_ATTACK)
+		if (m_Motion2.GetMotionNo() == MOTION_ATTACK)
 		{
 			px -= PLAYER_ATTACKWIDTH;
 		}
@@ -670,7 +664,7 @@ void CPlayer::CollisionStage(float ox, float oy)
 			if (m_bJump)
 			{
 				m_bJump = false;
-				m_Motion2.ChangeMotion(MOTION_JUMPEND);
+				m_Motion2.ChangeMotion(MOTION_JUMPEND2);
 			}
 		}
 		else if (oy > 0 && m_MoveY < 0)
@@ -748,8 +742,8 @@ bool CPlayer::CollisionBlock(CBlock& Block, float ox, float oy)
 	if (prlg.CollisionRect(bl))
 	{
 		m_PosX += ox;
-		m_PosY += oy - 0.5;
-		m_MoveY += -50;
+		m_PosY += oy - 0.3;
+		//m_MoveY += -50;
 		//m_PosY += oy - 0.5;
 
 		if (oy < 40 && m_MoveY>0)
@@ -969,102 +963,117 @@ bool CPlayer::CollusionItem(CItem& itm)
 
 CRectangle CPlayer::GetRect(void)
 {
-	if (m_bJump == true)
+	if (Characternumber == 0)
 	{
-		return CRectangle(
-			m_PosX + 20, m_PosY + 40, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
-		);
-	}
-	else if (m_bDash == true)
-	{
-		return CRectangle(
-			m_PosX + 20, m_PosY + 40, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
-		);
-	}
+		if (m_bJump == true)
+		{
+			return CRectangle(
+				m_PosX + 20, m_PosY + 40, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
+			);
+		}
+		else if (m_bDash == true)
+		{
+			return CRectangle(
+				m_PosX + 20, m_PosY + 40, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
+			);
+		}
 
-	else
-	{
-		return CRectangle(
-			m_PosX + 20, m_PosY + 30, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
-		);
+		else
+		{
+			return CRectangle(
+				m_PosX + 20, m_PosY + 30, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
+			);
+		}
 	}
-
-	if (IsAttack())
+	else if (Characternumber == 1)
 	{
-		return CRectangle(m_PosX + PLAYER_RECTDECREASE, m_PosY + PLAYER_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - PLAYER_ATTACKWIDTH, m_PosY + m_SrcRect.GetHeight());
+		if (IsAttack())
+		{
+			return CRectangle(m_PosX + PLAYER_RECTDECREASE, m_PosY + PLAYER_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - PLAYER_ATTACKWIDTH, m_PosY + m_SrcRect.GetHeight());
+		}
+		return CRectangle(m_PosX+20  , m_PosY+20, m_PosX + m_SrcRect.GetWidth()-20 , m_PosY + m_SrcRect.GetHeight());
 	}
-	return CRectangle(m_PosX + PLAYER_RECTDECREASE, m_PosY + PLAYER_RECTDECREASE, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE, m_PosY + m_SrcRect.GetHeight());
 }
 
 CRectangle CPlayer::GetLEG(void)
 {
-	if (m_bJump == true)
+	if (Characternumber == 0)
 	{
-		return CRectangle(
-			m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 50, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
-		);
-	}
+		if (m_bJump == true)
+		{
+			return CRectangle(
+				m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 50, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
+			);
+		}
 
-	else if (m_bDash == true)
-	{
-		return CRectangle(
-			m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 60, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
-		);
-	}
 
-	else
-	{
-		return CRectangle(
-			m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 50, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
-		);
+		else if (m_bDash == true)
+		{
+			return CRectangle(
+				m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 60, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
+			);
+		}
+
+
+		else
+		{
+			return CRectangle(
+				m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 50, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight()
+			);
+		}
 	}
 }
 
 CRectangle CPlayer::Getbody(void)
 {
-
-
-	if (m_bJump == true)
+	if (Characternumber == 0)
 	{
-		return CRectangle(
-			m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 50, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 15
-		);
-	}
 
-	else if (m_bDash == true)
-	{
-		return CRectangle(
-			m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 50, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 5
-		);
-	}
+		if (m_bJump == true)
+		{
+			return CRectangle(
+				m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 50, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 15
+			);
+		}
 
-	else
-	{
-		return CRectangle(
-			m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 40, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 5
-		);
+		else if (m_bDash == true)
+		{
+			return CRectangle(
+				m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 50, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 5
+			);
+		}
+
+		else
+		{
+			return CRectangle(
+				m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 40, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 5
+			);
+		}
 	}
 }
 
 CRectangle CPlayer::Gethed(void)
 {
-	if (m_bJump == true)
+	if (Characternumber == 0)
 	{
-		return CRectangle
-		(m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 10, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 10
-		);
-	}
-	if (m_bDash == true)
-	{
-		return CRectangle
-		(m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 25, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 20
-		);
-	}
-	else
-	{
-		return CRectangle
-		(m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 20, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 15
-		);
+		if (m_bJump == true)
+		{
+			return CRectangle
+			(m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 10, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 10
+			);
+		}
+		if (m_bDash == true)
+		{
+			return CRectangle
+			(m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 25, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 20
+			);
+		}
+		else
+		{
+			return CRectangle
+			(m_PosX + PLAYER_RECTDECREASE + 10, m_PosY + PLAYER_RECTDECREASE + 20, m_PosX + m_SrcRect.GetWidth() - PLAYER_RECTDECREASE - 10, m_PosY + m_SrcRect.GetHeight() - 15
+			);
+		}
 	}
 }
 

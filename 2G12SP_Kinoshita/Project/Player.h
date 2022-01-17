@@ -21,7 +21,7 @@
 
 #define PLAYER_JUMP       -10.0f
 
-#define PLAYER_RECTDECREASE  10
+#define PLAYER_RECTDECREASE  12
 
 #define PLAYER_LEG            -5
 
@@ -101,7 +101,7 @@ private:
 		MOTION_JUMP2,
 		MOTION_JUMPEND2,
 		MOTION_ATTACK,
-		MOTION_ATTACK2,
+		
 		MOTION_DAMAGE2,
 		MOTION_DASHSTART,
 		MOTION_DASHEND,
@@ -135,14 +135,12 @@ public:
 	
 	bool IsDead(void) { return m_bDead; }
 
-
 	bool CollisionBlock(CBlock& Block,float ox,float oy);
 	bool CollisionQBlock(CQuestionBlock& QBlock,float ox,float oy);
 	
 	
 	bool CollisionGoal(CGoal& goal);
 	bool IsGoal(void) { return m_bGoal; }
-	/*bool CollisionbreakBlock(float ox,float oy);*/
 	bool CollisionbreakBlock(CbreakBlock& blo, float ox, float oy);
 
 	bool CollusionItem(CItem& itm);

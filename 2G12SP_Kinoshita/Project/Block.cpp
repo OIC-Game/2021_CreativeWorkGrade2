@@ -55,7 +55,7 @@ void CBlock::Render(float wx, float wy) {
 	
 	
 	//テクスチャの描画
-	m_pTexture->Render(m_Pos.x - wx, m_Pos.y - wy,dr);
+	//m_pTexture->Render(m_Pos.x - wx, m_Pos.y - wy,dr);
 	//m_pTexture->Render(0, 0);
 }
 

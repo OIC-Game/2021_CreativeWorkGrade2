@@ -263,15 +263,15 @@ bool CPlayer::Collision(CEnemy& ene)
 				}
 				CRectangle srec = ene.GetShot(t,i, j).GetRect();
 				//ÉvÉåÉCÉÑÅ[Ç∆ìGíeÇÃîªíË
-				//if (m_PlayerColor != enecolor)
-				//{
-				//	if (srec.CollisionRect(prec))
-				//	{
-				//		m_bDead = true;
-				//		ene.GetShot(t,i,j).SetShow(false);
-				//		return true;
-				//	}
-				//}
+				if (m_PlayerColor != enecolor)
+				{
+					if (srec.CollisionRect(prec))
+					{
+						m_bDead = true;
+						ene.GetShot(t,i,j).SetShow(false);
+						return true;
+					}
+				}
 			}
 		}
 	}
